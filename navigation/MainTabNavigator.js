@@ -68,6 +68,7 @@ export default createBottomTabNavigator({
                 shadowOpacity: 0.8,
                 shadowRadius: 2,
                 elevation: 1,
+                backgroundColor: '#111111'
             },
         }
     });

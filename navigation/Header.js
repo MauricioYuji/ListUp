@@ -8,25 +8,34 @@ import {
     Text,
     TouchableOpacity,
     View,
-    TextInput
+    TextInput,
+    TouchableHighlight
 } from 'react-native';
 import { WebBrowser, Icon, Constants } from 'expo';
 
 import { MonoText } from '../components/StyledText';
 
 export default class Header extends React.Component {
-
+    test() {
+        Alert.alert('teste');
+    }
 
     render() {
         return (
-            <View style={styles.searchbar}>
+            <View style={styles.searchbar} onPress={() => {
+                console.log('You tapped the button!');
+            }}>
+
                 <View style={styles.logobox}>
+                    <TouchableHighlight onPress={() => console.log('You tapped the button!')}>
                     <Image source={require('../assets/images/logo.png')} style={styles.logo} />
+                    </TouchableHighlight>
                 </View>
                 <View style={styles.searchbox}>
+                    <Image source={require('../assets/images/search-icon.png')} style={styles.searchicon} />
                     <TextInput
                         style={styles.inputsearch}
-                        placeholder="Type here to translate!"
+                        onPress={() => console.log("Pressed")}
                         onChangeText={(text) => this.setState({ text })}
                     />
                 </View>
@@ -42,12 +51,16 @@ export default class Header extends React.Component {
 
 const styles = StyleSheet.create({
     searchbar: {
-        width: '100%',
-        height: '7%',
-        backgroundColor: '#FFF',
+        position: 'absolute',
+        top: 0,
+        left: -5,
+        right: -5,
+        paddingLeft: 10,
+        paddingRight: 10,
+        height: 60,
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
         flexDirection: 'row',
         alignSelf: 'flex-start',
-        marginTop: Constants.statusBarHeight,
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -65,12 +78,21 @@ const styles = StyleSheet.create({
         width: 80,
         height: 24
     },
+    searchicon: {
+        position: 'absolute',
+        top: 20,
+        left: 10,
+        width: 24,
+        height: 20,
+        zIndex: 10
+    },
     inputsearch: {
-        backgroundColor: '#EEE',
+        backgroundColor: '#ccc',
+        position: 'relative',
         borderRadius: 20,
         height: 40,
         marginTop: 10,
-        paddingLeft: 10,
+        paddingLeft: 40,
         paddingRight: 10
     },
     logobox: {

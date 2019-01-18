@@ -1,11 +1,13 @@
 {
   "ExpandedNodes": [
     "",
+    "\\assets",
+    "\\assets\\images",
     "\\components",
     "\\constants",
     "\\navigation",
     "\\screens"
   ],
-  "SelectedNode": "\\app.json",
+  "SelectedNode": "\\screens\\HomeScreen.js",
   "PreviewInSolutionExplorer": false
 }
