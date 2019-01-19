@@ -1,5 +1,5 @@
 import React from 'react';
-//import * as firebase from 'firebase';
+import * as firebase from 'firebase';
 import {
     Image,
     Platform,
@@ -12,15 +12,56 @@ import {
 } from 'react-native';
 import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 
+import Dimensions from '../constants/Layout';
+import { getUserInfo, test } from '../components/Service';
 import { MonoText } from '../components/StyledText';
 
 export default class HomeScreen extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = { isLoading: true }
+    }
+
     static navigationOptions = {
         header: null,
     };
 
     componentDidMount() {
+        //var teste = Service.test();
+
+        //getUserInfo("asd")
+        //    .then((res) => {
+        //        console.log("res: ", res);
+        //        if (res.message === 'Not Found') {
+        //            this.setState({
+        //                error: 'User not found'
+        //            });
+        //        }
+        //        else {
+        //            this.props.navigator.push({
+        //                title: res.name || 'No Title',
+        //                passProps: { userInfo: res }
+        //            });
+        //            this.setState({
+        //                error: false,
+        //                username: ''
+        //            })
+        //        }
+        //    });
+
+
+        test()
+            .then((res) => {
+                console.log("res: ", res);
+               
+            });
+
+
+
+        console.log("LIST: ");
         var _self = this;
+        
         //firebase.database().ref('/Games').on('value', function (snapshot) {
         //    console.log(snapshot.val());
         //    _self.setState({
@@ -41,12 +82,6 @@ export default class HomeScreen extends React.Component {
                     style={styles.backgroundBanner} />
                 <View style={styles.content}>
                     <View style={styles.banner}>
-                        <Button
-                            onPress={() => {
-                                console.log('You tapped the button!');
-                            }}
-                            title="Press Me"
-                        />
                         <Text  style={styles.textWhite}>d anslkd maklsmd lkamsdl kmaslkd m</Text>
                         <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-Black' }]}>black</Text>
                         <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-BlackItalic' }]}>blackitalic</Text>
@@ -92,7 +127,7 @@ const styles = StyleSheet.create({
     },
     backgroundBanner: {
         width: '100%',
-        height: '100%',
+        height: Dimensions.window.height,
         position: 'absolute',
         top: 0,
         left: 0,

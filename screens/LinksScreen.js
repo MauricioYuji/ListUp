@@ -9,7 +9,6 @@ export default class LinksScreen extends React.Component {
     test() {
     }
     render() {
-        console.log('You tapped the button!');
         return (
             <ScrollView style={styles.container}>
                 {/* Go ahead and delete ExpoLinksView and replace it with your

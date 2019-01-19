@@ -1,11 +1,28 @@
 import React from 'react';
-import { Platform, StatusBar, StyleSheet, View, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import {
+    Platform,
+    StatusBar,
+    StyleSheet,
+    View,
+    TouchableWithoutFeedback,
+    Keyboard,
+} from 'react-native';
 import { AppLoading, Asset, Font, Icon, Constants } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
 import Header from './navigation/Header';
 import * as firebase from 'firebase';
 
 // Initialize Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyCFC4YSALGezCekcoPVY42gPGUKcQsmfD0",
+    authDomain: "teste-925f4.firebaseapp.com",
+    databaseURL: "https://teste-925f4.firebaseio.com",
+    projectId: "teste-925f4",
+    storageBucket: "teste-925f4.appspot.com",
+    messagingSenderId: "245054025436"
+};
+
+firebase.initializeApp(firebaseConfig);
 
 export default class App extends React.Component {
     state = {
@@ -77,9 +94,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         marginTop: Constants.statusBarHeight,
-        backgroundColor: '#000'
+        backgroundColor: '#000',
     },
     header: {
-        zIndex: 100
-    }
+        zIndex: 100,
+    },
 });

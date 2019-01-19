@@ -35,7 +35,6 @@ export default class Header extends React.Component {
                     <Image source={require('../assets/images/search-icon.png')} style={styles.searchicon} />
                     <TextInput
                         style={styles.inputsearch}
-                        onPress={() => console.log("Pressed")}
                         onChangeText={(text) => this.setState({ text })}
                     />
                 </View>
