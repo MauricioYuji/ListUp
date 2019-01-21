@@ -54,14 +54,14 @@ export default class HomeScreen extends React.Component {
         test()
             .then((res) => {
                 console.log("res: ", res);
-               
+
             });
 
 
 
         console.log("LIST: ");
         var _self = this;
-        
+
         //firebase.database().ref('/Games').on('value', function (snapshot) {
         //    console.log(snapshot.val());
         //    _self.setState({
@@ -82,31 +82,28 @@ export default class HomeScreen extends React.Component {
                     style={styles.backgroundBanner} />
                 <View style={styles.content}>
                     <View style={styles.banner}>
-                        <Text  style={styles.textWhite}>d anslkd maklsmd lkamsdl kmaslkd m</Text>
-                        <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-Black' }]}>black</Text>
-                        <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-BlackItalic' }]}>blackitalic</Text>
-                        <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-Bold' }]}>bold</Text>
-                        <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-BoldItalic' }]}>bolditalic</Text>
-                        <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-ExtraLightItalic' }]}>extralightitalic</Text>
-                        <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-Italic' }]}>italic</Text>
-                        <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-Light' }]}>light</Text>
-                        <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-LightItalic' }]}>lightitalic</Text>
-                        <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-Regular' }]}>regular</Text>
-                        <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-SemiBold' }]}>semibold</Text>
-                        <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-SemiBoldItalic' }]}>semibolditalic</Text>
+                        <View style={styles.bannerCard}>
+                            <Text style={styles.textWhite}>Call of Duty Black OPS IIII</Text>
+                        </View>
                     </View>
                     <View style={styles.grid}>
-                        <View style={styles.leftColumn}>
-                            <View style={styles.card}>
-                                <Text style={styles.textWhite}>B</Text>
-                            </View>
-                            <View style={styles.card}>
-                                <Text style={styles.textWhite}>C</Text>
-                            </View>
+                        <View style={styles.card}>
+                            <Text style={styles.textWhite}>B</Text>
                         </View>
-                        <View style={styles.rightColumn}>
-                            <Text style={styles.textWhite}>D</Text>
+                        <View style={styles.card}>
+                            <Text style={styles.textWhite}>C</Text>
                         </View>
+                    </View>
+                    <View style={styles.grid}>
+                        <View style={styles.card}>
+                            <Text style={styles.textWhite}>C</Text>
+                        </View>
+                        <View style={styles.card}>
+                            <Text style={styles.textWhite}>C</Text>
+                        </View>
+                    </View>
+                    <View style={styles.slidegroup}>
+                        <Text style={styles.textWhite}>D</Text>
                     </View>
                 </View>
             </View>
@@ -136,24 +133,38 @@ const styles = StyleSheet.create({
         zIndex: 0
     },
     banner: {
-        flex: 2,
+        flex: 3,
+        padding: 5,
+        marginBottom: 10
+    },
+    bannerCard: {
+        flex: 1,
+        borderRadius: 20,
+        borderWidth: 0.5,
+        borderColor: 'rgba(255,255,255,0.2)',
+        padding: 10,
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        justifyContent: 'flex-start'
+        
     },
     grid: {
-        flex: 3,
+        flex: 1,
         flexDirection: 'row',
-    },
-    leftColumn: {
-        flex: 6,
-        backgroundColor: '#FF0',
-        opacity: 0.3
+        paddingLeft: 5,
+        paddingRight: 5,
     },
     card: {
-        flex: 1,
+        borderRadius: 10,
+        margin: 3,
+        padding: 5,
+        backgroundColor: '#222',
+        flex: 1
     },
-    rightColumn: {
-        flex: 4,
-        backgroundColor: '#F0F',
-        opacity: 0.3
+    slidegroup: {
+        flex: 3,
+        padding: 10,
+        marginTop: 10
     },
     textWhite: {
         fontSize: 26,
