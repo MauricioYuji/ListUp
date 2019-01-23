@@ -9,26 +9,32 @@ import {
     TouchableOpacity,
     View,
     TextInput,
-    TouchableHighlight
+    TouchableHighlight,
+    DeviceEventEmitter
 } from 'react-native';
 import { WebBrowser, Icon, Constants } from 'expo';
 
 import { MonoText } from '../components/StyledText';
 
 export default class Header extends React.Component {
-    test() {
-        Alert.alert('teste');
+
+    constructor(props) {
+        super(props);
+    }
+
+    logoff() {
+        console.log("LOGOFF");
+        DeviceEventEmitter.emit('login', { logged: false });
     }
 
     render() {
+        // console.log("this.state: ", this.state);
         return (
-            <View style={styles.searchbar} onPress={() => {
-                console.log('You tapped the button!');
-            }}>
+            <View style={styles.searchbar}>
 
                 <View style={styles.logobox}>
-                    <TouchableHighlight onPress={() => console.log('You tapped the button!')}>
-                    <Image source={require('../assets/images/logo.png')} style={styles.logo} />
+                    <TouchableHighlight onPress={() => this.test()}>
+                        <Image source={require('../assets/images/logo.png')} style={styles.logo} />
                     </TouchableHighlight>
                 </View>
                 <View style={styles.searchbox}>
@@ -38,9 +44,11 @@ export default class Header extends React.Component {
                         onChangeText={(text) => this.setState({ text })}
                     />
                 </View>
-                <View style={styles.profilebox}>
-                    <View style={styles.profile} />
-                </View>
+                <TouchableHighlight onPress={() => this.logoff()}>
+                    <View style={styles.profilebox}>
+                        <View style={styles.profile} />
+                    </View>
+                </TouchableHighlight>
             </View>
         );
     }
@@ -57,7 +65,7 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         paddingRight: 10,
         height: 60,
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
         flexDirection: 'row',
         alignSelf: 'flex-start',
         shadowColor: "#000",
@@ -86,13 +94,14 @@ const styles = StyleSheet.create({
         zIndex: 10
     },
     inputsearch: {
-        backgroundColor: '#ccc',
+        backgroundColor: 'rgba(0,0,0,0.4)',
         position: 'relative',
         borderRadius: 20,
         height: 40,
         marginTop: 10,
         paddingLeft: 40,
-        paddingRight: 10
+        paddingRight: 10,
+        color: '#FFF'
     },
     logobox: {
         flex: 0,

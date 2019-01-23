@@ -3,14 +3,22 @@ import {
     Platform,
     StatusBar,
     StyleSheet,
+    ScrollView,
     View,
     TouchableWithoutFeedback,
     Keyboard,
+    Text,
+    Button,
+    AsyncStorage,
+    DeviceEventEmitter
 } from 'react-native';
 import { AppLoading, Asset, Font, Icon, Constants } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
 import Header from './navigation/Header';
+import Layout from './constants/Layout';
+
 import * as firebase from 'firebase';
+import LoginScreen from './screens/LoginScreen';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -27,9 +35,50 @@ firebase.initializeApp(firebaseConfig);
 export default class App extends React.Component {
     state = {
         isLoadingComplete: false,
+        showHeader: true,
+        logged: false
     };
+    _storeData = async (test) => {
+        try {
+            await AsyncStorage.setItem('tasks', test);
+        } catch (error) {
+            // Error saving data
+        }
+    }
+    _retrieveData = async () => {
+        try {
+            const value = await AsyncStorage.getItem('tasks');
+            if (value !== null) {
+                // We have data!!
+                this.setState({ test: value });
+                console.log(value);
+            }
+        } catch (error) {
+            // Error retrieving data
+        }
+    }
+    componentWillMount() {
+        //this._storeData('asd');
+        //this._retrieveData();
 
+        DeviceEventEmitter.addListener('eventKey', (data) => {
+            //console.log("data: ", data);
+            this.setState({ showHeader: data.showHeader });
+        });
+        DeviceEventEmitter.addListener('login', (data) => {
+            //console.log("data: ", data);
+            this.setState({ logged: data.logged });
+        });
+    }
+    test() {
+        this._storeData('123');
+        this.setState({ showHeader: !this.state.showHeader });
+    }
     render() {
+        let header;
+        if (this.state.showHeader) {
+            header = <Header style={styles.header} />;
+        }
         if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
             return (
                 <AppLoading
@@ -38,15 +87,22 @@ export default class App extends React.Component {
                     onFinish={this._handleFinishLoading}
                 />
             );
+        } else if (!this.state.logged) {
+            return (
+                <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1 }}
+                    keyboardShouldPersistTaps='handled'>
+                    <StatusBar barStyle="default" />
+                    <LoginScreen />
+                </ScrollView>
+            );
         } else {
             return (
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-                    <View style={styles.container}>
-                        <StatusBar barStyle="default" />
-                        <AppNavigator />
-                        <Header style={styles.header} />
-                    </View>
-                </TouchableWithoutFeedback>
+                <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1 }}
+                    keyboardShouldPersistTaps='handled'>
+                    <StatusBar barStyle="default" />
+                    <AppNavigator />
+                    {header}
+                </ScrollView>
             );
         }
     }

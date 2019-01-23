@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text } from 'react-native';
 import * as firebase from 'firebase';
+import Layout from '../constants/Layout';
 
 
 //export const getUserInfo = (name) => {
@@ -11,7 +12,7 @@ import * as firebase from 'firebase';
 //        .then((res) => res.json());
 //};
 export const test = () => {
-    return firebase.database().ref('/Games').once('value').then(function (snapshot) {
+    return firebase.database().ref('/Companies').once('value').then(function (snapshot) {
         return snapshot.val();
     });
     //firebase.database().ref('/Games').on('value', function (snapshot) {

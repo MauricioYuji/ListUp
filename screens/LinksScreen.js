@@ -27,7 +27,7 @@ export default class LinksScreen extends React.Component {
                 <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-Regular' }]}>regular</Text>
                 <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-SemiBold' }]}>semibold</Text>
                 <Text style={[styles.textWhite, { fontFamily: 'SourceSansPro-SemiBoldItalic' }]}>semibolditalic</Text>
-                
+
                 <Button
                     onPress={() => {
                         this.test();
