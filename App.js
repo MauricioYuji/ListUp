@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { AppLoading, Asset, Font, Icon, Constants } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
+import Auth from './navigation/Nav';
 import Header from './navigation/Header';
 import Layout from './constants/Layout';
 
@@ -32,48 +33,74 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
+
 export default class App extends React.Component {
     state = {
         isLoadingComplete: false,
+        skipLoadingScreen: false,
         showHeader: true,
-        logged: false
+        logged: false,
+        user: null
     };
-    _storeData = async (test) => {
+    _storeUser = async (user) => {
         try {
-            await AsyncStorage.setItem('tasks', test);
+            await AsyncStorage.setItem('user', user);
         } catch (error) {
             // Error saving data
         }
     }
-    _retrieveData = async () => {
+    _deleteUser = async () => {
         try {
-            const value = await AsyncStorage.getItem('tasks');
+            await AsyncStorage.removeItem('user');
+        } catch (error) {
+            // Error saving data
+        }
+    }
+    _getUser = async () => {
+        try {
+            const value = await AsyncStorage.getItem('user');
             if (value !== null) {
                 // We have data!!
-                this.setState({ test: value });
-                console.log(value);
+                //this.setState({ test: value });
+                this.setState({ user: JSON.parse(value) });
+                
             }
         } catch (error) {
             // Error retrieving data
         }
     }
     componentWillMount() {
+
+        // Listen for authentication state to change.
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user != null) {
+                this.setState({ logged: true });
+                this._storeUser(JSON.stringify(user));
+            } else {
+                this.setState({ logged: false });
+                this._deleteUser();
+            }
+            this._getUser();
+            this.setState({ isLoadingComplete: true });
+            // Do other things
+        });
+
         //this._storeData('asd');
         //this._retrieveData();
 
-        DeviceEventEmitter.addListener('eventKey', (data) => {
-            //console.log("data: ", data);
-            this.setState({ showHeader: data.showHeader });
-        });
-        DeviceEventEmitter.addListener('login', (data) => {
-            //console.log("data: ", data);
-            this.setState({ logged: data.logged });
-        });
+        //DeviceEventEmitter.addListener('eventKey', (data) => {
+        //    //console.log("data: ", data);
+        //    this.setState({ showHeader: data.showHeader });
+        //});
+        //DeviceEventEmitter.addListener('login', (data) => {
+        //    //console.log("data: ", data);
+        //    this.setState({ logged: data.logged });
+        //});
     }
-    test() {
-        this._storeData('123');
-        this.setState({ showHeader: !this.state.showHeader });
+    componentDidMount() {
+
     }
+    
     render() {
         let header;
         if (this.state.showHeader) {
@@ -92,7 +119,7 @@ export default class App extends React.Component {
                 <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1 }}
                     keyboardShouldPersistTaps='handled'>
                     <StatusBar barStyle="default" />
-                    <LoginScreen />
+                    <Auth />
                 </ScrollView>
             );
         } else {
@@ -142,7 +169,6 @@ export default class App extends React.Component {
     };
 
     _handleFinishLoading = () => {
-        this.setState({ isLoadingComplete: true });
     };
 }
 
@@ -154,5 +180,5 @@ const styles = StyleSheet.create({
     },
     header: {
         zIndex: 100,
-    },
+    }
 });

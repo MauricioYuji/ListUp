@@ -13,6 +13,7 @@ import {
     DeviceEventEmitter
 } from 'react-native';
 import { WebBrowser, Icon, Constants } from 'expo';
+import * as firebase from 'firebase';
 
 import { MonoText } from '../components/StyledText';
 
@@ -23,8 +24,12 @@ export default class Header extends React.Component {
     }
 
     logoff() {
-        console.log("LOGOFF");
-        DeviceEventEmitter.emit('login', { logged: false });
+        firebase.auth().signOut().then(function () {
+            // Sign-out successful.
+            //DeviceEventEmitter.emit('login', { logged: false });
+        }, function (error) {
+            // An error happened.
+        });
     }
 
     render() {

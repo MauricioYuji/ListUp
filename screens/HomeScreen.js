@@ -24,12 +24,29 @@ export default class HomeScreen extends React.Component {
         super(props);
     }
 
+    state = {
+        user: null
+    };
     static navigationOptions = {
         header: null,
     };
 
+    _getUser = async () => {
+        try {
+            const value = await AsyncStorage.getItem('user');
+            console.log("value: ", value);
+            if (value !== null) {
+                // We have data!!
+                //this.setState({ test: value });
+                this.setState({ user: JSON.parse(value) });
+
+            }
+        } catch (error) {
+            // Error retrieving data
+        }
+    }
     componentWillMount() {
-        DeviceEventEmitter.emit('eventKey', { showHeader: true });
+        this._getUser();
     }
     componentDidMount() {
         //var teste = Service.test();

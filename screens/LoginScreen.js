@@ -1,21 +1,40 @@
-import React from 'react';
+﻿import React from 'react';
 import { ScrollView, StyleSheet, Text, View, TextInput, CheckBox, DeviceEventEmitter, Image, TouchableOpacity, Switch } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
 import Layout from '../constants/Layout';
 import { Constants } from 'expo';
+import * as firebase from 'firebase';
 
 export default class LoginScreen extends React.Component {
     constructor(props) {
         super(props);
     }
+
+    static navigationOptions = {
+        header: null,
+    };
     state = {
-        secureTextEntry: true,
+        secureTextEntry: true, email: '', password: '', errorMessage: null
     };
 
     loggin() {
-        DeviceEventEmitter.emit('login', { logged: true });
+
+        const { email, password } = this.state;
+
+        firebase.auth().signInWithEmailAndPassword(email, password)
+            .then(() => {
+                this.setState({ errorMessage: null, loading: false });
+                //DeviceEventEmitter.emit('login', { logged: true });
+            })
+            .catch(() => {
+                this.setState({ errorMessage: 'Usuário ou senha inválidos!', loading: false });
+            });
     }
     render() {
+        let error;
+        if (this.state.errorMessage !== null) {
+            error = <Text style={styles.errorFeedback}>{this.state.errorMessage}</Text>;
+        }
         return (
             <View style={styles.container}
                 keyboardShouldPersistTaps='handled'>
@@ -25,18 +44,22 @@ export default class LoginScreen extends React.Component {
 
                     <Image source={require('../assets/images/logo.png')} style={styles.logo} />
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>EMAIL</Text>
                         <TextInput
-                            style={styles.input}
-                            onChangeText={(text) => this.setState({ text })}
+                            style={this.state.errorMessage !== null ? styles.inputerror : styles.input}
+                            autoCapitalize="none"
+                            placeholder="Email"
+                            onChangeText={email => this.setState({ email })}
+                            value={this.state.email}
                         />
                     </View>
                     <View style={styles.inputGroup}>
-                        <Text style={styles.label}>SENHA</Text>
                         <TextInput
-                            style={styles.input}
+                            style={this.state.errorMessage !== null ? styles.inputerror : styles.input}
+                            autoCapitalize="none"
+                            placeholder="Password"
+                            onChangeText={password => this.setState({ password })}
+                            value={this.state.password}
                             secureTextEntry={this.state.secureTextEntry}
-                            onChangeText={(text) => this.setState({ text })}
                         />
                     </View>
                     <View style={styles.inputGroupCheckbox}>
@@ -47,6 +70,18 @@ export default class LoginScreen extends React.Component {
                             value={!this.state.secureTextEntry} />
                         <TouchableOpacity onPress={() => this.setState({ secureTextEntry: !this.state.secureTextEntry })}>
                             <Text style={styles.infoText}>MOSTRAR SENHA</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View>
+                        {error}
+                    </View>
+                    <View>
+                        <TouchableOpacity onPress={() => {
+                            this.props.navigation.navigate('Register');
+                        }}>
+                            <Text style={styles.button}>
+                                CADASTRAR
+                        </Text>
                         </TouchableOpacity>
                     </View>
                     <TouchableOpacity onPress={() => {
@@ -94,13 +129,6 @@ const styles = StyleSheet.create({
         fontFamily: 'SourceSansPro-Bold',
         marginLeft: 5
     },
-    label: {
-        fontSize: 20,
-        color: '#FFF',
-        alignItems: 'flex-start',
-        width: '100%',
-        fontFamily: 'SourceSansPro-Bold'
-    },
     input: {
         backgroundColor: '#222',
         width: '100%',
@@ -109,6 +137,21 @@ const styles = StyleSheet.create({
         padding: 15,
         color: '#FFF',
         borderRadius: 10
+    },
+    inputerror: {
+        backgroundColor: '#222',
+        width: '100%',
+        height: 60,
+        marginTop: 10,
+        padding: 15,
+        color: '#FFF',
+        borderWidth: 1,
+        borderRadius: 10,
+        borderColor: '#D00',
+    },
+    errorFeedback: {
+        color: '#F00',
+        margin: 10
     },
     button: {
         marginTop: 30,
