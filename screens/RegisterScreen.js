@@ -1,9 +1,11 @@
 ﻿import React from 'react';
-import { ScrollView, StyleSheet, Text, View, TextInput, CheckBox, DeviceEventEmitter, Image, TouchableOpacity, Switch } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, TextInput, CheckBox, DeviceEventEmitter, Image, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
 import Layout from '../constants/Layout';
 import { Constants } from 'expo';
 import * as firebase from 'firebase';
+import { signInWithFacebook } from '../components/facebookAuth';
+import TabBarIcon from '../components/TabBarIcon';
 
 export default class RegisterScreen extends React.Component {
     constructor(props) {
@@ -29,15 +31,21 @@ export default class RegisterScreen extends React.Component {
             return true;
         }
     }
-    changeValue = (text) => {
-        console.log(text);
+    facebookloggin() {
+        this.setState({ loading: 'facebook' });
+        signInWithFacebook().then(() => {
+            this.setState({ loading: null });
+        })
+            .catch(() => {
+                this.setState({ errorMessage: null, loading: null });
+            });
     }
     register() {
 
         const { email, password, confirmpassword } = this.state;
 
         this.setState({
-            email: { value: this.state.email.value, errorMessage: null }, password: { value: this.state.password.value, errorMessage: null }, confirmpassword: { value: this.state.confirmpassword.value, errorMessage: null }
+            loading: 'register', email: { value: this.state.email.value, errorMessage: null }, password: { value: this.state.password.value, errorMessage: null }, confirmpassword: { value: this.state.confirmpassword.value, errorMessage: null }
         });
         var validate = true;
         if (email.value.length == 0) {
@@ -84,17 +92,18 @@ export default class RegisterScreen extends React.Component {
             firebase.auth().createUserWithEmailAndPassword(email.value, password.value)
                 .then(() => {
                     console.log("usuario criado");
-                    this.setState({ error: '', loading: false });
+                    this.setState({ error: '', loading: null });
                 })
                 .catch((e) => {
                     console.log("erro: ", e);
                     this.setState({
-                        email: { value: this.state.email.value, errorMessage: "Email já cadastrado!" }
+                        email: { value: this.state.email.value, errorMessage: "Email já cadastrado!", loading: null }
                     });
                 });
         }
     }
     render() {
+        const loadingButton = this.state.loading;
         let emailerrorMessage;
         let passworderrorMessage;
         let confirmpassworderrorMessage;
@@ -147,13 +156,46 @@ export default class RegisterScreen extends React.Component {
                         />
                         {confirmpassworderrorMessage}
                     </View>
-                    <TouchableOpacity onPress={() => {
-                        this.register();
-                    }}>
-                        <Text style={styles.button}>
-                            ENTRAR
+                    <View style={styles.buttonGroup}>
+                        <TouchableOpacity onPress={() => { this.props.navigation.navigate('Login'); }}>
+                            <Text style={[styles.button, styles.buttonSecondary]}>
+                                Voltar
                         </Text>
-                    </TouchableOpacity>
+                        </TouchableOpacity>
+                        <View style={[styles.button, styles.buttonPrimary]}>
+                        {loadingButton === "register" ? (
+                            <ActivityIndicator size="small" color="#FFFFFF" />
+                        ) : (
+                                <TouchableOpacity onPress={() => {
+                                    this.register();
+                                }}>
+                                        <Text style={styles.buttonText}>
+                                        Criar conta
+                        </Text>
+                                </TouchableOpacity>
+                                )}
+                        </View>
+                    </View>
+
+                    <View style={styles.divider}>
+                        <Text style={styles.dividerText}>OU</Text>
+                    </View>
+                    <View style={styles.facebookButton}>
+                        {loadingButton === "facebook" ? (
+                            <ActivityIndicator size="small" color="#FFFFFF" />
+                        ) : (
+                                <TouchableOpacity onPress={() => { this.facebookloggin(); }} style={styles.buttonGroup}>
+                                    <TabBarIcon
+                                        name={'facebook'}
+                                        type={'FontAwesome'}
+                                        style={styles.facebooklogo}
+                                    />
+                                    <Text style={styles.buttonText}>
+                                        Entrar com Facebook
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+                    </View>
                 </View>
 
             </View>
@@ -178,7 +220,7 @@ const styles = StyleSheet.create({
     },
     inputGroup: {
         width: '100%',
-        marginBottom: 20
+        marginBottom: 5
     },
     inputGroupCheckbox: {
         flexDirection: 'row',
@@ -215,9 +257,46 @@ const styles = StyleSheet.create({
     errorFeedback: {
         color: '#F00',
     },
+    buttonText: {
+        fontSize: 20,
+        color: '#FFF',
+        fontFamily: 'SourceSansPro-Bold'
+    },
+    buttonGroup: {
+        flexDirection: 'row',
+    },
+    facebookButton: {
+        flexDirection: 'row',
+        marginTop: 30,
+        backgroundColor: '#3A559F',
+        paddingTop: 15,
+        paddingBottom: 15,
+        paddingLeft: 30,
+        paddingRight: 30,
+        borderRadius: 5
+    },
+    facebooklogo: {
+        marginRight: 20
+    },
+    divider: {
+        borderBottomColor: '#444444',
+        borderBottomWidth: 1,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        marginTop: 20,
+        marginBottom: 0
+    },
+    dividerText: {
+        color: '#FFF',
+        fontSize: 20,
+        marginBottom: -12
+    },
     button: {
         marginTop: 30,
-        backgroundColor: '#006CD8',
+        marginLeft: 10,
+        marginRight: 10,
         fontSize: 20,
         paddingTop: 15,
         paddingBottom: 15,
@@ -226,5 +305,11 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontFamily: 'SourceSansPro-Bold',
         borderRadius: 5
+    },
+    buttonPrimary: {
+        backgroundColor: '#006CD8',
+    },
+    buttonSecondary: {
+        backgroundColor: '#444444',
     }
 });

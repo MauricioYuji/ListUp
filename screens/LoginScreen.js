@@ -1,36 +1,48 @@
 ﻿import React from 'react';
-import { ScrollView, StyleSheet, Text, View, TextInput, CheckBox, DeviceEventEmitter, Image, TouchableOpacity, Switch } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, TextInput, CheckBox, DeviceEventEmitter, Image, TouchableOpacity, Switch, Icon, ActivityIndicator } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
 import Layout from '../constants/Layout';
+import { signInWithFacebook } from '../components/facebookAuth';
 import { Constants } from 'expo';
 import * as firebase from 'firebase';
+import TabBarIcon from '../components/TabBarIcon';
 
 export default class LoginScreen extends React.Component {
-    constructor(props) {
-        super(props);
-    }
 
     static navigationOptions = {
         header: null,
     };
+    constructor(props) {
+        super(props);
+    }
     state = {
-        secureTextEntry: true, email: '', password: '', errorMessage: null
+        secureTextEntry: true, email: '', password: '', errorMessage: null, loading: null
     };
-
+    facebookloggin() {
+        this.setState({ loading: 'facebook' });
+        signInWithFacebook().then(() => {
+            this.setState({ loading: null });
+        })
+            .catch(() => {
+                this.setState({ errorMessage: null, loading: null });
+            });
+    }
     loggin() {
 
         const { email, password } = this.state;
 
+        this.setState({ loading: 'login' });
         firebase.auth().signInWithEmailAndPassword(email, password)
             .then(() => {
-                this.setState({ errorMessage: null, loading: false });
+                this.setState({ errorMessage: null, loading: null });
                 //DeviceEventEmitter.emit('login', { logged: true });
             })
             .catch(() => {
-                this.setState({ errorMessage: 'Usuário ou senha inválidos!', loading: false });
+                this.setState({ errorMessage: 'Usuário ou senha inválidos!', loading: null });
             });
     }
     render() {
+        const loadingButton = this.state.loading;
         let error;
         if (this.state.errorMessage !== null) {
             error = <Text style={styles.errorFeedback}>{this.state.errorMessage}</Text>;
@@ -56,41 +68,69 @@ export default class LoginScreen extends React.Component {
                         <TextInput
                             style={this.state.errorMessage !== null ? styles.inputerror : styles.input}
                             autoCapitalize="none"
-                            placeholder="Password"
+                            placeholder={this.state.secureTextEntry ? '********' : 'Password'}
                             onChangeText={password => this.setState({ password })}
                             value={this.state.password}
                             secureTextEntry={this.state.secureTextEntry}
                         />
+                        <TouchableOpacity style={styles.showPassword} onPress={() => this.setState({ secureTextEntry: !this.state.secureTextEntry })}>
+                            <Text style={styles.infoText}>MOSTRAR</Text>
+                        </TouchableOpacity>
                     </View>
-                    <View style={styles.inputGroupCheckbox}>
-                        <Switch
-                            trackColor={'#006CD8'}
-                            thumbColor={'#666'}
-                            onValueChange={() => this.setState({ secureTextEntry: !this.state.secureTextEntry })}
-                            value={!this.state.secureTextEntry} />
-                        <TouchableOpacity onPress={() => this.setState({ secureTextEntry: !this.state.secureTextEntry })}>
-                            <Text style={styles.infoText}>MOSTRAR SENHA</Text>
+                    <View style={styles.forgottenPassword}>
+                        <TouchableOpacity onPress={() => {
+                            this.props.navigation.navigate('ResetPassword');
+                        }}>
+                            <Text style={styles.forgottenPasswordbuttonText}>Esqueceu a senha?</Text>
                         </TouchableOpacity>
                     </View>
                     <View>
                         {error}
                     </View>
-                    <View>
-                        <TouchableOpacity onPress={() => {
+                    <View style={styles.buttonGroup}>
+                        <View style={[styles.button, styles.buttonSecondary]}>
+                            {loadingButton === "login" ? (
+                                <ActivityIndicator size="small" color="#FFFFFF" />
+                            ) : (
+                                    <TouchableOpacity onPress={() => {
+                                        this.loggin();
+                                    }}>
+
+
+                                        <Text style={styles.buttonText}>
+                                            Entrar
+                        </Text>
+                                    </TouchableOpacity>
+                                )}
+                        </View>
+                        <TouchableOpacity style={[styles.button, styles.buttonPrimary]} onPress={() => {
                             this.props.navigation.navigate('Register');
                         }}>
-                            <Text style={styles.button}>
-                                CADASTRAR
+                            <Text style={styles.buttonText}>
+                                Criar uma conta
                         </Text>
                         </TouchableOpacity>
                     </View>
-                    <TouchableOpacity onPress={() => {
-                        this.loggin();
-                    }}>
-                        <Text style={styles.button}>
-                            ENTRAR
-                        </Text>
-                    </TouchableOpacity>
+                    <View style={styles.divider}>
+                        <Text style={styles.dividerText}>OU</Text>
+                    </View>
+                    <View style={styles.facebookButton}>
+                        {loadingButton === "facebook" ? (
+                            <ActivityIndicator size="small" color="#FFFFFF" />
+                        ) : (
+                                <TouchableOpacity onPress={() => { this.facebookloggin(); }} style={styles.buttonGroup}>
+                                    <TabBarIcon
+                                        name={'facebook'}
+                                        type={'FontAwesome'}
+                                        style={styles.facebooklogo}
+                                    />
+                                    <Text style={styles.buttonText}>
+                                        Entrar com Facebook
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+                    </View>
+
                 </View>
 
             </View>
@@ -108,26 +148,60 @@ const styles = StyleSheet.create({
     logo: {
         marginBottom: 60
     },
+    forgottenPassword: {
+        width: '100%',
+        alignItems: 'flex-start',
+        margin: 10,
+    },
+    forgottenPasswordbuttonText: {
+        fontSize: 16,
+        fontFamily: 'SourceSansPro-Bold',
+        textDecorationLine: 'underline',
+        color:'#FFF'
+    },
+    divider: {
+        borderBottomColor: '#444444',
+        borderBottomWidth: 1,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        marginTop: 20,
+        marginBottom: 0
+    },
+    dividerText: {
+        color: '#FFF',
+        backgroundColor: '#111',
+        paddingLeft: 10,
+        paddingRight: 10,
+        fontSize: 20,
+        marginBottom: -12
+    },
     loginBox: {
         alignItems: 'center',
         justifyContent: 'center',
-        width: '70%',
+        width: '80%',
     },
     inputGroup: {
         width: '100%',
-        marginBottom: 20
+        marginBottom: 5,
+        position: 'relative'
     },
-    inputGroupCheckbox: {
-        flexDirection: 'row',
-        width: '100%',
-        alignItems: 'flex-start',
+    showPassword: {
+        marginLeft: 5,
+        position: 'absolute',
+        alignItems: 'center',
+        justifyContent: 'center',
+        top: 10,
+        right: 15,
+        bottom: 0,
+        zIndex: 100
     },
     infoText: {
-        color: '#FFF',
+        color: '#AAAAAA',
         lineHeight: 30,
         fontSize: 12,
         fontFamily: 'SourceSansPro-Bold',
-        marginLeft: 5
     },
     input: {
         backgroundColor: '#222',
@@ -153,16 +227,41 @@ const styles = StyleSheet.create({
         color: '#F00',
         margin: 10
     },
-    button: {
+    facebookButton: {
+        flexDirection: 'row',
         marginTop: 30,
-        backgroundColor: '#006CD8',
-        fontSize: 20,
+        backgroundColor: '#3A559F',
         paddingTop: 15,
         paddingBottom: 15,
         paddingLeft: 30,
         paddingRight: 30,
-        color: '#FFF',
-        fontFamily: 'SourceSansPro-Bold',
         borderRadius: 5
+    },
+    facebooklogo: {
+        marginRight: 20
+    },
+    buttonGroup: {
+        flexDirection: 'row',
+    },
+    buttonText: {
+        fontSize: 20,
+        color: '#FFF',
+        fontFamily: 'SourceSansPro-Bold'
+    },
+    button: {
+        marginTop: 30,
+        marginLeft: 10,
+        marginRight: 10,
+        paddingTop: 15,
+        paddingBottom: 15,
+        paddingLeft: 30,
+        paddingRight: 30,
+        borderRadius: 5
+    },
+    buttonPrimary: {
+        backgroundColor: '#006CD8',
+    },
+    buttonSecondary: {
+        backgroundColor: '#444444',
     }
 });

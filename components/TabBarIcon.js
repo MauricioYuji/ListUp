@@ -14,7 +14,7 @@ export default class TabBarIcon extends React.Component {
                 <Icon.Ionicons
                     name={this.props.name}
                     size={26}
-                    style={{ marginBottom: -3 }}
+                    style={[{ marginBottom: -3 }, this.props.style]}
                     color={this.props.focused ? Colors.tabIconSelected : Colors.tabIconDefault}
                 />
             );
@@ -24,7 +24,7 @@ export default class TabBarIcon extends React.Component {
                 <Icon.MaterialIcons
                     name={this.props.name}
                     size={26}
-                    style={{ marginBottom: -3 }}
+                    style={[{ marginBottom: -3 }, this.props.style]}
                     color={this.props.focused ? Colors.tabIconSelected : Colors.tabIconDefault}
                 />
             );
@@ -34,7 +34,7 @@ export default class TabBarIcon extends React.Component {
                 <Icon.FontAwesome
                     name={this.props.name}
                     size={26}
-                    style={{ marginBottom: -3 }}
+                    style={[{ marginBottom: -3 }, this.props.style]}
                     color={this.props.focused ? Colors.tabIconSelected : Colors.tabIconDefault}
                 />
             );

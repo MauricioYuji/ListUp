@@ -10,7 +10,8 @@ import {
     View,
     TextInput,
     TouchableHighlight,
-    DeviceEventEmitter
+    DeviceEventEmitter,
+    AsyncStorage
 } from 'react-native';
 import { WebBrowser, Icon, Constants } from 'expo';
 import * as firebase from 'firebase';
@@ -23,6 +24,9 @@ export default class Header extends React.Component {
         super(props);
     }
 
+    state = {
+        user: null
+    };
     logoff() {
         firebase.auth().signOut().then(function () {
             // Sign-out successful.
@@ -32,6 +36,32 @@ export default class Header extends React.Component {
         });
     }
 
+    _getUser = async () => {
+        try {
+            const value = await AsyncStorage.getItem('user');
+            //console.log("value: ", value);
+            return value;
+            //if (value !== null) {
+            //    // We have data!!
+            //    //this.setState({ test: value });
+            //    this.setState({ user: JSON.parse(value) });
+
+            //}
+        } catch (error) {
+            // Error retrieving data
+        }
+    }
+    test() {
+        console.log("GET USER: ", this.state.user);
+    }
+    componentWillMount() {
+
+        this._getUser().then((user) => {
+            this.setState({
+                user: user
+            });
+        });
+    }
     render() {
         // console.log("this.state: ", this.state);
         return (

@@ -22,16 +22,8 @@ import * as firebase from 'firebase';
 import LoginScreen from './screens/LoginScreen';
 
 // Initialize Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyCFC4YSALGezCekcoPVY42gPGUKcQsmfD0",
-    authDomain: "teste-925f4.firebaseapp.com",
-    databaseURL: "https://teste-925f4.firebaseio.com",
-    projectId: "teste-925f4",
-    storageBucket: "teste-925f4.appspot.com",
-    messagingSenderId: "245054025436"
-};
 
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(Constants.manifest.extra.firebase);
 
 
 export default class App extends React.Component {
@@ -59,12 +51,13 @@ export default class App extends React.Component {
     _getUser = async () => {
         try {
             const value = await AsyncStorage.getItem('user');
-            if (value !== null) {
-                // We have data!!
-                //this.setState({ test: value });
-                this.setState({ user: JSON.parse(value) });
+            //console.log("value: ", value);
+            //if (value !== null) {
+            //    // We have data!!
+            //    //this.setState({ test: value });
+            //    this.setState({ user: JSON.parse(value) });
                 
-            }
+            //}
         } catch (error) {
             // Error retrieving data
         }
@@ -81,7 +74,9 @@ export default class App extends React.Component {
                 this._deleteUser();
             }
             this._getUser();
-            this.setState({ isLoadingComplete: true });
+
+            this.setState({ isLoadingComplete: true, user });
+            
             // Do other things
         });
 

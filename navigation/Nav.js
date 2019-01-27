@@ -4,10 +4,12 @@ import { createAppContainer, createSwitchNavigator, createStackNavigator } from 
 
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
+import ResetPasswordScreen from '../screens/ResetPasswordScreen';
 
 const AuthStack = createStackNavigator({
     Login: LoginScreen,
-    Register: RegisterScreen
+    Register: RegisterScreen,
+    ResetPassword: ResetPasswordScreen
 });
 
 export default createAppContainer(createSwitchNavigator({

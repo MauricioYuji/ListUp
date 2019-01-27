@@ -27,6 +27,20 @@
     },
     "android": {
       "package": "com.ListUP.app"
+    },
+    "extra": {
+      "firebase": {
+
+        "apiKey": "AIzaSyCFC4YSALGezCekcoPVY42gPGUKcQsmfD0",
+        "authDomain": "teste-925f4.firebaseapp.com",
+        "databaseURL": "https://teste-925f4.firebaseio.com",
+        "projectId": "teste-925f4",
+        "storageBucket": "teste-925f4.appspot.com",
+        "messagingSenderId": "245054025436",
+      },
+      "facebook": {
+        "appId": "282570635750496"
+      }
     }
   }
 }
