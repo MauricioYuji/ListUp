@@ -19,9 +19,24 @@ export default class LoginScreen extends React.Component {
         secureTextEntry: true, email: '', password: '', errorMessage: null, loading: null
     };
     facebookloggin() {
+        const _self = this;
         this.setState({ loading: 'facebook' });
         signInWithFacebook().then(() => {
-            this.setState({ loading: null });
+            var user = firebase.auth().currentUser;
+            console.log("user: ", user);
+
+            _self.setState({ errorMessage: null, loading: null });
+            //if (user.emailVerified) {
+            //    _self.setState({ errorMessage: null, loading: null });
+            //} else {
+
+            //    firebase.auth().signOut().then(function () {
+            //        // Sign-out successful.
+            //        _self.setState({ errorMessage: 'Verifique seu email e confirma sua conta para poder entrar.', loading: null });
+            //    }, function (error) {
+            //        // An error happened.
+            //    });
+            //}
         })
             .catch(() => {
                 this.setState({ errorMessage: null, loading: null });
@@ -30,11 +45,24 @@ export default class LoginScreen extends React.Component {
     loggin() {
 
         const { email, password } = this.state;
-
-        this.setState({ loading: 'login' });
+        const _self = this;
+        this.setState({ loading: 'login', errorMessage: null });
         firebase.auth().signInWithEmailAndPassword(email, password)
             .then(() => {
-                this.setState({ errorMessage: null, loading: null });
+
+                var user = firebase.auth().currentUser;
+
+                if (user.emailVerified) {
+                    this.setState({ errorMessage: null, loading: null });
+                } else {
+
+                    firebase.auth().signOut().then(function () {
+                        // Sign-out successful.
+                        _self.setState({ errorMessage: 'Verifique seu email e confirma sua conta para poder entrar.', loading: null });
+                    }, function (error) {
+                        // An error happened.
+                    });
+                }
                 //DeviceEventEmitter.emit('login', { logged: true });
             })
             .catch(() => {
@@ -88,7 +116,15 @@ export default class LoginScreen extends React.Component {
                         {error}
                     </View>
                     <View style={styles.buttonGroup}>
-                        <View style={[styles.button, styles.buttonSecondary]}>
+                        <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={() => {
+                            this.props.navigation.navigate('Register');
+                        }}>
+                            <Text style={styles.buttonText}>
+                                Criar uma conta
+                        </Text>
+                        </TouchableOpacity>
+
+                        <View style={[styles.button, styles.buttonPrimary]}>
                             {loadingButton === "login" ? (
                                 <ActivityIndicator size="small" color="#FFFFFF" />
                             ) : (
@@ -103,13 +139,6 @@ export default class LoginScreen extends React.Component {
                                     </TouchableOpacity>
                                 )}
                         </View>
-                        <TouchableOpacity style={[styles.button, styles.buttonPrimary]} onPress={() => {
-                            this.props.navigation.navigate('Register');
-                        }}>
-                            <Text style={styles.buttonText}>
-                                Criar uma conta
-                        </Text>
-                        </TouchableOpacity>
                     </View>
                     <View style={styles.divider}>
                         <Text style={styles.dividerText}>OU</Text>
@@ -157,7 +186,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: 'SourceSansPro-Bold',
         textDecorationLine: 'underline',
-        color:'#FFF'
+        color: '#FFF'
     },
     divider: {
         borderBottomColor: '#444444',

@@ -4,6 +4,7 @@ import { ExpoLinksView } from '@expo/samples';
 import Layout from '../constants/Layout';
 import { Constants } from 'expo';
 import * as firebase from 'firebase';
+//import { getUserInfo, saveUserInfo } from '../components/Service';
 import { signInWithFacebook } from '../components/facebookAuth';
 import TabBarIcon from '../components/TabBarIcon';
 
@@ -16,7 +17,7 @@ export default class RegisterScreen extends React.Component {
         header: null,
     };
     state = {
-        email: { value: '', errorMessage: null }, password: { value: '', errorMessage: null }, confirmpassword: { value: '', errorMessage: null }
+        name: { value: '', errorMessage: null }, email: { value: '', errorMessage: null }, password: { value: '', errorMessage: null }, confirmpassword: { value: '', errorMessage: null }, feedback: ''
     };
 
     validate = (text) => {
@@ -41,13 +42,19 @@ export default class RegisterScreen extends React.Component {
             });
     }
     register() {
-
-        const { email, password, confirmpassword } = this.state;
+        const _self = this;
+        const { name, email, password, confirmpassword } = this.state;
 
         this.setState({
-            loading: 'register', email: { value: this.state.email.value, errorMessage: null }, password: { value: this.state.password.value, errorMessage: null }, confirmpassword: { value: this.state.confirmpassword.value, errorMessage: null }
+            loading: 'register', name: { value: this.state.name.value, errorMessage: null }, email: { value: this.state.email.value, errorMessage: null }, password: { value: this.state.password.value, errorMessage: null }, confirmpassword: { value: this.state.confirmpassword.value, errorMessage: null }
         });
         var validate = true;
+        if (name.value.length == 0) {
+            validate = false;
+            this.setState({
+                name: { value: this.state.name.value, errorMessage: "Preencha o campo nome!" }
+            });
+        }
         if (email.value.length == 0) {
             validate = false;
             this.setState({
@@ -92,7 +99,36 @@ export default class RegisterScreen extends React.Component {
             firebase.auth().createUserWithEmailAndPassword(email.value, password.value)
                 .then(() => {
                     console.log("usuario criado");
-                    this.setState({ error: '', loading: null });
+
+                    var user = firebase.auth().currentUser;
+
+                    user.updateProfile({
+                        displayName: name.value,
+                        photoURL: ""
+                    }).then(function () {
+                        // Update successful.
+
+                        user.sendEmailVerification().then(function () {
+                            // Email sent.
+                            _self.setState({ error: '', loading: null, feedback: 'Usuário criado, acesse seu email para confirmar a conta.' });
+                        }).catch(function (error) {
+                            // An error happened.
+                        });
+                    }).catch(function (error) {
+                        // An error happened.
+                    });
+
+
+                    //getUserInfo(user.uid).then((res) => {
+                    //    console.log("firebase.auth().currentUser.uid: ", firebase.auth().currentUser.uid);
+                    //    console.log("name: ", name.value);
+                    //    if (res === null) {
+                    //        saveUserInfo(firebase.auth().currentUser.uid, name.value, '').then((res) => {
+                    //            console.log("res: ", res);
+                    //        });
+                    //    }
+                    //});
+
                 })
                 .catch((e) => {
                     console.log("erro: ", e);
@@ -100,13 +136,22 @@ export default class RegisterScreen extends React.Component {
                         email: { value: this.state.email.value, errorMessage: "Email já cadastrado!", loading: null }
                     });
                 });
+        } else {
+            this.setState({
+                loading: null
+            });
         }
     }
     render() {
         const loadingButton = this.state.loading;
+        const feedback = this.state.feedback;
+        let nameerrorMessage;
         let emailerrorMessage;
         let passworderrorMessage;
         let confirmpassworderrorMessage;
+        if (this.state.name.errorMessage !== null) {
+            nameerrorMessage = <Text style={styles.errorFeedback}>{this.state.name.errorMessage}</Text>;
+        }
         if (this.state.email.errorMessage !== null) {
             emailerrorMessage = <Text style={styles.errorFeedback}>{this.state.email.errorMessage}</Text>;
         }
@@ -124,38 +169,55 @@ export default class RegisterScreen extends React.Component {
                 <View style={styles.loginBox}>
 
                     <Image source={require('../assets/images/logo.png')} style={styles.logo} />
-                    <View style={styles.inputGroup}>
-                        <TextInput
-                            style={this.state.email.errorMessage !== null ? styles.inputerror : styles.input}
-                            autoCapitalize="none"
-                            placeholder="Email"
-                            onChangeText={text => this.setState({ email: { value: text, errorMessage: null } })}
-                            value={this.state.email.value}
-                        />
-                        {emailerrorMessage}
-                    </View>
-                    <View style={styles.inputGroup}>
-                        <TextInput
-                            style={this.state.password.errorMessage !== null ? styles.inputerror : styles.input}
-                            autoCapitalize="none"
-                            placeholder="Password"
-                            onChangeText={text => this.setState({ password: { value: text, errorMessage: null } })}
-                            value={this.state.password.value}
-                            secureTextEntry={true}
-                        />
-                        {passworderrorMessage}
-                    </View>
-                    <View style={styles.inputGroup}>
-                        <TextInput
-                            style={this.state.confirmpassword.errorMessage !== null ? styles.inputerror : styles.input}
-                            autoCapitalize="none"
-                            placeholder="Confirm Password"
-                            onChangeText={text => this.setState({ confirmpassword: { value: text, errorMessage: null } })}
-                            value={this.state.confirmpassword.value}
-                            secureTextEntry={true}
-                        />
-                        {confirmpassworderrorMessage}
-                    </View>
+
+                    {feedback === "" ? (
+                        <View style={styles.inputGroup}>
+                            <View style={styles.inputGroup}>
+                                <TextInput
+                                    style={this.state.name.errorMessage !== null ? styles.inputerror : styles.input}
+                                    autoCapitalize="none"
+                                    placeholder="Nome"
+                                    onChangeText={text => this.setState({ name: { value: text, errorMessage: null } })}
+                                    value={this.state.name.value}
+                                />
+                                {nameerrorMessage}
+                            </View>
+                            <View style={styles.inputGroup}>
+                                <TextInput
+                                    style={this.state.email.errorMessage !== null ? styles.inputerror : styles.input}
+                                    autoCapitalize="none"
+                                    placeholder="Email"
+                                    onChangeText={text => this.setState({ email: { value: text, errorMessage: null } })}
+                                    value={this.state.email.value}
+                                />
+                                {emailerrorMessage}
+                            </View>
+                            <View style={styles.inputGroup}>
+                                <TextInput
+                                    style={this.state.password.errorMessage !== null ? styles.inputerror : styles.input}
+                                    autoCapitalize="none"
+                                    placeholder="Password"
+                                    onChangeText={text => this.setState({ password: { value: text, errorMessage: null } })}
+                                    value={this.state.password.value}
+                                    secureTextEntry={true}
+                                />
+                                {passworderrorMessage}
+                            </View>
+                            <View style={styles.inputGroup}>
+                                <TextInput
+                                    style={this.state.confirmpassword.errorMessage !== null ? styles.inputerror : styles.input}
+                                    autoCapitalize="none"
+                                    placeholder="Confirm Password"
+                                    onChangeText={text => this.setState({ confirmpassword: { value: text, errorMessage: null } })}
+                                    value={this.state.confirmpassword.value}
+                                    secureTextEntry={true}
+                                />
+                                {confirmpassworderrorMessage}
+                            </View>
+                        </View>
+                    ) : (
+                            <Text style={styles.buttonText}>{feedback}</Text>
+                        )}
                     <View style={styles.buttonGroup}>
                         <TouchableOpacity onPress={() => { this.props.navigation.navigate('Login'); }}>
                             <Text style={[styles.button, styles.buttonSecondary]}>
@@ -163,16 +225,16 @@ export default class RegisterScreen extends React.Component {
                         </Text>
                         </TouchableOpacity>
                         <View style={[styles.button, styles.buttonPrimary]}>
-                        {loadingButton === "register" ? (
-                            <ActivityIndicator size="small" color="#FFFFFF" />
-                        ) : (
-                                <TouchableOpacity onPress={() => {
-                                    this.register();
-                                }}>
+                            {loadingButton === "register" ? (
+                                <ActivityIndicator size="small" color="#FFFFFF" />
+                            ) : (
+                                    <TouchableOpacity onPress={() => {
+                                        this.register();
+                                    }}>
                                         <Text style={styles.buttonText}>
-                                        Criar conta
+                                            Criar conta
                         </Text>
-                                </TouchableOpacity>
+                                    </TouchableOpacity>
                                 )}
                         </View>
                     </View>
@@ -198,7 +260,7 @@ export default class RegisterScreen extends React.Component {
                     </View>
                 </View>
 
-            </View>
+            </View >
         );
     }
 }

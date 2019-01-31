@@ -36,3 +36,22 @@ export const test = () => {
 //        });
 //    }
 //}
+//export const getUserInfo = (id) => {
+//    return firebase.database().ref('/UserInfo').child(id).once('value').then(function (snapshot) {
+//        //console.log("snapshot.val(): ", snapshot.val());
+//        return snapshot.val();
+//    });
+//};
+//export const saveUserInfo = (userid, name, photo) => {
+//    const obj = {
+//        name: name,
+//        photo: photo
+//    };
+//    return firebase.database().ref('/UserInfo/' + userid).set(obj).then((data) => {
+//        //success callback
+//        console.log('data ', data);
+//    }).catch((error) => {
+//        //error callback
+//        console.log('error ', error);
+//    });
+//};

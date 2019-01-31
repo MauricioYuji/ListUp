@@ -127,7 +127,10 @@ export default class HomeScreen extends React.Component {
                     <View style={styles.slidegroup}>
                         <Text style={styles.title}>YOUR GAMES</Text>
                         <ScrollView style={styles.gameslide} horizontal={true}>
-                            <Image resizeMode="contain" source={{ uri: 'https://firebasestorage.googleapis.com/v0/b/teste-925f4.appspot.com/o/thumbs%2Fs-l1600.jpg?alt=media&token=3955711d-ed54-4969-b226-969eba063c90' }} style={styles.thumb} />
+
+                            <TouchableHighlight onPress={() => this.props.navigation.navigate('Profile')}>
+                                <Image resizeMode="contain" source={{ uri: 'https://firebasestorage.googleapis.com/v0/b/teste-925f4.appspot.com/o/thumbs%2Fs-l1600.jpg?alt=media&token=3955711d-ed54-4969-b226-969eba063c90' }} style={styles.thumb} />
+                            </TouchableHighlight>
                             <Image resizeMode="contain" source={{ uri: 'https://firebasestorage.googleapis.com/v0/b/teste-925f4.appspot.com/o/thumbs%2Fs-l1600.jpg?alt=media&token=3955711d-ed54-4969-b226-969eba063c90' }} style={styles.thumb} />
                             <Image resizeMode="contain" source={{ uri: 'https://firebasestorage.googleapis.com/v0/b/teste-925f4.appspot.com/o/thumbs%2Fs-l1600.jpg?alt=media&token=3955711d-ed54-4969-b226-969eba063c90' }} style={styles.thumb} />
                             <Image resizeMode="contain" source={{ uri: 'https://firebasestorage.googleapis.com/v0/b/teste-925f4.appspot.com/o/thumbs%2Fs-l1600.jpg?alt=media&token=3955711d-ed54-4969-b226-969eba063c90' }} style={styles.thumb} />
