@@ -28,6 +28,16 @@ export default class TabBarIcon extends React.Component {
                     color={this.props.focused ? Colors.tabIconSelected : Colors.tabIconDefault}
                 />
             );
+        } else if (this.props.type == "MaterialCommunityIcons") {
+            return (
+                //<Text>{this.props.name}</Text>
+                <Icon.MaterialCommunityIcons
+                    name={this.props.name}
+                    size={26}
+                    style={[{ marginBottom: -3 }, this.props.style]}
+                    color={this.props.focused ? Colors.tabIconSelected : Colors.tabIconDefault}
+                />
+            );
         } else if (this.props.type == "FontAwesome") {
             return (
                 //<Text>{this.props.name}</Text>

@@ -37,7 +37,7 @@ export class FadeSpin extends React.Component {
                 {
                     rotate: this._visibility.interpolate({
                         inputRange: [0, 1],
-                        outputRange: ["450deg", "0deg"],
+                        outputRange: ["90deg", "0deg"],
                     }),
                 },
             ],

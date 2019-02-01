@@ -13,7 +13,8 @@ import {
     DeviceEventEmitter,
     AsyncStorage,
     Animated,
-    PixelRatio
+    PixelRatio,
+    Dimensions
 } from 'react-native';
 import { WebBrowser, Icon, Constants } from 'expo';
 import * as firebase from 'firebase';
@@ -27,8 +28,10 @@ export default class Header extends React.Component {
 
     constructor(props) {
         super(props);
+        const { height, width } = Dimensions.get('window');
+        console.log("width:", width);
+        console.log("height:", height);
     }
-
     state = {
         user: null,
         loading: false,
@@ -163,7 +166,7 @@ export default class Header extends React.Component {
             <View style={styles.searchbar}>
 
                 <View style={styles.logobox}>
-                    <TouchableHighlight onPress={() => NavigationService.navigate('App')}>
+                    <TouchableHighlight underlayColor="transparent" onPress={() => NavigationService.navigate('App')}>
                         <Image source={require('../assets/images/logo.png')} style={styles.logo} />
                     </TouchableHighlight>
                 </View>
@@ -188,17 +191,90 @@ export default class Header extends React.Component {
                         </FadeSpin>
                     </View>
                 </TouchableHighlight>
-
-                <Grow style={styles.profile} visible={!visible}>
-                    <View style={styles.showMenu}>
-                        <Text>Menu</Text>
-                        <Text>Menu</Text>
-                        <Text>Menu</Text>
-                        <Text>Menu</Text>
-                        <Text>Menu</Text>
-                        <Text>Menu</Text>
-                    </View>
-                </Grow>
+                <View style={styles.sidemenu}>
+                    <Grow style={styles.menuArea} visible={!visible}>
+                        <View style={styles.showMenu}>
+                            <View style={styles.contentMenu}>
+                                <View style={styles.scrollarea}>
+                                    <ScrollView style={styles.menuContent} horizontal={true}>
+                                        <View style={styles.menuItem}>
+                                            <TabBarIcon
+                                                name={'user-o'}
+                                                type={'FontAwesome'}
+                                                style={styles.menuIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>Perfil</Text>
+                                        </View>
+                                        <View style={styles.menuItem}>
+                                            <TabBarIcon
+                                                name={'settings'}
+                                                type={'MaterialIcons'}
+                                                style={styles.menuIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>Editar</Text>
+                                        </View>
+                                        <View style={styles.menuItem}>
+                                            <TabBarIcon
+                                                name={'logout'}
+                                                type={'MaterialCommunityIcons'}
+                                                style={styles.menuIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>Logout</Text>
+                                        </View>
+                                        <View style={styles.menuItem}>
+                                            <TabBarIcon
+                                                name={'user-o'}
+                                                type={'FontAwesome'}
+                                                style={styles.menuIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>Perfil</Text>
+                                        </View>
+                                        <View style={styles.menuItem}>
+                                            <TabBarIcon
+                                                name={'settings'}
+                                                type={'MaterialIcons'}
+                                                style={styles.menuIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>Editar</Text>
+                                        </View>
+                                        <View style={styles.menuItem}>
+                                            <TabBarIcon
+                                                name={'logout'}
+                                                type={'MaterialCommunityIcons'}
+                                                style={styles.menuIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>Logout</Text>
+                                        </View>
+                                        <View style={styles.menuItem}>
+                                            <TabBarIcon
+                                                name={'user-o'}
+                                                type={'FontAwesome'}
+                                                style={styles.menuIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>Perfil</Text>
+                                        </View>
+                                        <View style={styles.menuItem}>
+                                            <TabBarIcon
+                                                name={'settings'}
+                                                type={'MaterialIcons'}
+                                                style={styles.menuIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>Editar</Text>
+                                        </View>
+                                        <View style={styles.menuItem}>
+                                            <TabBarIcon
+                                                name={'logout'}
+                                                type={'MaterialCommunityIcons'}
+                                                style={styles.menuIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>Logout</Text>
+                                        </View>
+                                    </ScrollView>
+                                </View>
+                            </View>
+                        </View>
+                    </Grow>
+                </View>
             </View>
         );
     }
@@ -299,17 +375,71 @@ const styles = StyleSheet.create({
         fontSize: 40,
         color: '#FFF'
     },
-    showMenu: {
+    sidemenu: {
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
-        width: 1000,
-        height: 1000,
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').width / 3,
+        overflow: 'hidden'
+    },
+    showMenu: {
+        position: 'absolute',
+        top: -Dimensions.get('window').width,
+        right: -Dimensions.get('window').width / 2,
+        width: Dimensions.get('window').width * 2,
+        height: Dimensions.get('window').width * 2,
         backgroundColor: '#006CD8',
         zIndex: 100,
-        borderRadius: 1000,
-        transform: [{ translateY: -500 }, { translateX: 0 }]
+        borderRadius: Dimensions.get('window').width * 2,
+        //transform: [{ translateY: -Dimensions.get('window').height / 2 }, { translateX: Dimensions.get('window').height / 4 }]
+        //top: 0,
+        //right: 0,
+        //width: Dimensions.get('window').width,
+        //height: Dimensions.get('window').width,
+    },
+    menuArea: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+    },
+    contentMenu: {
+        position: 'absolute',
+        //right: Dimensions.get('window').width / 4,
+        left: Dimensions.get('window').width / 2,
+        top: Dimensions.get('window').width,
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').width / 3,
+        alignSelf: 'flex-end',
+        flex: 1,
+        paddingTop: 40
+    },
+    scrollarea: {
+        flex: 1,
+        position: 'relative'
+    },
+    menuContent: {
+        flexDirection: 'row',
+        alignSelf: 'center',
+        flex: 1,
+        position: 'relative'
+    },
+    menuItem: {
+        width: Dimensions.get('window').width / 4 - 10,
+        alignSelf: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    menuIcon: {
+        fontSize: 40,
+        color: '#FFF',
+        marginBottom: 5
+    },
+    menuLabel: {
+        color: '#FFF',
+        fontSize: 16,
+        fontFamily: 'SourceSansPro-Bold'
     }
 });
 

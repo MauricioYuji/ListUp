@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
         marginTop: 60,
     },
     gameslide: {
-        flex: 1,
+        flex: 1
     },
     thumb: {
         width: 90,

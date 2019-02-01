@@ -1,5 +1,5 @@
 import React from 'react';
-import { Animated, Text, View, interpolate } from 'react-native';
+import { Animated, Text, View, interpolate, Dimensions } from 'react-native';
 
 export class Grow extends React.Component {
     constructor(props) {
@@ -29,9 +29,21 @@ export class Grow extends React.Component {
         const { visible, style, children, ...rest } = this.props;
 
         const containerStyle = {
-            opacity: this._visibility.interpolate({
+            //width: this._visibility.interpolate({
+            //    inputRange: [0, 1],
+            //    outputRange: [0, Dimensions.get('window').width],
+            //}),
+            //height: this._visibility.interpolate({
+            //    inputRange: [0, 1],
+            //    outputRange: [0, Dimensions.get('window').width / 2],
+            //}),
+            borderRadius: this._visibility.interpolate({
                 inputRange: [0, 1],
-                outputRange: [0, 1],
+                outputRange: [0, Dimensions.get('window').width],
+            }),
+            opacity: this._visibility.interpolate({
+                inputRange: [0, 0.1, 1],
+                outputRange: [0, 1, 1],
             }),
             transform: [
                 {
@@ -46,12 +58,12 @@ export class Grow extends React.Component {
                         outputRange: [0, 1],
                     })
                 },
-                {
-                    translateX: this._visibility.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0, -100],
-                    })
-                },
+                //{
+                //    translateX: this._visibility.interpolate({
+                //        inputRange: [0, 1],
+                //        outputRange: [Dimensions.get('window').height, 0],
+                //    })
+                //},
             ],
         };
 
