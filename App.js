@@ -17,13 +17,13 @@ import {
 import { AppLoading, Asset, Font, Icon, Constants } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
 import Auth from './navigation/Nav';
-import Header from './navigation/Header';
+import Header from './screens/Shared/Header';
 import Layout from './constants/Layout';
-import { getUserInfo } from './components/Service';
+import { getUserInfo } from './components/services/Service';
 
 import * as firebase from 'firebase';
-import LoginScreen from './screens/LoginScreen';
-import NavigationService from './components/NavigationService';
+import LoginScreen from './screens/Auth/LoginScreen';
+import NavigationService from './components/services/NavigationService';
 
 // Initialize Firebase
 

@@ -14,9 +14,9 @@ import {
 } from 'react-native';
 import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 
-import Layout from '../constants/Layout';
-import { getUserInfo, test } from '../components/Service';
-import { MonoText } from '../components/StyledText';
+import Layout from '../../constants/Layout';
+import { getUserInfo, test } from '../../components/services/Service';
+import { MonoText } from '../../components/UI/StyledText';
 
 export default class HomeScreen extends React.Component {
 

@@ -1,11 +1,11 @@
 ﻿import React from 'react';
 import { ScrollView, StyleSheet, Text, View, TextInput, CheckBox, DeviceEventEmitter, Image, TouchableOpacity, Switch, Icon, ActivityIndicator } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
-import Layout from '../constants/Layout';
-import { signInWithFacebook } from '../components/facebookAuth';
+import Layout from '../../constants/Layout';
+import { signInWithFacebook } from '../../components/services/facebookAuth';
 import { Constants } from 'expo';
 import * as firebase from 'firebase';
-import TabBarIcon from '../components/TabBarIcon';
+import TabBarIcon from '../../components/UI/TabBarIcon';
 
 export default class ResetPasswordScreen extends React.Component {
 
@@ -49,7 +49,7 @@ export default class ResetPasswordScreen extends React.Component {
            * content, we just wanted to provide you with some helpful links */}
                 <View style={styles.loginBox}>
 
-                    <Image source={require('../assets/images/logo.png')} style={styles.logo} />
+                    <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
                     <View style={styles.inputGroup}>
                         <TextInput
                             style={this.state.errorMessage !== null ? styles.inputerror : styles.input}

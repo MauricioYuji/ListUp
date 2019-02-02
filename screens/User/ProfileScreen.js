@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View, TextInput, Image, TouchableWithoutFeedback, TouchableHighlight } from 'react-native';
 import { ExpoConfigView } from '@expo/samples';
-import { Fade } from '../components/Fade';
+import { Fade } from '../../components/animations/Fade';
 
 export default class ProfileScreen extends React.Component {
     static navigationOptions = {

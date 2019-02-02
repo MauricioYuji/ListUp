@@ -1,12 +1,12 @@
 ﻿import React from 'react';
 import { ScrollView, StyleSheet, Text, View, TextInput, CheckBox, DeviceEventEmitter, Image, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
-import Layout from '../constants/Layout';
+import Layout from '../../constants/Layout';
 import { Constants } from 'expo';
 import * as firebase from 'firebase';
 //import { getUserInfo, saveUserInfo } from '../components/Service';
-import { signInWithFacebook } from '../components/facebookAuth';
-import TabBarIcon from '../components/TabBarIcon';
+import { signInWithFacebook } from '../../components/services/facebookAuth';
+import TabBarIcon from '../../components/UI/TabBarIcon';
 
 export default class RegisterScreen extends React.Component {
     constructor(props) {
@@ -168,7 +168,7 @@ export default class RegisterScreen extends React.Component {
            * content, we just wanted to provide you with some helpful links */}
                 <View style={styles.loginBox}>
 
-                    <Image source={require('../assets/images/logo.png')} style={styles.logo} />
+                    <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
 
                     {feedback === "" ? (
                         <View style={styles.inputGroup}>

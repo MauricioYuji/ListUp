@@ -18,11 +18,11 @@ import {
 } from 'react-native';
 import { WebBrowser, Icon, Constants } from 'expo';
 import * as firebase from 'firebase';
-import { Grow } from '../components/Grow';
-import { FadeSpin } from '../components/FadeSpin';
-import { MonoText } from '../components/StyledText';
-import NavigationService from '../components/NavigationService';
-import TabBarIcon from '../components/TabBarIcon';
+import { Grow } from '../../components/animations/Grow';
+import { FadeSpin } from '../../components/animations/FadeSpin';
+import { MonoText } from '../../components/UI/StyledText';
+import NavigationService from '../../components/services/NavigationService';
+import TabBarIcon from '../../components/UI/TabBarIcon';
 
 export default class Header extends React.Component {
 
@@ -37,7 +37,7 @@ export default class Header extends React.Component {
         loading: false,
         showMenu: false,
         rotateAnim: new Animated.Value(0),  // Initial value for opacity: 0
-        visible: true
+        visible: false
     };
     componentWillMount() {
 
@@ -159,7 +159,7 @@ export default class Header extends React.Component {
             } else if (userdata.photoURL !== null) {
                 avatar = <Image source={{ uri: userdata.photoURL }} style={styles.profile} />;
             } else {
-                avatar = <Image source={require('../assets/images/avatar.png')} style={styles.profile} />;
+                avatar = <Image source={require('../../assets/images/avatar.png')} style={styles.profile} />;
             }
         }
         return (
@@ -167,112 +167,109 @@ export default class Header extends React.Component {
 
                 <View style={styles.logobox}>
                     <TouchableHighlight underlayColor="transparent" onPress={() => NavigationService.navigate('App')}>
-                        <Image source={require('../assets/images/logo.png')} style={styles.logo} />
+                        <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
                     </TouchableHighlight>
                 </View>
                 <View style={styles.searchbox}>
-                    <Image source={require('../assets/images/search-icon.png')} style={styles.searchicon} />
+                    <Image source={require('../../assets/images/search-icon.png')} style={styles.searchicon} />
                     <TextInput
                         style={styles.inputsearch}
                         onChangeText={(text) => this.setState({ text })}
                     />
                 </View>
-                <TouchableHighlight underlayColor="transparent" onPress={() => this.showMenu()} style={styles.profileitem}>
-                    <View style={styles.profilebox}>
-                        <FadeSpin style={styles.profile} visible={visible}>
-                            {avatar}
-                        </FadeSpin>
-                        <FadeSpin style={styles.profile} visible={!visible}>
-                            <TabBarIcon
-                                name={'ios-close'}
-                                type={'Ionicons'}
-                                style={styles.closeBtn}
-                            />
-                        </FadeSpin>
-                    </View>
-                </TouchableHighlight>
-                <View style={styles.sidemenu}>
-                    <Grow style={styles.menuArea} visible={!visible}>
-                        <View style={styles.showMenu}>
-                            <View style={styles.contentMenu}>
-                                <View style={styles.scrollarea}>
-                                    <ScrollView style={styles.menuContent} horizontal={true}>
-                                        <View style={styles.menuItem}>
-                                            <TabBarIcon
-                                                name={'user-o'}
-                                                type={'FontAwesome'}
-                                                style={styles.menuIcon}
-                                            />
-                                            <Text style={styles.menuLabel}>Perfil</Text>
-                                        </View>
-                                        <View style={styles.menuItem}>
-                                            <TabBarIcon
-                                                name={'settings'}
-                                                type={'MaterialIcons'}
-                                                style={styles.menuIcon}
-                                            />
-                                            <Text style={styles.menuLabel}>Editar</Text>
-                                        </View>
-                                        <View style={styles.menuItem}>
-                                            <TabBarIcon
-                                                name={'logout'}
-                                                type={'MaterialCommunityIcons'}
-                                                style={styles.menuIcon}
-                                            />
-                                            <Text style={styles.menuLabel}>Logout</Text>
-                                        </View>
-                                        <View style={styles.menuItem}>
-                                            <TabBarIcon
-                                                name={'user-o'}
-                                                type={'FontAwesome'}
-                                                style={styles.menuIcon}
-                                            />
-                                            <Text style={styles.menuLabel}>Perfil</Text>
-                                        </View>
-                                        <View style={styles.menuItem}>
-                                            <TabBarIcon
-                                                name={'settings'}
-                                                type={'MaterialIcons'}
-                                                style={styles.menuIcon}
-                                            />
-                                            <Text style={styles.menuLabel}>Editar</Text>
-                                        </View>
-                                        <View style={styles.menuItem}>
-                                            <TabBarIcon
-                                                name={'logout'}
-                                                type={'MaterialCommunityIcons'}
-                                                style={styles.menuIcon}
-                                            />
-                                            <Text style={styles.menuLabel}>Logout</Text>
-                                        </View>
-                                        <View style={styles.menuItem}>
-                                            <TabBarIcon
-                                                name={'user-o'}
-                                                type={'FontAwesome'}
-                                                style={styles.menuIcon}
-                                            />
-                                            <Text style={styles.menuLabel}>Perfil</Text>
-                                        </View>
-                                        <View style={styles.menuItem}>
-                                            <TabBarIcon
-                                                name={'settings'}
-                                                type={'MaterialIcons'}
-                                                style={styles.menuIcon}
-                                            />
-                                            <Text style={styles.menuLabel}>Editar</Text>
-                                        </View>
-                                        <View style={styles.menuItem}>
-                                            <TabBarIcon
-                                                name={'logout'}
-                                                type={'MaterialCommunityIcons'}
-                                                style={styles.menuIcon}
-                                            />
-                                            <Text style={styles.menuLabel}>Logout</Text>
-                                        </View>
-                                    </ScrollView>
-                                </View>
-                            </View>
+                <View>
+                    <TouchableHighlight underlayColor="transparent" onPress={() => this.showMenu()} style={styles.profileitem}>
+                        <View style={styles.profilebox}>
+                            <FadeSpin style={styles.profile} visible={!visible}>
+                                {avatar}
+                            </FadeSpin>
+                            <FadeSpin style={styles.profile} visible={visible}>
+                                <TabBarIcon
+                                    name={'ios-close'}
+                                    type={'Ionicons'}
+                                    style={styles.closeBtn}
+                                />
+                            </FadeSpin>
                         </View>
+                    </TouchableHighlight>
+
+                    <Grow style={styles.menuArea} visible={visible}>
+                        <ScrollView style={styles.menuContent} horizontal={true}>
+                            <TouchableHighlight onPress={() => NavigationService.navigate('Profile')}>
+                                <View style={styles.menuItem}>
+                                    <TabBarIcon
+                                        name={'user-o'}
+                                        type={'FontAwesome'}
+                                        style={styles.menuIcon}
+                                    />
+                                    <Text style={styles.menuLabel}>Perfil</Text>
+                                </View>
+                            </TouchableHighlight>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'settings'}
+                                    type={'MaterialIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Editar</Text>
+                            </View>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'logout'}
+                                    type={'MaterialCommunityIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Logout</Text>
+                            </View>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'user-o'}
+                                    type={'FontAwesome'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Perfil</Text>
+                            </View>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'settings'}
+                                    type={'MaterialIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Editar</Text>
+                            </View>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'logout'}
+                                    type={'MaterialCommunityIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Logout</Text>
+                            </View>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'user-o'}
+                                    type={'FontAwesome'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Perfil</Text>
+                            </View>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'settings'}
+                                    type={'MaterialIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Editar</Text>
+                            </View>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'logout'}
+                                    type={'MaterialCommunityIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Logout</Text>
+                            </View>
+                        </ScrollView>
                     </Grow>
                 </View>
             </View>
@@ -357,7 +354,8 @@ const styles = StyleSheet.create({
         position: 'relative',
         overflow: 'hidden',
         marginRight: 10,
-        zIndex: 100
+        zIndex: 100,
+        opacity: 0.3
     },
     profile: {
         flex: 1,
@@ -378,11 +376,14 @@ const styles = StyleSheet.create({
     sidemenu: {
         position: 'absolute',
         top: 0,
-        left: 0,
         right: 0,
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').width / 3,
         overflow: 'hidden'
+    },
+    hide: {
+        width: 0,
+        height: 0
     },
     showMenu: {
         position: 'absolute',
@@ -403,27 +404,20 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         right: 0,
-    },
-    contentMenu: {
-        position: 'absolute',
-        //right: Dimensions.get('window').width / 4,
-        left: Dimensions.get('window').width / 2,
-        top: Dimensions.get('window').width,
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').width / 3,
-        alignSelf: 'flex-end',
-        flex: 1,
-        paddingTop: 40
-    },
-    scrollarea: {
-        flex: 1,
-        position: 'relative'
+        backgroundColor: '#006CD8',
+        overflow: 'hidden'
     },
     menuContent: {
         flexDirection: 'row',
         alignSelf: 'center',
         flex: 1,
-        position: 'relative'
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
     },
     menuItem: {
         width: Dimensions.get('window').width / 4 - 10,

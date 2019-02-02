@@ -2,9 +2,9 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { createAppContainer, createSwitchNavigator, createStackNavigator } from 'react-navigation';
 
-import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
-import ResetPasswordScreen from '../screens/ResetPasswordScreen';
+import LoginScreen from '../screens/Auth/LoginScreen';
+import RegisterScreen from '../screens/Auth/RegisterScreen';
+import ResetPasswordScreen from '../screens/Auth/ResetPasswordScreen';
 
 const AuthStack = createStackNavigator({
     Login: LoginScreen,
