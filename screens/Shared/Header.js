@@ -99,17 +99,28 @@ export default class Header extends React.Component {
         });
 
     }
+    changePage(page, id) {
+        if (id !== undefined) {
+            NavigationService.navigate(page, { Id: id });
+        } else {
+            NavigationService.navigate(page);
+        }
+
+
+        this.setState({
+            visible: false,
+        });
+
+    }
     logoff() {
-        NavigationService.navigate('Profile', { Id: '1' });
-        //firebase.auth().signOut().then(function () {
-        //    // Sign-out successful.
-        //this.setState({
-        //    showMenu: !this.state.showMenu
-        //});
+        //NavigationService.navigate('Profile', { Id: '1' });
         //DeviceEventEmitter.emit('showMenu', { show: this.state.showMenu });
-        //}, function (error) {
-        //    // An error happened.
-        //});
+        firebase.auth().signOut().then(function () {
+            // Sign-out successful.
+
+        }, function (error) {
+            // An error happened.
+        });
     }
     _storeUser = async (user) => {
         try {
@@ -192,7 +203,7 @@ export default class Header extends React.Component {
                     </View>
                 </TouchableHighlight>
 
-                <View style={[styles.sidemenu]}>
+                <View style={[styles.sidemenu, visible ? '' : styles.hide]}>
                     <Grow style={styles.menuArea} visible={visible}>
                         <View style={styles.showMenu}>
                             <View style={styles.contentMenu}>
@@ -203,7 +214,7 @@ export default class Header extends React.Component {
                     </Grow>
 
                     <ScrollView style={styles.menuContent} horizontal={true}>
-                        <TouchableHighlight style={styles.menuItem} onPress={() => NavigationService.navigate('Profile')}>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Profile', 1)}>
                             <View>
                                 <TabBarIcon
                                     name={'user-o'}
@@ -213,70 +224,27 @@ export default class Header extends React.Component {
                                 <Text style={styles.menuLabel}>Perfil</Text>
                             </View>
                         </TouchableHighlight>
-                        <View style={styles.menuItem}>
-                            <TabBarIcon
-                                name={'settings'}
-                                type={'MaterialIcons'}
-                                style={styles.menuIcon}
-                            />
-                            <Text style={styles.menuLabel}>Editar</Text>
-                        </View>
-                        <View style={styles.menuItem}>
-                            <TabBarIcon
-                                name={'logout'}
-                                type={'MaterialCommunityIcons'}
-                                style={styles.menuIcon}
-                            />
-                            <Text style={styles.menuLabel}>Logout</Text>
-                        </View>
-                        <View style={styles.menuItem}>
-                            <TabBarIcon
-                                name={'user-o'}
-                                type={'FontAwesome'}
-                                style={styles.menuIcon}
-                            />
-                            <Text style={styles.menuLabel}>Perfil</Text>
-                        </View>
-                        <View style={styles.menuItem}>
-                            <TabBarIcon
-                                name={'settings'}
-                                type={'MaterialIcons'}
-                                style={styles.menuIcon}
-                            />
-                            <Text style={styles.menuLabel}>Editar</Text>
-                        </View>
-                        <View style={styles.menuItem}>
-                            <TabBarIcon
-                                name={'logout'}
-                                type={'MaterialCommunityIcons'}
-                                style={styles.menuIcon}
-                            />
-                            <Text style={styles.menuLabel}>Logout</Text>
-                        </View>
-                        <View style={styles.menuItem}>
-                            <TabBarIcon
-                                name={'user-o'}
-                                type={'FontAwesome'}
-                                style={styles.menuIcon}
-                            />
-                            <Text style={styles.menuLabel}>Perfil</Text>
-                        </View>
-                        <View style={styles.menuItem}>
-                            <TabBarIcon
-                                name={'settings'}
-                                type={'MaterialIcons'}
-                                style={styles.menuIcon}
-                            />
-                            <Text style={styles.menuLabel}>Editar</Text>
-                        </View>
-                        <View style={styles.menuItem}>
-                            <TabBarIcon
-                                name={'logout'}
-                                type={'MaterialCommunityIcons'}
-                                style={styles.menuIcon}
-                            />
-                            <Text style={styles.menuLabel}>Logout</Text>
-                        </View>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'settings'}
+                                    type={'MaterialIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Editar</Text>
+                            </View>
+                        </TouchableHighlight>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.logoff()}>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'logout'}
+                                    type={'MaterialCommunityIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Logout</Text>
+                            </View>
+                        </TouchableHighlight>
+
                     </ScrollView>
                 </View>
             </View>
