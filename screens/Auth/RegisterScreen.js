@@ -6,6 +6,7 @@ import { Constants } from 'expo';
 import * as firebase from 'firebase';
 //import { getUserInfo, saveUserInfo } from '../components/Service';
 import { signInWithFacebook } from '../../components/services/facebookAuth';
+import { saveUserInfo } from '../../components/services/Service';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 
 export default class RegisterScreen extends React.Component {
@@ -17,7 +18,7 @@ export default class RegisterScreen extends React.Component {
         header: null,
     };
     state = {
-        name: { value: '', errorMessage: null }, email: { value: '', errorMessage: null }, password: { value: '', errorMessage: null }, confirmpassword: { value: '', errorMessage: null }, feedback: ''
+        name: { value: '', errorMessage: null }, email: { value: '', errorMessage: null }, password: { value: '', errorMessage: null }, confirmpassword: { value: '', errorMessage: null }, feedback: null
     };
 
     validate = (text) => {
@@ -32,9 +33,11 @@ export default class RegisterScreen extends React.Component {
             return true;
         }
     }
+
     facebookloggin() {
         this.setState({ loading: 'facebook' });
         signInWithFacebook().then(() => {
+            var user = firebase.auth().currentUser;
             this.setState({ loading: null });
         })
             .catch(() => {
@@ -109,6 +112,7 @@ export default class RegisterScreen extends React.Component {
                         // Update successful.
 
                         user.sendEmailVerification().then(function () {
+                            console.log("EMAIL ENVIADO");
                             // Email sent.
                             _self.setState({ error: '', loading: null, feedback: 'Usuário criado, acesse seu email para confirmar a conta.' });
                         }).catch(function (error) {
@@ -133,13 +137,46 @@ export default class RegisterScreen extends React.Component {
                 .catch((e) => {
                     console.log("erro: ", e);
                     this.setState({
-                        email: { value: this.state.email.value, errorMessage: "Email já cadastrado!", loading: null }
+                        email: { value: this.state.email.value, errorMessage: "Email já cadastrado!" }, loading: null
                     });
                 });
         } else {
             this.setState({
                 loading: null
             });
+        }
+    }
+    sendEmail() {
+        var user = firebase.auth().currentUser;
+        user.sendEmailVerification().then(function () {
+            console.log("EMAIL ENVIADO");
+            // Email sent.
+            _self.setState({ error: '', loading: null, feedback: 'Email de verificação enviado com sucesso, acesse-ô para confirmar sua conta.' });
+        }).catch(function (error) {
+            // An error happened.
+        });
+    }
+
+    renderButton() {
+        console.log("this.state.feedback: ", this.state.feedback);
+        if (this.state.loading === "register") {
+            return (
+                <View style={[styles.button, styles.buttonPrimary]}>
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                </View>
+            );
+        } else if (this.state.feedback === null) {
+            return (
+                <View style={[styles.button, styles.buttonPrimary]}>
+                    <TouchableOpacity onPress={() => {
+                        this.register();
+                    }}>
+                        <Text style={styles.buttonText}>
+                            Criar conta
+                                        </Text>
+                    </TouchableOpacity>
+                </View>
+            );
         }
     }
     render() {
@@ -170,7 +207,7 @@ export default class RegisterScreen extends React.Component {
 
                     <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
 
-                    {feedback === "" ? (
+                    {feedback === null ? (
                         <View style={styles.inputGroup}>
                             <View style={styles.inputGroup}>
                                 <TextInput
@@ -224,19 +261,8 @@ export default class RegisterScreen extends React.Component {
                                 Voltar
                         </Text>
                         </TouchableOpacity>
-                        <View style={[styles.button, styles.buttonPrimary]}>
-                            {loadingButton === "register" ? (
-                                <ActivityIndicator size="small" color="#FFFFFF" />
-                            ) : (
-                                    <TouchableOpacity onPress={() => {
-                                        this.register();
-                                    }}>
-                                        <Text style={styles.buttonText}>
-                                            Criar conta
-                        </Text>
-                                    </TouchableOpacity>
-                                )}
-                        </View>
+
+                        {this.renderButton()}
                     </View>
 
                     <View style={styles.divider}>

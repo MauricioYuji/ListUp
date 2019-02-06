@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, View, TextInput, CheckBox, DeviceEventEmi
 import { ExpoLinksView } from '@expo/samples';
 import Layout from '../../constants/Layout';
 import { signInWithFacebook } from '../../components/services/facebookAuth';
+import { saveUserInfo } from '../../components/services/Service';
 import { Constants } from 'expo';
 import * as firebase from 'firebase';
 import TabBarIcon from '../../components/UI/TabBarIcon';
@@ -16,15 +17,13 @@ export default class LoginScreen extends React.Component {
         super(props);
     }
     state = {
-        secureTextEntry: true, email: '', password: '', errorMessage: null, loading: null
+        secureTextEntry: true, email: '', password: '', errorMessage: null, loading: null, emailSend: false, feedback: null
     };
     facebookloggin() {
         const _self = this;
         this.setState({ loading: 'facebook' });
         signInWithFacebook().then(() => {
             var user = firebase.auth().currentUser;
-            console.log("user: ", user);
-
             _self.setState({ errorMessage: null, loading: null });
             //if (user.emailVerified) {
             //    _self.setState({ errorMessage: null, loading: null });
@@ -46,34 +45,59 @@ export default class LoginScreen extends React.Component {
 
         const { email, password } = this.state;
         const _self = this;
-        this.setState({ loading: 'login', errorMessage: null });
-        firebase.auth().signInWithEmailAndPassword(email, password)
-            .then(() => {
+        _self.setState({ loading: 'login', errorMessage: null, emailSend: false, feedback: null });
+        firebase.auth().signOut().then(function () {
+            // Sign-out successful.
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then((data) => {
+                    var user = firebase.auth().currentUser;
 
-                var user = firebase.auth().currentUser;
+                    if (user.emailVerified) {
+                        _self.setState({ errorMessage: null, loading: null });
+                    } else {
 
-                if (user.emailVerified) {
-                    this.setState({ errorMessage: null, loading: null });
-                } else {
 
-                    firebase.auth().signOut().then(function () {
-                        // Sign-out successful.
-                        _self.setState({ errorMessage: 'Verifique seu email e confirma sua conta para poder entrar.', loading: null });
-                    }, function (error) {
-                        // An error happened.
-                    });
-                }
-                //DeviceEventEmitter.emit('login', { logged: true });
-            })
-            .catch(() => {
-                this.setState({ errorMessage: 'Usuário ou senha inválidos!', loading: null });
-            });
+                        _self.setState({ errorMessage: 'Verifique seu email e confirme sua conta para poder entrar.', loading: null, emailSend: true, feedback: null });
+                        //firebase.auth().signOut().then(function () {
+                        //    // Sign-out successful.
+                        //}, function (error) {
+                        //    // An error happened.
+                        //});
+                    }
+                    //DeviceEventEmitter.emit('login', { logged: true });
+                })
+                .catch(() => {
+                    _self.setState({ errorMessage: 'Usuário ou senha inválidos!', loading: null, feedback: null });
+                });
+        }, function (error) {
+            // An error happened.
+        });
+
+
+    }
+    sendEmail() {
+        var _self = this;
+        _self.setState({ errorMessage: null, loading: null, emailSend: false });
+        var user = firebase.auth().currentUser;
+        user.sendEmailVerification().then(function () {
+            console.log("EMAIL ENVIADO");
+            // Email sent.
+            _self.setState({ feedback: 'Email enviado com sucesso.' });
+        }).catch(function (error) {
+            // An error happened.
+        });
     }
     render() {
         const loadingButton = this.state.loading;
         let error;
         if (this.state.errorMessage !== null) {
             error = <Text style={styles.errorFeedback}>{this.state.errorMessage}</Text>;
+        }
+        let emailSend;
+        emailSend = this.state.emailSend;
+        let feedback;
+        if (this.state.feedback !== null) {
+            feedback = <Text style={styles.feedbackMessage}>{this.state.feedback}</Text>;
         }
         return (
             <View style={styles.container}
@@ -115,6 +139,17 @@ export default class LoginScreen extends React.Component {
                     <View>
                         {error}
                     </View>
+                    {emailSend === true ? (
+                        <View>
+                            <TouchableOpacity onPress={() => this.sendEmail()}>
+                                <Text style={styles.sendLink}>Caso não tenha recebido o email, clique aqui para reenviar o email de confirmação.</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ) : (
+                            <View>
+                                {feedback}
+                            </View>
+                        )}
                     <View style={styles.buttonGroup}>
                         <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={() => {
                             this.props.navigation.navigate('Register');
@@ -256,6 +291,10 @@ const styles = StyleSheet.create({
         color: '#F00',
         margin: 10
     },
+    feedbackMessage: {
+        color: '#0F0',
+        margin: 10
+    },
     facebookButton: {
         flexDirection: 'row',
         marginTop: 30,
@@ -268,6 +307,12 @@ const styles = StyleSheet.create({
     },
     facebooklogo: {
         marginRight: 20
+    },
+    sendLink: {
+        color: '#FFF',
+        fontSize: 14,
+        fontFamily: 'SourceSansPro-Bold',
+        margin: 10
     },
     buttonGroup: {
         flexDirection: 'row',

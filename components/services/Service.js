@@ -42,16 +42,38 @@ export const test = () => {
 //        return snapshot.val();
 //    });
 //};
-//export const saveUserInfo = (userid, name, photo) => {
-//    const obj = {
-//        name: name,
-//        photo: photo
-//    };
-//    return firebase.database().ref('/UserInfo/' + userid).set(obj).then((data) => {
-//        //success callback
-//        console.log('data ', data);
-//    }).catch((error) => {
-//        //error callback
-//        console.log('error ', error);
-//    });
-//};
+export const setData = (table, obj) => {
+    return firebase.database().ref('/' + table).update(obj).then((data) => {
+        //success callback
+        //console.log('data ', data);
+        return data;
+    }).catch((error) => {
+        //error callback
+        console.log('error ', error);
+    });
+};
+
+export const getData = (table) => {
+    //firebase.database().ref('/Games').on('value', function (snapshot) {
+    //    console.log("LOADED");
+    //    return snapshot.val();
+    //});
+    //console.log("table: ", table);
+    return firebase.database().ref('/' + table).once('value').then(function (snapshot) {
+        //console.log("snapshot: ", snapshot);
+        return snapshot.val();
+    });
+
+    //return firebase.database().ref('/' + table).once('value').then(function (snapshot) {
+        
+    //    return snapshot.val();
+    //});
+};
+
+
+export const getGamesbyKeys = (keys) => {
+
+    return firebase.database().ref('/Games').once('value').then(function (snapshot) {
+        return snapshot.val();
+    });
+};

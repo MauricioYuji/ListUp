@@ -23,14 +23,13 @@ import { FadeSpin } from '../../components/animations/FadeSpin';
 import { MonoText } from '../../components/UI/StyledText';
 import NavigationService from '../../components/services/NavigationService';
 import TabBarIcon from '../../components/UI/TabBarIcon';
+import { setData } from '../../components/services/Service';
 
 export default class Header extends React.Component {
 
     constructor(props) {
         super(props);
         const { height, width } = Dimensions.get('window');
-        console.log("width:", width);
-        console.log("height:", height);
     }
     state = {
         user: null,
@@ -93,6 +92,17 @@ export default class Header extends React.Component {
         //});
         //console.log("value: ", value);
         //console.log("this.state.rotateAnim: ", this.state.rotateAnim);
+
+        //var user = null;
+        //    this._getUser().then((res) => {
+        //        user = res;
+        //        var obj = ['-LVi3nkMK28C1386Ibau', '-LVi3nkaJdwErn95GnuB', '-LVi3nl2QoVMIiPLn2cp', '-LVi3nlEPgIjsGXRef5h'];
+        //        setData('/userGames/'+user.uid, obj)
+        //            .then((res) => {
+        //                // console.log("res: ", res);
+
+        //            });
+        //});
 
         this.setState({
             visible: !this.state.visible,
@@ -163,7 +173,7 @@ export default class Header extends React.Component {
         let avatar;
         if (user !== null) {
             const userdata = this.state.user.providerData[0];
-
+            //console.log("userdata: ", userdata);
 
             if (userdata.providerId === "facebook.com") {
                 avatar = <Image source={{ uri: userdata.photoURL + '?type=large' }} style={styles.profile} />;
@@ -214,7 +224,7 @@ export default class Header extends React.Component {
                     </Grow>
 
                     <ScrollView style={styles.menuContent} horizontal={true}>
-                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Profile', 1)}>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Profile', this.state.user.uid)}>
                             <View>
                                 <TabBarIcon
                                     name={'user-o'}
@@ -336,7 +346,8 @@ const styles = StyleSheet.create({
         zIndex: 100
     },
     profile: {
-        flex: 1,
+        width: '100%',
+        height: '100%',
         maxWidth: '100%',
         maxHeight: '100%',
         top: 0,

@@ -15,38 +15,25 @@ import {
 import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 
 import Layout from '../../constants/Layout';
-import { getUserInfo, test } from '../../components/services/Service';
+import { getData } from '../../components/services/Service';
 import { MonoText } from '../../components/UI/StyledText';
+import { GetImage } from '../../components/UI/GetImage';
 
 export default class HomeScreen extends React.Component {
 
+    static navigationOptions = {
+        header: null,
+    };
     constructor(props) {
         super(props);
     }
 
     state = {
-        user: null
+        user: null,
+        usergames: [],
+        companies: null
     };
-    static navigationOptions = {
-        header: null,
-    };
-
-    _getUser = async () => {
-        try {
-            const value = await AsyncStorage.getItem('user');
-            console.log("value: ", value);
-            if (value !== null) {
-                // We have data!!
-                //this.setState({ test: value });
-                this.setState({ user: JSON.parse(value) });
-
-            }
-        } catch (error) {
-            // Error retrieving data
-        }
-    }
     componentWillMount() {
-        this._getUser();
     }
     componentDidMount() {
         //var teste = Service.test();
@@ -72,30 +59,81 @@ export default class HomeScreen extends React.Component {
         //    });
 
 
-        test()
+        var user = firebase.auth().currentUser;
+        this.setState({ user: user });
+        getData('userGames/' + user.uid)
             .then((res) => {
-                // console.log("res: ", res);
-
+                //console.log("res: ", res);
+                this.setState({ usergames: res });
             });
 
+
+        getData('Companies')
+            .then((res) => {
+                //console.log("res: ", res);
+                this.setState({ companies: res });
+            });
 
 
         // console.log("this.state: ", this.state);
         //   console.log("LIST: ");
         var _self = this;
 
-        //firebase.database().ref('/Games').on('value', function (snapshot) {
+        //firebase.database().ref('/Companies').on('value', function (snapshot) {
         //    console.log(snapshot.val());
-        //    _self.setState({
-        //        isLoading: false,
-        //        dataSource: snapshot.val(),
-        //    }, function () {
-
-        //    });
         //});
     }
+    renderCompanies() {
+        console.log("this.state.usergames: ", this.state.usergames);
+        if (this.state.companies == null)
+            return;
 
+        let table = [];
+
+        let obj = this.state.companies;
+        //let obj = Object.values(this.state.companies.val());
+        //console.log("this.state.companies: ", this.state.companies);
+        //console.log("obj: ", obj);
+        var index = 0;
+        // Outer loop to create parent
+        let entries = null;
+        if (obj !== null) {
+            entries = Object.entries(obj);
+            //console.log(entries);
+        }
+
+        for (var key in obj) {
+            //console.log("key: ", key);
+            //console.log("obj: ", obj[key]);
+            
+
+
+            if (index % 2 === 0) {
+                table.push(
+                    <View style={styles.grid}>
+                        <View style={styles.card}>
+                            <GetImage data={obj[key].img} resizeMode={'contain'} style={styles.cardImage}/>
+                            <Text style={styles.cardText}>0</Text>
+                        </View>
+                        <View style={styles.card}>
+                            <GetImage data={obj[entries[index + 1][0]].img} resizeMode={'contain'} style={styles.cardImage} />
+                            <Text style={styles.cardText}>0</Text>
+                        </View>
+                    </View>
+                );
+            }
+
+            //<View style={styles.card}>{`Column ${this.state.usergames[i + 1]}`}</View>
+            index++;
+        }
+        return table;
+    }
     render() {
+        let randgame = null;
+        let nintendogames = null;
+        let pcgames = null;
+        let psgames = null;
+        let xboxgames = null;
         return (
             <View style={styles.container}>
                 <Image source={{ uri: 'https://firebasestorage.googleapis.com/v0/b/teste-925f4.appspot.com/o/thumbs%2Fs-l1600.jpg?alt=media&token=3955711d-ed54-4969-b226-969eba063c90' }} style={styles.backgroundBanner} />
@@ -108,22 +146,7 @@ export default class HomeScreen extends React.Component {
                             <Text style={styles.bannerTitle}>Call of Duty Black OPS IIII</Text>
                         </View>
                     </View>
-                    <View style={styles.grid}>
-                        <View style={styles.card}>
-                            <Text style={styles.textWhite}>A</Text>
-                        </View>
-                        <View style={styles.card}>
-                            <Text style={styles.textWhite}>B</Text>
-                        </View>
-                    </View>
-                    <View style={styles.grid}>
-                        <View style={styles.card}>
-                            <Text style={styles.textWhite}>C</Text>
-                        </View>
-                        <View style={styles.card}>
-                            <Text style={styles.textWhite}>D</Text>
-                        </View>
-                    </View>
+                    {this.renderCompanies()}
                     <View style={styles.slidegroup}>
                         <Text style={styles.title}>YOUR GAMES</Text>
                         <ScrollView style={styles.gameslide} horizontal={true}>
@@ -215,6 +238,21 @@ const styles = StyleSheet.create({
     textWhite: {
         fontSize: 26,
         color: '#FFF'
+    },
+    cardImage: {
+        flex: 1,
+        maxHeight: '100%',
+        padding: 10,
+        tintColor: 'red'
+    },
+    cardText: {
+        flex: 1,
+        fontSize: 26,
+        alignItems: 'flex-end',
+        justifyContent: 'flex-end',
+        color: '#FFF',
+        textAlign: 'right',
+        padding: 10
     },
     bannerTitle: {
         fontSize: 40,
