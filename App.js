@@ -41,21 +41,21 @@ export default class App extends React.Component {
     };
     componentWillMount() {
 
-        // Listen for authentication state to change.
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user != null && (user.emailVerified || user.providerData[0].providerId === "facebook.com")) {
-                this._storeUser(JSON.stringify(user));
-                this.setState({ logged: true });
-            } else {
-                this.setState({ logged: false });
-                this._deleteUser();
-            }
-            this._getUser();
+        //// Listen for authentication state to change.
+        //firebase.auth().onAuthStateChanged((user) => {
+        //    if (user != null && (user.emailVerified || user.providerData[0].providerId === "facebook.com")) {
+        //        this._storeUser(JSON.stringify(user));
+        //        this.setState({ logged: true });
+        //    } else {
+        //        this.setState({ logged: false });
+        //        this._deleteUser();
+        //    }
+        //    this._getUser();
 
-            this.setState({ isLoadingComplete: true, user });
+        //    this.setState({ isLoadingComplete: true, user });
 
-            // Do other things
-        });
+        //    // Do other things
+        //});
 
         //this._storeData('asd');
         //this._retrieveData();
@@ -71,6 +71,22 @@ export default class App extends React.Component {
 
     }
     componentDidMount() {
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user != null && (user.emailVerified || user.providerData[0].providerId === "facebook.com")) {
+                this._storeUser(JSON.stringify(user));
+                this.setState({ logged: true });
+            } else {
+                this.setState({ logged: false });
+                this._deleteUser();
+            }
+            this._getUser();
+
+            this.setState({ isLoadingComplete: false, user });
+
+            // Do other things
+        });
+
         LayoutAnimation.easeInEaseOut();
     }
     _storeUser = async (user) => {
@@ -113,7 +129,6 @@ export default class App extends React.Component {
                 ...Icon.Ionicons.font,
                 // We include SpaceMono because we use it in HomeScreen.js. Feel free
                 // to remove this if you are not using it in your app
-                'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
                 'SourceSansPro-Black': require('./assets/fonts/SourceSansPro-Black.ttf'),
                 'SourceSansPro-BlackItalic': require('./assets/fonts/SourceSansPro-BlackItalic.ttf'),
                 'SourceSansPro-Bold': require('./assets/fonts/SourceSansPro-Bold.ttf'),
@@ -137,6 +152,7 @@ export default class App extends React.Component {
     };
 
     _handleFinishLoading = () => {
+        this.setState({ isLoadingComplete: true });
     };
 
     render() {

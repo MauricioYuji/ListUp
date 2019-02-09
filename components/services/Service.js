@@ -70,10 +70,3 @@ export const getData = (table) => {
     //});
 };
 
-
-export const getGamesbyKeys = (keys) => {
-
-    return firebase.database().ref('/Games').once('value').then(function (snapshot) {
-        return snapshot.val();
-    });
-};
