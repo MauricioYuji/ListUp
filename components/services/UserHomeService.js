@@ -6,7 +6,7 @@ import { getData } from './Service';
 
 
 export const getUserGames = async (uid) => {
-    console.log("ASYNC CONST");
+    //console.log("ASYNC CONST");
 
     let usergames = null;
     let games = null;
@@ -78,7 +78,7 @@ export const getUserGames = async (uid) => {
         //console.log("--------------------");
         objgames.push(obj);
     }
-        //console.log("================");
+    //console.log("================");
 
     //for (var i = 0; i < usergames.length; i++) {
     //    let obj = games[usergames[i]];
@@ -106,6 +106,7 @@ export const getUserGames = async (uid) => {
     //});
     //console.log("RETURN RESULT: ", companies);
     //console.log("usergames: ", usergames);
+    //objgames = ((objgames.length == 0) ? null : objgames);
     return objgames;
 };
 

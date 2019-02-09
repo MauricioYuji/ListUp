@@ -46,16 +46,19 @@ export default class HomeScreen extends React.Component {
 
 
         getData('Companies')
-            .then((res) => {
-                //console.log("res: ", res);
-                this.setState({ companies: res });
-                getUserGames(user.uid).then((res) => {
-                    //console.log("teste: ", res);
-                    var game = res[Math.floor(Math.random() * res.length)];
-                    this.setState({ usergames: res, randomGame: game, loaded: true });
+            .then((companies) => {
+                companies = companies === undefined ? null : companies;
+                //console.log("companies: ", companies);
+                this.setState({ companies: companies });
+                getUserGames(user.uid).then((usergames) => {
+                    var game = null;
+                    if (usergames.length > 0) {
+                        game = usergames[Math.floor(Math.random() * usergames.length)];
+                    }
+                    this.setState({ usergames: usergames, randomGame: game, loaded: true });
                 });
             });
-        
+
 
     }
     componentWillUnmount() {
@@ -152,19 +155,23 @@ export default class HomeScreen extends React.Component {
     }
     render() {
         let randgame = this.state.randomGame;
+        let randgameImg = null;
+        if (randgame !== null) {
+            randgameImg = <GetImage data={randgame.img} resizeMode={'cover'} style={[styles.backgroundBanner]} />;
+        }
         let usergames = this.state.usergames;
         let loaded = this.state.loaded;
         if (loaded) {
             return (
                 <View style={styles.container}>
-                    <GetImage data={randgame.img} resizeMode={'cover'} style={[styles.backgroundBanner]} />
+                    {randgameImg}
                     <LinearGradient
                         colors={['rgba(0, 0, 0, 0.8)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 1)', 'rgba(0, 0, 0, 1)']}
                         style={styles.backgroundBanner} />
                     <View style={styles.content}>
                         <View style={styles.banner}>
                             <View style={styles.bannerCard}>
-                                <Text style={styles.bannerTitle}>{randgame.name}</Text>
+                                <Text style={styles.bannerTitle}>{randgame !== null ? randgame.name : ""}</Text>
                             </View>
                         </View>
                         {this.renderCompanies()}
