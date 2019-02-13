@@ -19,6 +19,7 @@ import { getData } from '../../components/services/Service';
 import { getUserGames } from '../../components/services/UserHomeService';
 import { MonoText } from '../../components/UI/StyledText';
 import { GetImage } from '../../components/UI/GetImage';
+import LoadingScreen from '../Loading/LoadingScreen';
 import { parse } from 'qs';
 
 export default class HomeScreen extends React.Component {
@@ -182,7 +183,7 @@ export default class HomeScreen extends React.Component {
                                     //console.log('key: ', key);
                                     //console.log('prop: ', prop);
                                     return (
-                                        <TouchableHighlight onPress={() => this.props.navigation.navigate('Profile')}>
+                                        <TouchableHighlight onPress={() => this.props.navigation.navigate('Profile')} key={key}>
                                             <GetImage data={prop.img} resizeMode={'contain'} style={[styles.thumb]} />
                                         </TouchableHighlight>
                                     );
@@ -193,7 +194,7 @@ export default class HomeScreen extends React.Component {
                 </View>
             );
         } else {
-            return null;
+            return (<LoadingScreen/>);
         }
     }
 

@@ -69,6 +69,8 @@ export const getUserGames = async (uid) => {
         obj.companies = [];
         for (var j = 0; j < obj.keyconsole.length; j++) {
             var company = companies[consoles[obj.keyconsole[j]].keycompany];
+            //console.log("consoles[obj.keyconsole[j]]: ", consoles[obj.keyconsole[j]]);
+            //console.log("company: ", company);
             company.key = consoles[obj.keyconsole[j]].keycompany;
             if (!obj.companies.includes(company))
                 obj.companies.push(company);
@@ -107,6 +109,7 @@ export const getUserGames = async (uid) => {
     //console.log("RETURN RESULT: ", companies);
     //console.log("usergames: ", usergames);
     //objgames = ((objgames.length == 0) ? null : objgames);
+    //console.log("objgames: ", objgames);
     return objgames;
 };
 

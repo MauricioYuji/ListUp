@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { AppLoading, Asset, Font, Icon, Constants } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
-import Auth from './navigation/Nav';
+import Auth from './navigation/AuthNavigator';
 import Header from './screens/Shared/Header';
 import Layout from './constants/Layout';
 import { getUserInfo } from './components/services/Service';
