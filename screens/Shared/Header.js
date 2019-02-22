@@ -63,7 +63,7 @@ export default class Header extends React.Component {
     }
     componentDidMount() {
         this._getUser().then((user) => {
-            //console.log("GET user: ", user);
+            console.log("GET user: ", user);
             this.setState({
                 user: user,
                 loading: true
@@ -172,7 +172,7 @@ export default class Header extends React.Component {
         const user = this.state.user;
         let avatar;
         if (user !== null) {
-            const userdata = this.state.user.providerData[0];
+            const userdata = this.state.user;
             //console.log("userdata: ", userdata);
 
             if (userdata.providerId === "facebook.com") {

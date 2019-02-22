@@ -1,9 +1,9 @@
 ﻿import React from 'react';
-import { ScrollView, StyleSheet, Text, View, TextInput, CheckBox, DeviceEventEmitter, Image, TouchableOpacity, Switch, Icon, ActivityIndicator } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, TextInput, CheckBox, DeviceEventEmitter, Image, TouchableOpacity, Switch, Icon, ActivityIndicator, ImageBackground } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
 import Layout from '../../constants/Layout';
 import { signInWithFacebook } from '../../components/services/facebookAuth';
-import { saveUserInfo } from '../../components/services/Service';
+import { setData } from '../../components/services/Service';
 import { Constants } from 'expo';
 import * as firebase from 'firebase';
 import TabBarIcon from '../../components/UI/TabBarIcon';
@@ -24,7 +24,20 @@ export default class LoginScreen extends React.Component {
         this.setState({ loading: 'facebook' });
         signInWithFacebook().then(() => {
             var user = firebase.auth().currentUser;
-            _self.setState({ errorMessage: null, loading: null });
+
+            console.log("user: ", user);
+            var obj = {
+                uid: user.uid,
+                photoURL: user.photoURL,
+                displayName: user.displayName,
+                email: user.email,
+                flagtutorial: false
+            };
+            console.log("obj: ", obj);
+            setData('UserInfo/' + user.uid, obj).then((p) => {
+                console.log("p: ", p);
+                _self.setState({ errorMessage: null, loading: null });
+            });
             //if (user.emailVerified) {
             //    _self.setState({ errorMessage: null, loading: null });
             //} else {
@@ -104,7 +117,7 @@ export default class LoginScreen extends React.Component {
                 keyboardShouldPersistTaps='handled'>
                 {/* Go ahead and delete ExpoLinksView and replace it with your
            * content, we just wanted to provide you with some helpful links */}
-                <View style={styles.loginBox}>
+                    <View style={styles.loginBox}>
 
                     <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
                     <View style={styles.inputGroup}>
@@ -196,18 +209,27 @@ export default class LoginScreen extends React.Component {
                     </View>
 
                 </View>
-
-            </View>
+                </View >
         );
     }
 }
 
 const styles = StyleSheet.create({
+    backgroundBanner: {
+        width: '100%',
+        height: Layout.window.height,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 0,
+    },
     container: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#111',
+
     },
     logo: {
         marginBottom: 60

@@ -12,18 +12,24 @@ import {
     AsyncStorage,
     DeviceEventEmitter,
     LayoutAnimation,
-    Animated
+    Animated,
+    ImageBackground,
+    Image,
+    TouchableHighlight,
+    TouchableOpacity
 } from 'react-native';
 import { AppLoading, Asset, Font, Icon, Constants } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
 import Auth from './navigation/AuthNavigator';
 import Header from './screens/Shared/Header';
 import Layout from './constants/Layout';
-import { getUserInfo } from './components/services/Service';
+import { setData, getData } from './components/services/Service';
 
 import * as firebase from 'firebase';
 import LoginScreen from './screens/Auth/LoginScreen';
 import NavigationService from './components/services/NavigationService';
+import Tutorial from './screens/Tutorial/Tutorial';
+
 
 // Initialize Firebase
 
@@ -37,8 +43,9 @@ export default class App extends React.Component {
         showHeader: true,
         logged: false,
         user: null,
-        showMenu: false
+        showMenu: false,
     };
+
     componentWillMount() {
 
         //// Listen for authentication state to change.
@@ -72,20 +79,6 @@ export default class App extends React.Component {
     }
     componentDidMount() {
 
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user != null && (user.emailVerified || user.providerData[0].providerId === "facebook.com")) {
-                this._storeUser(JSON.stringify(user));
-                this.setState({ logged: true });
-            } else {
-                this.setState({ logged: false });
-                this._deleteUser();
-            }
-            this._getUser();
-
-            this.setState({ isLoadingComplete: false, user });
-
-            // Do other things
-        });
 
         LayoutAnimation.easeInEaseOut();
     }
@@ -118,11 +111,33 @@ export default class App extends React.Component {
             // Error retrieving data
         }
     }
+    _doneTutorial = () => {
+
+        var user = firebase.auth().currentUser;
+
+        var newuser = {
+            uid: user.uid,
+            photoURL: user.photoURL,
+            displayName: user.displayName,
+            email: user.email,
+            flagtutorial: true
+        };
+        var obj = {
+            flagtutorial: true
+        };
+        setData('UserInfo/' + user.uid, obj).then((p) => {
+            this.setState({ user: newuser });
+        });
+    };
     _loadResourcesAsync = async () => {
         return Promise.all([
             Asset.loadAsync([
                 require('./assets/images/logo.png'),
                 require('./assets/images/search-icon.png'),
+                require('./assets/images/background.png'),
+                require('./assets/images/tutorial-1.png'),
+                require('./assets/images/tutorial-2.png'),
+                require('./assets/images/tutorial-3.png'),
             ]),
             Font.loadAsync({
                 // This is the font that we are using for our tab bar
@@ -152,9 +167,22 @@ export default class App extends React.Component {
     };
 
     _handleFinishLoading = () => {
-        this.setState({ isLoadingComplete: true });
-    };
 
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user != null && (user.emailVerified || user.providerData[0].providerId === "facebook.com")) {
+                getData('UserInfo/' + user.uid).then((p) => {
+                    this._storeUser(JSON.stringify(p));
+                    this.setState({ logged: true, user: p, isLoadingComplete: true });
+                });
+            } else {
+                this.setState({ logged: false, isLoadingComplete: true });
+                this._deleteUser();
+            }
+            //this._getUser();
+
+            // Do other things
+        });
+    };
     render() {
         const showMenu = this.state.showMenu;
         let header;
@@ -173,30 +201,75 @@ export default class App extends React.Component {
             return (
                 <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1 }}
                     keyboardShouldPersistTaps='handled'>
+                    <Image source={require('./assets/images/background.png')} resizeMode={'cover'} style={[styles.backgroundBanner]} />
                     <StatusBar barStyle="default" />
                     <Auth />
                 </ScrollView>
             );
+        } else if (this.state.user != null) {
+            //console.log("this.state.user: ", this.state.user);
+            if (this.state.user.flagtutorial) {
+                return (
+                    <Animated.ScrollView style={[styles.container, showMenu ? styles.showMenu : '']} contentContainerStyle={{ flexGrow: 1 }}
+                        keyboardShouldPersistTaps='handled'>
+                        <Image source={require('./assets/images/background.png')} resizeMode={'cover'} style={[styles.backgroundBanner]} />
+                        <StatusBar barStyle="default" />
+                        <AppNavigator ref={navigatorRef => {
+                            NavigationService.setTopLevelNavigator(navigatorRef);
+                        }} />
+                        <Header style={styles.header} />
+                    </Animated.ScrollView>
+                );
+            } else {
+                return (
+                    <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1 }}
+                        keyboardShouldPersistTaps='handled'>
+                        <Image source={require('./assets/images/background.png')} resizeMode={'cover'} style={[styles.backgroundBanner]} />
+                        <StatusBar barStyle="default" />
+
+                        <TouchableOpacity onPress={() => { this._doneTutorial(); }} style={styles.skipButton}>
+                            <Text style={styles.skipText}>Pular</Text>
+                        </TouchableOpacity>
+                        <Tutorial />
+
+                    </ScrollView>
+                );
+            }
         } else {
-            return (
-                <Animated.ScrollView style={[styles.container, showMenu ? styles.showMenu : '']} contentContainerStyle={{ flexGrow: 1 }}
-                    keyboardShouldPersistTaps='handled'>
-                    <StatusBar barStyle="default" />
-                    <AppNavigator ref={navigatorRef => {
-                        NavigationService.setTopLevelNavigator(navigatorRef);
-                    }} />
-                    <Header style={styles.header} />
-                </Animated.ScrollView>
-            );
+            return null;
         }
     }
 }
 
+var changingTutorial = false;
+const tutorialpages = ["TutorialGames", "TutorialLists", "TutorialFeed"];
 const styles = StyleSheet.create({
+    skipButton: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        zIndex: 1000000000,
+        backgroundColor: '#F00'
+    },
+    skipText: {
+
+        fontSize: 24,
+        color: '#FFF',
+    },
     container: {
         flex: 1,
         marginTop: Constants.statusBarHeight,
-        backgroundColor: '#000'
+        backgroundColor: '#000',
+    },
+    backgroundBanner: {
+        width: '100%',
+        height: Layout.window.height,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 0,
     },
     showMenu: {
         marginRight: 200,

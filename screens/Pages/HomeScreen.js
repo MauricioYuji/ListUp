@@ -15,7 +15,7 @@ import {
 import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 
 import Layout from '../../constants/Layout';
-import { getData } from '../../components/services/Service';
+import { getData, setData } from '../../components/services/Service';
 import { getUserGames } from '../../components/services/UserHomeService';
 import { MonoText } from '../../components/UI/StyledText';
 import { GetImage } from '../../components/UI/GetImage';
@@ -46,19 +46,19 @@ export default class HomeScreen extends React.Component {
         this.setState({ user: user });
 
 
-        getData('Companies')
-            .then((companies) => {
-                companies = companies === undefined ? null : companies;
-                //console.log("companies: ", companies);
-                this.setState({ companies: companies });
-                getUserGames(user.uid).then((usergames) => {
-                    var game = null;
-                    if (usergames.length > 0) {
-                        game = usergames[Math.floor(Math.random() * usergames.length)];
-                    }
-                    this.setState({ usergames: usergames, randomGame: game, loaded: true });
-                });
-            });
+        //getData('Companies')
+        //    .then((companies) => {
+        //        companies = companies === undefined ? null : companies;
+        //        //console.log("companies: ", companies);
+        //        this.setState({ companies: companies });
+        //        getUserGames(user.uid).then((usergames) => {
+        //            var game = null;
+        //            if (usergames.length > 0) {
+        //                game = usergames[Math.floor(Math.random() * usergames.length)];
+        //            }
+        //            this.setState({ usergames: usergames, randomGame: game, loaded: true });
+        //        });
+        //    });
 
 
     }
@@ -69,132 +69,16 @@ export default class HomeScreen extends React.Component {
             companies: null
         });
     }
-    getconsolestyle(console) {
-        switch (console) {
-            case "Playstation":
-                return styles.Playstation;
-            case "Nintendo":
-                return styles.Nintendo;
-            case "Xbox":
-                return styles.Xbox;
-            case "Steam":
-                return styles.Steam;
-            default:
-            // code block
-        }
-    }
-    getconsolestyletext(console) {
-        switch (console) {
-            case "Playstation":
-                return styles.PlaystationText;
-            case "Nintendo":
-                return styles.NintendoText;
-            case "Xbox":
-                return styles.XboxText;
-            case "Steam":
-                return styles.SteamText;
-            default:
-            // code block
-        }
-    }
-    renderCompanies() {
-        //console.log("this.state.usergames: ", this.state.usergames);
-        //console.log("this.state.companies: ", this.state.companies);
-        if (this.state.usergames === null || this.state.companies === null)
-            return;
-
-        let companies = this.state.companies;
-        let content = [];
-
-        var usergames = this.state.usergames;
-        for (var i = 0; i < usergames.length; i++) {
-            let c = usergames[i].companies;
-
-            for (var j = 0; j < c.length; j++) {
-                if ("games" in companies[c[j].key])
-                    companies[c[j].key].games++;
-                else
-                    companies[c[j].key].games = 1;
-                //var obj = companies.filter(p => p.key == c[j].key);
-                //index = companies.findIndex(p => p.key == c[j].key);
-                //console.log("obj: ", obj);
-                //console.log("index: ", index);
-
-                //if (obj.length == 0) {
-                //    c[j].games = 1;
-                //    companies.push(c[j]);
-                //} else {
-                //    companies[index].games = parseInt(obj.games) + 1;
-                //}
-            }
-        }
-
-
-        //console.log("companies: ", companies);
-        let index = 0;
-        let lastkey = null;
-        for (var key in companies) {
-            if (index % 2 !== 0) {
-                content.push(
-                    <View style={styles.grid} key={key}>
-                        <View style={styles.card}>
-                            <GetImage data={companies[lastkey].img} resizeMode={'contain'} style={[styles.cardImage, this.getconsolestyle(companies[lastkey].name)]} />
-                            <Text style={[styles.cardText, this.getconsolestyletext(companies[lastkey].name)]}>{companies[lastkey].games}</Text>
-                        </View>
-                        <View style={styles.card}>
-                            <GetImage data={companies[key].img} resizeMode={'contain'} style={[styles.cardImage, this.getconsolestyle(companies[key].name)]} />
-                            <Text style={[styles.cardText, this.getconsolestyletext(companies[key].name)]}>{companies[key].games}</Text>
-                        </View>
-                    </View>
-                );
-            }
-            lastkey = key;
-            index++;
-        }
-
-        return content;
-    }
     render() {
-        let randgame = this.state.randomGame;
-        let randgameImg = null;
-        if (randgame !== null) {
-            randgameImg = <GetImage data={randgame.img} resizeMode={'cover'} style={[styles.backgroundBanner]} />;
-        }
-        let usergames = this.state.usergames;
         let loaded = this.state.loaded;
         if (loaded) {
             return (
                 <View style={styles.container}>
-                    {randgameImg}
-                    <LinearGradient
-                        colors={['rgba(0, 0, 0, 0.8)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 1)', 'rgba(0, 0, 0, 1)']}
-                        style={styles.backgroundBanner} />
-                    <View style={styles.content}>
-                        <View style={styles.banner}>
-                            <View style={styles.bannerCard}>
-                                <Text style={styles.bannerTitle}>{randgame !== null ? randgame.name : ""}</Text>
-                            </View>
-                        </View>
-                        {this.renderCompanies()}
-                        <View style={styles.slidegroup}>
-                            <Text style={styles.title}>YOUR GAMES</Text>
-                            <ScrollView style={styles.gameslide} horizontal={true}>
-                                {usergames.map((prop, key) => {
-                                    //console.log('key: ', key);
-                                    //console.log('prop: ', prop);
-                                    return (
-                                        <TouchableHighlight onPress={() => this.props.navigation.navigate('Profile')} key={key}>
-                                            <GetImage data={prop.img} resizeMode={'contain'} style={[styles.thumb]} />
-                                        </TouchableHighlight>
-                                    );
-                                })}
-                            </ScrollView>
-                        </View>
-                    </View>
+                    <Text>teste</Text>
                 </View>
             );
         } else {
-            return (<LoadingScreen/>);
+            return (<LoadingScreen />);
         }
     }
 

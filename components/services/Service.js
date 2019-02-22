@@ -43,9 +43,10 @@ export const test = () => {
 //    });
 //};
 export const setData = (table, obj) => {
+    console.log('table ', table);
+    console.log('obj ', obj);
     return firebase.database().ref('/' + table).update(obj).then((data) => {
         //success callback
-        //console.log('data ', data);
         return data;
     }).catch((error) => {
         //error callback

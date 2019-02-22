@@ -6,7 +6,7 @@ import { Constants } from 'expo';
 import * as firebase from 'firebase';
 //import { getUserInfo, saveUserInfo } from '../components/Service';
 import { signInWithFacebook } from '../../components/services/facebookAuth';
-import { saveUserInfo } from '../../components/services/Service';
+import { setData } from '../../components/services/Service';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 
 export default class RegisterScreen extends React.Component {
@@ -22,14 +22,14 @@ export default class RegisterScreen extends React.Component {
     };
 
     validate = (text) => {
-        console.log(text);
+        //console.log(text);
         let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
         if (reg.test(text) === false) {
-            console.log("Email is Not Correct");
+            //console.log("Email is Not Correct");
             return false;
         }
         else {
-            console.log("Email is Correct");
+            //console.log("Email is Correct");
             return true;
         }
     }
@@ -37,8 +37,23 @@ export default class RegisterScreen extends React.Component {
     facebookloggin() {
         this.setState({ loading: 'facebook' });
         signInWithFacebook().then(() => {
+
             var user = firebase.auth().currentUser;
-            this.setState({ loading: null });
+            console.log("user: ", user);
+            var obj = {
+                uid: user.uid,
+                photoURL: user.photoURL,
+                displayName: user.displayName,
+                email: user.email,
+                flagtutorial: false
+            };
+            console.log("obj: ", obj);
+            setData('UserInfo/' + user.uid, obj).then((p) => {
+                console.log("p: ", p);
+                _self.setState({ errorMessage: null, loading: null });
+            });
+
+            
         })
             .catch(() => {
                 this.setState({ errorMessage: null, loading: null });
@@ -114,7 +129,19 @@ export default class RegisterScreen extends React.Component {
                         user.sendEmailVerification().then(function () {
                             console.log("EMAIL ENVIADO");
                             // Email sent.
-                            _self.setState({ error: '', loading: null, feedback: 'Usuário criado, acesse seu email para confirmar a conta.' });
+                            console.log("user: ", user);
+                            var obj = {
+                                uid: user.uid,
+                                photoURL: user.photoURL,
+                                displayName: user.displayName,
+                                email: user.email,
+                                flagtutorial: false
+                            };
+                            console.log("obj: ", obj);
+                            setData('UserInfo/' + user.uid, obj).then((p) => {
+                                console.log("p: ", p);
+                                _self.setState({ errorMessage: null, loading: null, feedback: 'Usuário criado, acesse seu email para confirmar a conta.' });
+                            });
                         }).catch(function (error) {
                             // An error happened.
                         });
@@ -158,7 +185,6 @@ export default class RegisterScreen extends React.Component {
     }
 
     renderButton() {
-        console.log("this.state.feedback: ", this.state.feedback);
         if (this.state.loading === "register") {
             return (
                 <View style={[styles.button, styles.buttonPrimary]}>
@@ -296,7 +322,6 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#111',
     },
     logo: {
         marginBottom: 60
