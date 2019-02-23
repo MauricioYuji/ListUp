@@ -76,6 +76,13 @@ export default class App extends React.Component {
         //    this.setState({ showMenu: data.show });
         //});
 
+
+        DeviceEventEmitter.addListener('updateUser', (data) => {
+            //console.log("data: ", data);
+            this._updateUser(data.user);
+            NavigationService.navigate('App');
+        });
+
     }
     componentDidMount() {
 
@@ -122,11 +129,11 @@ export default class App extends React.Component {
             email: user.email,
             flagtutorial: true
         };
-        var obj = {
-            flagtutorial: true
-        };
-        setData('UserInfo/' + user.uid, obj).then((p) => {
-            this.setState({ user: newuser });
+        this._updateUser(newuser);
+    };
+    _updateUser = (user) => {
+        setData('UserInfo/' + user.uid, user).then((p) => {
+            this.setState({ user: user });
         });
     };
     _loadResourcesAsync = async () => {
@@ -173,10 +180,17 @@ export default class App extends React.Component {
                 getData('UserInfo/' + user.uid).then((p) => {
                     this._storeUser(JSON.stringify(p));
                     this.setState({ logged: true, user: p, isLoadingComplete: true });
+                    if (p.flagtutorial) {
+                        NavigationService.navigate('App');
+                    } else {
+                        NavigationService.navigate('Tutorial');
+                    }
                 });
             } else {
                 this.setState({ logged: false, isLoadingComplete: true });
                 this._deleteUser();
+
+                NavigationService.navigate('Auth');
             }
             //this._getUser();
 
@@ -184,11 +198,6 @@ export default class App extends React.Component {
         });
     };
     render() {
-        const showMenu = this.state.showMenu;
-        let header;
-        if (this.state.showHeader) {
-            header = <Header style={styles.header} />;
-        }
         if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
             return (
                 <AppLoading
@@ -197,48 +206,75 @@ export default class App extends React.Component {
                     onFinish={this._handleFinishLoading}
                 />
             );
-        } else if (!this.state.logged) {
+        } else {
             return (
                 <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1 }}
                     keyboardShouldPersistTaps='handled'>
                     <Image source={require('./assets/images/background.png')} resizeMode={'cover'} style={[styles.backgroundBanner]} />
                     <StatusBar barStyle="default" />
-                    <Auth />
+                    <AppNavigator ref={navigatorRef => {
+                        NavigationService.setTopLevelNavigator(navigatorRef);
+                    }} />
                 </ScrollView>
             );
-        } else if (this.state.user != null) {
-            //console.log("this.state.user: ", this.state.user);
-            if (this.state.user.flagtutorial) {
-                return (
-                    <Animated.ScrollView style={[styles.container, showMenu ? styles.showMenu : '']} contentContainerStyle={{ flexGrow: 1 }}
-                        keyboardShouldPersistTaps='handled'>
-                        <Image source={require('./assets/images/background.png')} resizeMode={'cover'} style={[styles.backgroundBanner]} />
-                        <StatusBar barStyle="default" />
-                        <AppNavigator ref={navigatorRef => {
-                            NavigationService.setTopLevelNavigator(navigatorRef);
-                        }} />
-                        <Header style={styles.header} />
-                    </Animated.ScrollView>
-                );
-            } else {
-                return (
-                    <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1 }}
-                        keyboardShouldPersistTaps='handled'>
-                        <Image source={require('./assets/images/background.png')} resizeMode={'cover'} style={[styles.backgroundBanner]} />
-                        <StatusBar barStyle="default" />
-
-                        <TouchableOpacity onPress={() => { this._doneTutorial(); }} style={styles.skipButton}>
-                            <Text style={styles.skipText}>Pular</Text>
-                        </TouchableOpacity>
-                        <Tutorial />
-
-                    </ScrollView>
-                );
-            }
-        } else {
-            return null;
         }
     }
+    //render() {
+    //    const showMenu = this.state.showMenu;
+    //    let header;
+    //    if (this.state.showHeader) {
+    //        header = <Header style={styles.header} />;
+    //    }
+    //    if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
+    //        return (
+    //            <AppLoading
+    //                startAsync={this._loadResourcesAsync}
+    //                onError={this._handleLoadingError}
+    //                onFinish={this._handleFinishLoading}
+    //            />
+    //        );
+    //    } else if (!this.state.logged) {
+    //        return (
+    //            <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1 }}
+    //                keyboardShouldPersistTaps='handled'>
+    //                <Image source={require('./assets/images/background.png')} resizeMode={'cover'} style={[styles.backgroundBanner]} />
+    //                <StatusBar barStyle="default" />
+    //                <Auth />
+    //            </ScrollView>
+    //        );
+    //    } else if (this.state.user != null) {
+    //        //console.log("this.state.user: ", this.state.user);
+    //        if (this.state.user.flagtutorial) {
+    //            return (
+    //                <Animated.ScrollView style={[styles.container, showMenu ? styles.showMenu : '']} contentContainerStyle={{ flexGrow: 1 }}
+    //                    keyboardShouldPersistTaps='handled'>
+    //                    <Image source={require('./assets/images/background.png')} resizeMode={'cover'} style={[styles.backgroundBanner]} />
+    //                    <StatusBar barStyle="default" />
+    //                    <AppNavigator ref={navigatorRef => {
+    //                        NavigationService.setTopLevelNavigator(navigatorRef);
+    //                    }} />
+    //                    <Header style={styles.header} />
+    //                </Animated.ScrollView>
+    //            );
+    //        } else {
+    //            return (
+    //                <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1 }}
+    //                    keyboardShouldPersistTaps='handled'>
+    //                    <Image source={require('./assets/images/background.png')} resizeMode={'cover'} style={[styles.backgroundBanner]} />
+    //                    <StatusBar barStyle="default" />
+
+    //                    <TouchableOpacity onPress={() => { this._doneTutorial(); }} style={styles.skipButton}>
+    //                        <Text style={styles.skipText}>Pular</Text>
+    //                    </TouchableOpacity>
+    //                    <Tutorial />
+
+    //                </ScrollView>
+    //            );
+    //        }
+    //    } else {
+    //        return null;
+    //    }
+    //}
 }
 
 var changingTutorial = false;
@@ -248,8 +284,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 10,
         right: 10,
-        zIndex: 1000000000,
-        backgroundColor: '#F00'
+        zIndex: 1
     },
     skipText: {
 

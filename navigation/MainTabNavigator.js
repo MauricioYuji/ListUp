@@ -3,21 +3,23 @@ import { Platform } from 'react-native';
 import { createStackNavigator, createBottomTabNavigator, createMaterialTopTabNavigator } from 'react-navigation';
 
 import TabBarIcon from '../components/UI/TabBarIcon';
+import { Menu } from '../components/UI/Menu';
 import HomeScreen from '../screens/Pages/HomeScreen';
 import LinksScreen from '../screens/Pages/LinksScreen';
 import SettingsScreen from '../screens/Pages/SettingsScreen';
+import { MultiBarToggle } from 'react-native-multibar';
 
 const HomeStack = createStackNavigator({
     Home: HomeScreen,
 });
 
 HomeStack.navigationOptions = {
-    tabBarLabel: 'Home',
+    tabBarLabel: 'Feed',
     tabBarIcon: ({ focused }) => (
         <TabBarIcon
             focused={focused}
-            name={'dashboard'}
-            type={'MaterialIcons'}
+            name={'list-alt'}
+            type={'FontAwesome'}
         />
     ),
 };
@@ -27,7 +29,7 @@ const LinksStack = createStackNavigator({
 });
 
 LinksStack.navigationOptions = {
-    tabBarLabel: 'Links',
+    tabBarLabel: 'Games',
     tabBarIcon: ({ focused }) => (
         <TabBarIcon
             focused={focused}
@@ -42,14 +44,35 @@ const SettingsStack = createStackNavigator({
 });
 
 SettingsStack.navigationOptions = {
-    tabBarLabel: 'Settings',
+    tabBarLabel: 'Profile',
     tabBarIcon: ({ focused }) => (
         <TabBarIcon
             focused={focused}
-            name={'md-stats'}
-            type={'Ionicons'}
+            name={'user'}
+            type={'FontAwesome'}
         />
     ),
+};
+const TestStack = createStackNavigator({
+    Test: LinksScreen,
+});
+
+TestStack.navigationOptions = {
+    tabBarLabel: 'Grupos',
+    tabBarIcon: ({ focused }) => (
+        <TabBarIcon
+            focused={focused}
+            name={'users'}
+            type={'FontAwesome'}
+        />
+    ),
+};
+
+const addingStack = {
+    screen: () => null, // Empty screen
+    navigationOptions: () => ({
+        tabBarIcon: <Menu /> // Plus button component
+    })
 };
 
 
@@ -57,7 +80,9 @@ SettingsStack.navigationOptions = {
 export default createBottomTabNavigator({
     HomeStack,
     LinksStack,
-    SettingsStack
+    addingStack,
+    SettingsStack,
+    TestStack
 }, {
         tabBarOptions: {
             showLabel: false,
@@ -95,4 +120,3 @@ export default createBottomTabNavigator({
 //            },
 //        }
 //    });
-
