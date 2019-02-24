@@ -215,6 +215,7 @@ export default class App extends React.Component {
                     <AppNavigator ref={navigatorRef => {
                         NavigationService.setTopLevelNavigator(navigatorRef);
                     }} />
+                    <Header style={styles.header} />
                 </ScrollView>
             );
         }

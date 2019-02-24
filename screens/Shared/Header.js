@@ -244,6 +244,56 @@ export default class Header extends React.Component {
                                 <Text style={styles.menuLabel}>Editar</Text>
                             </View>
                         </TouchableHighlight>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'settings'}
+                                    type={'MaterialIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Editar</Text>
+                            </View>
+                        </TouchableHighlight>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'settings'}
+                                    type={'MaterialIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Editar</Text>
+                            </View>
+                        </TouchableHighlight>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'settings'}
+                                    type={'MaterialIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Editar</Text>
+                            </View>
+                        </TouchableHighlight>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'settings'}
+                                    type={'MaterialIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Editar</Text>
+                            </View>
+                        </TouchableHighlight>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'settings'}
+                                    type={'MaterialIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Editar</Text>
+                            </View>
+                        </TouchableHighlight>
                         <TouchableHighlight style={styles.menuItem} onPress={() => this.logoff()}>
                             <View style={styles.menuItem}>
                                 <TabBarIcon

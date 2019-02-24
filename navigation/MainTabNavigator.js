@@ -1,19 +1,46 @@
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, Easing, Animated } from 'react-native';
 import { createStackNavigator, createBottomTabNavigator, createMaterialTopTabNavigator } from 'react-navigation';
 
 import TabBarIcon from '../components/UI/TabBarIcon';
 import { Menu } from '../components/UI/Menu';
-import HomeScreen from '../screens/Pages/HomeScreen';
-import LinksScreen from '../screens/Pages/LinksScreen';
-import SettingsScreen from '../screens/Pages/SettingsScreen';
-import { MultiBarToggle } from 'react-native-multibar';
+import FeedScreen from '../screens/Pages/FeedScreen';
+import GamesScreen from '../screens/Pages/GamesScreen';
+import GroupsScreen from '../screens/Pages/GroupsScreen';
+import ProfileScreen from '../screens/Pages/ProfileScreen';
+const transitionConfig = () => {
+    return {
+        transitionSpec: {
+            duration: 750,
+            easing: Easing.out(Easing.poly(4)),
+            timing: Animated.timing,
+            useNativeDriver: true,
+        },
+        screenInterpolator: sceneProps => {
+            const { layout, position, scene } = sceneProps
 
-const HomeStack = createStackNavigator({
-    Home: HomeScreen,
-});
+            const thisSceneIndex = scene.index
+            const width = layout.initWidth
 
-HomeStack.navigationOptions = {
+            const translateX = position.interpolate({
+                inputRange: [thisSceneIndex - 1, thisSceneIndex],
+                outputRange: [width, 0],
+            })
+
+            return { transform: [{ translateX }] }
+        },
+    }
+}
+const FeedStack = createStackNavigator({
+    Feed: FeedScreen,
+},
+    {
+        headerMode: 'none',
+        cardStyle: { backgroundColor: '#00000000' },
+        transitionConfig: transitionConfig,
+    });
+
+FeedStack.navigationOptions = {
     tabBarLabel: 'Feed',
     tabBarIcon: ({ focused }) => (
         <TabBarIcon
@@ -24,11 +51,16 @@ HomeStack.navigationOptions = {
     ),
 };
 
-const LinksStack = createStackNavigator({
-    Links: LinksScreen,
-});
+const GamesStack = createStackNavigator({
+    Games: GamesScreen,
+},
+    {
+        headerMode: 'none',
+        cardStyle: { backgroundColor: '#00000000' },
+        transitionConfig: transitionConfig,
+    });
 
-LinksStack.navigationOptions = {
+GamesStack.navigationOptions = {
     tabBarLabel: 'Games',
     tabBarIcon: ({ focused }) => (
         <TabBarIcon
@@ -39,11 +71,16 @@ LinksStack.navigationOptions = {
     ),
 };
 
-const SettingsStack = createStackNavigator({
-    Settings: SettingsScreen,
-});
+const ProfileStack = createStackNavigator({
+    Profile: ProfileScreen,
+},
+    {
+        headerMode: 'none',
+        cardStyle: { backgroundColor: '#00000000' },
+        transitionConfig: transitionConfig,
+    });
 
-SettingsStack.navigationOptions = {
+ProfileStack.navigationOptions = {
     tabBarLabel: 'Profile',
     tabBarIcon: ({ focused }) => (
         <TabBarIcon
@@ -53,11 +90,16 @@ SettingsStack.navigationOptions = {
         />
     ),
 };
-const TestStack = createStackNavigator({
-    Test: LinksScreen,
-});
+const GroupsStack = createStackNavigator({
+    Groups: GroupsScreen,
+},
+    {
+        headerMode: 'none',
+        cardStyle: { backgroundColor: '#00000000' },
+        transitionConfig: transitionConfig,
+    });
 
-TestStack.navigationOptions = {
+GroupsStack.navigationOptions = {
     tabBarLabel: 'Grupos',
     tabBarIcon: ({ focused }) => (
         <TabBarIcon
@@ -68,7 +110,7 @@ TestStack.navigationOptions = {
     ),
 };
 
-const addingStack = {
+const MenuStack = {
     screen: () => null, // Empty screen
     navigationOptions: () => ({
         tabBarIcon: <Menu /> // Plus button component
@@ -76,13 +118,12 @@ const addingStack = {
 };
 
 
-
 export default createBottomTabNavigator({
-    HomeStack,
-    LinksStack,
-    addingStack,
-    SettingsStack,
-    TestStack
+    FeedStack,
+    GamesStack,
+    MenuStack,
+    ProfileStack,
+    GroupsStack
 }, {
         tabBarOptions: {
             showLabel: false,
@@ -96,27 +137,10 @@ export default createBottomTabNavigator({
                 shadowOpacity: 0.8,
                 shadowRadius: 2,
                 elevation: 1,
-                backgroundColor: '#111111'
+                backgroundColor: '#333'
             },
-        }
+        },
+        headerMode: 'none',
+        cardStyle: { backgroundColor: '#00000000' },
+        transitionConfig: transitionConfig,
     });
-
-//export default createMaterialTopTabNavigator({
-//    HomeStack,
-//    LinksStack,
-//    SettingsStack
-//}, {
-//        tabBarPosition: 'bottom',
-//        swipeEnabled: true,
-//        animationEnabled: true,
-//        tabBarOptions: {
-//            showLabel: false,
-//            activeTintColor: '#FFFFFF',
-//            labelStyle: {
-//                fontSize: 32,
-//            },
-//            style: {
-//                backgroundColor: 'blue',
-//            },
-//        }
-//    });
