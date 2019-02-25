@@ -19,6 +19,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz",
     "react-native-multibar": "0.0.5",
     "react-native-swiper": "^1.5.14",
+    "react-native-view-overflow": "0.0.4",
     "react-navigation": "^3.0.9",
     "react-navigation-slide-from-right-transition": "^1.0.4"
   },

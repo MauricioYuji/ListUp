@@ -29,6 +29,7 @@ import * as firebase from 'firebase';
 import LoginScreen from './screens/Auth/LoginScreen';
 import NavigationService from './components/services/NavigationService';
 import Tutorial from './screens/Tutorial/Tutorial';
+import { BaseNavigator } from "./src/navigation";
 
 
 // Initialize Firebase
@@ -212,10 +213,8 @@ export default class App extends React.Component {
                     keyboardShouldPersistTaps='handled'>
                     <Image source={require('./assets/images/background.png')} resizeMode={'cover'} style={[styles.backgroundBanner]} />
                     <StatusBar barStyle="default" />
-                    <AppNavigator ref={navigatorRef => {
-                        NavigationService.setTopLevelNavigator(navigatorRef);
-                    }} />
-                    <Header style={styles.header} />
+
+                    <BaseNavigator />
                 </ScrollView>
             );
         }

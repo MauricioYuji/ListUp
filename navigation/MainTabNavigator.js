@@ -1,6 +1,7 @@
 import React from 'react';
-import { Platform, Easing, Animated } from 'react-native';
+import { Platform, Easing, Animated, TouchableWithoutFeedback } from 'react-native';
 import { createStackNavigator, createBottomTabNavigator, createMaterialTopTabNavigator } from 'react-navigation';
+import ViewOverflow from 'react-native-view-overflow';
 
 import TabBarIcon from '../components/UI/TabBarIcon';
 import { Menu } from '../components/UI/Menu';
@@ -124,7 +125,8 @@ export default createBottomTabNavigator({
     MenuStack,
     ProfileStack,
     GroupsStack
-}, {
+},
+    {
         tabBarOptions: {
             showLabel: false,
             activeTintColor: '#FFFFFF',
