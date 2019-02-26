@@ -3,6 +3,8 @@ import { Platform, Easing, Animated, TouchableWithoutFeedback } from 'react-nati
 import { createStackNavigator, createBottomTabNavigator, createMaterialTopTabNavigator } from 'react-navigation';
 import ViewOverflow from 'react-native-view-overflow';
 
+import { MultiBar } from './MultiBar';
+
 import TabBarIcon from '../components/UI/TabBarIcon';
 import { Menu } from '../components/UI/Menu';
 import FeedScreen from '../screens/Pages/FeedScreen';
@@ -115,7 +117,10 @@ const MenuStack = {
     screen: () => null, // Empty screen
     navigationOptions: () => ({
         tabBarIcon: <Menu /> // Plus button component
-    })
+    }),
+    params: {
+        navigationDisabled: true
+    }
 };
 
 
@@ -127,6 +132,7 @@ export default createBottomTabNavigator({
     GroupsStack
 },
     {
+        tabBarComponent: MultiBar,
         tabBarOptions: {
             showLabel: false,
             activeTintColor: '#FFFFFF',
@@ -134,12 +140,8 @@ export default createBottomTabNavigator({
                 fontSize: 32,
             },
             style: {
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.8,
-                shadowRadius: 2,
-                elevation: 1,
-                backgroundColor: '#333'
+                backgroundColor: '#333',
+                width: '100%'
             },
         },
         headerMode: 'none',

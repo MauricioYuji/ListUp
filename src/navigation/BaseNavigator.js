@@ -1,20 +1,22 @@
 import React from 'react';
-import {createAppContainer, createBottomTabNavigator, createStackNavigator} from 'react-navigation';
+import { createAppContainer, createBottomTabNavigator, createStackNavigator } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {MultiBar, MultiBarToggle} from 'react-native-multibar';
+import { MultiBar, MultiBarToggle } from 'react-native-multibar';
+import TabBarIcon from '../../components/UI/TabBarIcon';
+import { Menu } from '../../components/UI/Menu';
 
-import {Bookmarks, Likes, Private, Profile, Settings} from "../components";
-import {Routes} from "./Routes";
+import { Bookmarks, Likes, Private, Profile, Settings } from "../components";
+import { Routes } from "./Routes";
 
 const TabsNavigator = createBottomTabNavigator({
     [Routes.TabsBookmarks]: {
         screen: Bookmarks,
         navigationOptions: () => ({
-            tabBarIcon: ({tintColor}) => (
-                <Icon
-                    name="bookmark"
-                    color={tintColor}
-                    size={24}
+            tabBarIcon: ({ tintColor }) => (
+                <TabBarIcon
+                    focused={tintColor}
+                    name={'list-alt'}
+                    type={'FontAwesome'}
                 />
             )
         })
@@ -22,65 +24,20 @@ const TabsNavigator = createBottomTabNavigator({
     [Routes.TabsLikes]: {
         screen: Likes,
         navigationOptions: () => ({
-            tabBarIcon: ({tintColor}) => (
-                <Icon
-                    name="heart"
-                    color={tintColor}
-                    size={24}
+            tabBarIcon: ({ tintColor }) => (
+                <TabBarIcon
+                    focused={tintColor}
+                    name={'gamepad'}
+                    type={'FontAwesome'}
                 />
             )
         })
     },
     MultiBar: {
         screen: () => null,
-        navigationOptions: ({navigation}) => ({
+        navigationOptions: ({ navigation }) => ({
             tabBarIcon: () => (
-                <MultiBarToggle
-                    navigation={navigation}
-                    actionSize={30}
-                    routes={[
-                        {
-                            routeName: Routes.OtherScreen,
-                            color: '#FF8360',
-                            icon: (
-                                <Icon
-                                    name="rocket"
-                                    color="#333333"
-                                    size={15}
-                                />
-                            )
-                        },
-                        {
-                            routeName: Routes.OtherScreen,
-                            color: '#E8E288',
-                            icon: (
-                                <Icon
-                                    name="dashboard"
-                                    color="#333333"
-                                    size={15}
-                                />
-                            )
-                        },
-                        {
-                            routeName: Routes.OtherScreen,
-                            color: '#7DCE82',
-                            icon: (
-                                <Icon
-                                    name="gears"
-                                    color="#333333"
-                                    size={15}
-                                />
-                            )
-                        },
-                    ]}
-                    icon={(
-                        <Icon
-                            name="plus"
-                            color="#FFFFFF"
-                            size={24}
-                        />
-                    )}
-                />
+                <Menu />
             )
         }),
         params: {
@@ -90,11 +47,12 @@ const TabsNavigator = createBottomTabNavigator({
     [Routes.TabsPrivate]: {
         screen: Private,
         navigationOptions: () => ({
-            tabBarIcon: ({tintColor}) => (
-                <Icon
-                    name="lock"
+            tabBarIcon: ({ tintColor }) => (
+                <TabBarIcon
+                    focused={tintColor}
+                    name={'user'}
+                    type={'FontAwesome'}
                     color={tintColor}
-                    size={24}
                 />
             )
         })
@@ -102,33 +60,41 @@ const TabsNavigator = createBottomTabNavigator({
     [Routes.TabsProfile]: {
         screen: Profile,
         navigationOptions: () => ({
-            tabBarIcon: ({tintColor}) => (
-                <Icon
-                    name="user"
-                    color={tintColor}
-                    size={24}
+            tabBarIcon: ({ tintColor }) => (
+                <TabBarIcon
+                    focused={'#FFF'}
+                    name={'users'}
+                    type={'FontAwesome'}
                 />
             )
         })
     }
 }, {
-    tabBarComponent: MultiBar,
-    tabBarOptions: {
-        showLabel: false,
-        activeTintColor: '#F8F8F8',
-        inactiveTintColor: '#586589',
-        style: {
-            backgroundColor: '#171F33'
+        tabBarOptions: {
+            showLabel: false,
+            activeTintColor: '#FFFFFF',
+            labelStyle: {
+                fontSize: 32,
+            },
+            style: {
+                backgroundColor: '#333',
+                width: '100%'
+            },
+            tabStyle: { 
+            }
+
         },
-        tabStyle: {}
-    }
-});
+
+        headerMode: 'none',
+        cardStyle: { backgroundColor: '#00000000' },
+    });
 
 const BaseNavigatorContainer = createAppContainer(createStackNavigator({
     [Routes.Tabs]: TabsNavigator,
     [Routes.OtherScreen]: Settings
 }, {
-    headerMode: 'none'
-}));
+        headerMode: 'none',
+        cardStyle: { backgroundColor: '#00000000', width: '100%' },
+    }));
 
-export {BaseNavigatorContainer as BaseNavigator};
+export { BaseNavigatorContainer as BaseNavigator };

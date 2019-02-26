@@ -25,7 +25,7 @@ class Menu extends Component {
     render() {
         const menuPos = this.mode.interpolate({
             inputRange: [0, 1],
-            outputRange: [-120, 40]
+            outputRange: [-120, 50]
         });
         const opacity = this.mode.interpolate({
             inputRange: [0, 1],
@@ -41,7 +41,6 @@ class Menu extends Component {
         });
         return (
             <View style={{
-                position: 'absolute',
                 alignItems: 'center',
                 overflow: 'visible'
             }}
@@ -55,7 +54,7 @@ class Menu extends Component {
                             justifyContent: 'center',
                             width: SIZE,
                             height: SIZE,
-                            marginTop: -SIZE / 2,
+                            marginBottom: 10,
                             marginLeft: SIZE / 6,
                             marginRight: SIZE / 6,
                             borderRadius: SIZE / 2,
@@ -212,8 +211,7 @@ const styles = StyleSheet.create({
         height: SIZE,
         borderRadius: SIZE / 2,
         zIndex: 1000,
-        backgroundColor: '#F00'
-        //backgroundColor: '#48A2F8'
+        backgroundColor: '#48A2F8'
     },
     menuItem: {
         width: Layout.window.width / 4 - 10,

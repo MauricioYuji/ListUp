@@ -213,8 +213,9 @@ export default class App extends React.Component {
                     keyboardShouldPersistTaps='handled'>
                     <Image source={require('./assets/images/background.png')} resizeMode={'cover'} style={[styles.backgroundBanner]} />
                     <StatusBar barStyle="default" />
-
-                    <BaseNavigator />
+                    <AppNavigator ref={navigatorRef => {
+                            NavigationService.setTopLevelNavigator(navigatorRef);
+                        }} />
                 </ScrollView>
             );
         }
