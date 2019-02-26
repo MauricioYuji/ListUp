@@ -29,7 +29,6 @@ import * as firebase from 'firebase';
 import LoginScreen from './screens/Auth/LoginScreen';
 import NavigationService from './components/services/NavigationService';
 import Tutorial from './screens/Tutorial/Tutorial';
-import { BaseNavigator } from "./src/navigation";
 
 
 // Initialize Firebase

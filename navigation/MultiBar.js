@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { SafeAreaView, TouchableOpacity, View } from 'react-native';
 
-import { Colors } from '../src/utils/Colors';
+import { Colors } from '../utils/Colors';
 
 const MultiBar = ({ style, navigation, activeTintColor, inactiveTintColor, renderIcon, jumpTo }) => {
     const {

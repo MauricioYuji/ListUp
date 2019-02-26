@@ -3,6 +3,9 @@ import { Animated, TouchableHighlight, View, Image, StyleSheet, ScrollView, Text
 import Icon from '@expo/vector-icons/FontAwesome';
 import Layout from '../../constants/Layout';
 import TabBarIcon from '../../components/UI/TabBarIcon';
+import NavigationService from '../../components/services/NavigationService';
+import * as firebase from 'firebase';
+
 const SIZE = 60;
 class Menu extends Component {
     mode = new Animated.Value(0);
@@ -22,6 +25,30 @@ class Menu extends Component {
         });
 
     };
+
+    changePage(page, id) {
+        if (id !== undefined) {
+            NavigationService.navigate(page, { Id: id });
+        } else {
+            NavigationService.navigate(page);
+        }
+
+
+        this.setState({
+            visible: false,
+        });
+
+    }
+    logoff() {
+        //NavigationService.navigate('Profile', { Id: '1' });
+        //DeviceEventEmitter.emit('showMenu', { show: this.state.showMenu });
+        firebase.auth().signOut().then(function () {
+            // Sign-out successful.
+
+        }, function (error) {
+            // An error happened.
+        });
+    }
     render() {
         const menuPos = this.mode.interpolate({
             inputRange: [0, 1],
@@ -46,140 +73,140 @@ class Menu extends Component {
             }}
             >
 
+                <TouchableHighlight
+                    onPress={this.toggleView}
+                    underlayColor="transparent"
+                    style={{
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: SIZE,
+                        height: SIZE,
+                        marginBottom: 10,
+                        marginLeft: SIZE / 6,
+                        marginRight: SIZE / 6,
+                        borderRadius: SIZE / 2,
+                        backgroundColor: '#006CD8',
+                        zIndex: 1000
+                    }}
+                >
+                    <View style={styles.menuBox}>
+                        <Animated.View style={[styles.menuIcon, {
+                            opacity: invertedopacity,
+                            transform: [
+                                { rotate: rotation }
+                            ]
+                        }]}>
+                            <Image source={require('../../assets/images/listup-icon.png')} resizeMode="cover" style={styles.icon} />
+                        </Animated.View>
+                        <Animated.View style={{
+                            opacity,
+                            transform: [
+                                { rotate: rotation }
+                            ]
+                        }}>
+                            <Icon name="plus" size={30} color="#F8F8F8" />
+                        </Animated.View>
+                    </View>
+                </TouchableHighlight>
+                <Animated.View style={{
+                    position: 'absolute',
+                    width: Layout.window.width,
+                    height: SIZE * 2,
+                    bottom: menuPos,
+                    backgroundColor: '#48A2F8',
+                    opacity,
+                    zIndex: 10000
+                }}>
                     <TouchableHighlight
-                        onPress={this.toggleView}
-                        underlayColor="#2882D8"
-                        style={{
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: SIZE,
-                            height: SIZE,
-                            marginBottom: 10,
-                            marginLeft: SIZE / 6,
-                            marginRight: SIZE / 6,
-                            borderRadius: SIZE / 2,
-                            backgroundColor: '#006CD8',
-                            zIndex: 1000
+                        onPress={() => {
                         }}
                     >
-                        <View style={styles.menuBox}>
-                            <Animated.View style={[styles.menuIcon, {
-                                opacity: invertedopacity,
-                                transform: [
-                                    { rotate: rotation }
-                                ]
-                            }]}>
-                                <Image source={require('../../assets/images/listup-icon.png')} resizeMode="cover" style={styles.icon} />
-                            </Animated.View>
-                            <Animated.View style={{
-                                opacity,
-                                transform: [
-                                    { rotate: rotation }
-                                ]
-                            }}>
-                                <Icon name="plus" size={30} color="#F8F8F8" />
-                            </Animated.View>
-                        </View>
+
+                        <ScrollView style={styles.menuContent} horizontal={true}>
+                            <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Profile')}>
+                                <View>
+                                    <TabBarIcon
+                                        name={'user-o'}
+                                        type={'FontAwesome'}
+                                        style={styles.menuItemIcon}
+                                    />
+                                    <Text style={styles.menuLabel}>Perfil</Text>
+                                </View>
+                            </TouchableHighlight>
+                            <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Edit')}>
+                                <View style={styles.menuItem}>
+                                    <TabBarIcon
+                                        name={'settings'}
+                                        type={'MaterialIcons'}
+                                        style={styles.menuItemIcon}
+                                    />
+                                    <Text style={styles.menuLabel}>Editar</Text>
+                                </View>
+                            </TouchableHighlight>
+                            <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Edit')}>
+                                <View style={styles.menuItem}>
+                                    <TabBarIcon
+                                        name={'settings'}
+                                        type={'MaterialIcons'}
+                                        style={styles.menuItemIcon}
+                                    />
+                                    <Text style={styles.menuLabel}>Editar</Text>
+                                </View>
+                            </TouchableHighlight>
+                            <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Edit')}>
+                                <View style={styles.menuItem}>
+                                    <TabBarIcon
+                                        name={'settings'}
+                                        type={'MaterialIcons'}
+                                        style={styles.menuItemIcon}
+                                    />
+                                    <Text style={styles.menuLabel}>Editar</Text>
+                                </View>
+                            </TouchableHighlight>
+                            <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Edit')}>
+                                <View style={styles.menuItem}>
+                                    <TabBarIcon
+                                        name={'settings'}
+                                        type={'MaterialIcons'}
+                                        style={styles.menuItemIcon}
+                                    />
+                                    <Text style={styles.menuLabel}>Editar</Text>
+                                </View>
+                            </TouchableHighlight>
+                            <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Edit')}>
+                                <View style={styles.menuItem}>
+                                    <TabBarIcon
+                                        name={'settings'}
+                                        type={'MaterialIcons'}
+                                        style={styles.menuItemIcon}
+                                    />
+                                    <Text style={styles.menuLabel}>Editar</Text>
+                                </View>
+                            </TouchableHighlight>
+                            <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Edit')}>
+                                <View style={styles.menuItem}>
+                                    <TabBarIcon
+                                        name={'settings'}
+                                        type={'MaterialIcons'}
+                                        style={styles.menuItemIcon}
+                                    />
+                                    <Text style={styles.menuLabel}>Editar</Text>
+                                </View>
+                            </TouchableHighlight>
+                            <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.logoff()}>
+                                <View style={styles.menuItem}>
+                                    <TabBarIcon
+                                        name={'logout'}
+                                        type={'MaterialCommunityIcons'}
+                                        style={styles.menuItemIcon}
+                                    />
+                                    <Text style={styles.menuLabel}>Logout</Text>
+                                </View>
+                            </TouchableHighlight>
+
+                        </ScrollView>
                     </TouchableHighlight>
-                    <Animated.View style={{
-                        position: 'absolute',
-                        width: Layout.window.width,
-                        height: SIZE * 2,
-                        bottom: menuPos,
-                        backgroundColor: '#48A2F8',
-                        opacity,
-                        zIndex: 10000
-                    }}>
-                        <TouchableHighlight
-                            onPress={() => {
-                            }}
-                        >
-
-                            <ScrollView style={styles.menuContent} horizontal={true}>
-                                <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Profile', this.state.user.uid)}>
-                                    <View>
-                                        <TabBarIcon
-                                            name={'user-o'}
-                                            type={'FontAwesome'}
-                                            style={styles.menuItemIcon}
-                                        />
-                                        <Text style={styles.menuLabel}>Perfil</Text>
-                                    </View>
-                                </TouchableHighlight>
-                                <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
-                                    <View style={styles.menuItem}>
-                                        <TabBarIcon
-                                            name={'settings'}
-                                            type={'MaterialIcons'}
-                                            style={styles.menuItemIcon}
-                                        />
-                                        <Text style={styles.menuLabel}>Editar</Text>
-                                    </View>
-                                </TouchableHighlight>
-                                <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
-                                    <View style={styles.menuItem}>
-                                        <TabBarIcon
-                                            name={'settings'}
-                                            type={'MaterialIcons'}
-                                            style={styles.menuItemIcon}
-                                        />
-                                        <Text style={styles.menuLabel}>Editar</Text>
-                                    </View>
-                                </TouchableHighlight>
-                                <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
-                                    <View style={styles.menuItem}>
-                                        <TabBarIcon
-                                            name={'settings'}
-                                            type={'MaterialIcons'}
-                                            style={styles.menuItemIcon}
-                                        />
-                                        <Text style={styles.menuLabel}>Editar</Text>
-                                    </View>
-                                </TouchableHighlight>
-                                <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
-                                    <View style={styles.menuItem}>
-                                        <TabBarIcon
-                                            name={'settings'}
-                                            type={'MaterialIcons'}
-                                            style={styles.menuItemIcon}
-                                        />
-                                        <Text style={styles.menuLabel}>Editar</Text>
-                                    </View>
-                                </TouchableHighlight>
-                                <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
-                                    <View style={styles.menuItem}>
-                                        <TabBarIcon
-                                            name={'settings'}
-                                            type={'MaterialIcons'}
-                                            style={styles.menuItemIcon}
-                                        />
-                                        <Text style={styles.menuLabel}>Editar</Text>
-                                    </View>
-                                </TouchableHighlight>
-                                <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
-                                    <View style={styles.menuItem}>
-                                        <TabBarIcon
-                                            name={'settings'}
-                                            type={'MaterialIcons'}
-                                            style={styles.menuItemIcon}
-                                        />
-                                        <Text style={styles.menuLabel}>Editar</Text>
-                                    </View>
-                                </TouchableHighlight>
-                                <TouchableHighlight style={styles.menuItem} onPress={() => this.logoff()}>
-                                    <View style={styles.menuItem}>
-                                        <TabBarIcon
-                                            name={'logout'}
-                                            type={'MaterialCommunityIcons'}
-                                            style={styles.menuItemIcon}
-                                        />
-                                        <Text style={styles.menuLabel}>Logout</Text>
-                                    </View>
-                                </TouchableHighlight>
-
-                            </ScrollView>
-                        </TouchableHighlight>
-                    </Animated.View>
+                </Animated.View>
             </View>
         );
     }
