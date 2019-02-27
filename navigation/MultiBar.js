@@ -119,7 +119,7 @@ const Styles = {
         bottom: 0,
         width: '100%',
         justifyContent: 'flex-end',
-        minHeight: 260
+        minHeight: 500
     },
     fakeBackground: {
         position: 'absolute',
