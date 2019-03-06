@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import * as firebase from 'firebase';
 import {
     Image,
@@ -18,7 +18,7 @@ import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 
 import Layout from '../../constants/Layout';
 import { getData, setData } from '../../components/services/Service';
-import { getGames } from '../../components/services/UserHomeService';
+import { getUserGames } from '../../components/services/UserHomeService';
 import { MonoText } from '../../components/UI/StyledText';
 import { GetImage } from '../../components/UI/GetImage';
 import LoadingScreen from '../Loading/LoadingScreen';
@@ -27,9 +27,7 @@ import Masonry from 'react-native-masonry-layout';
 const { width } = Dimensions.get("window");
 const columnWidth = (width - 10) / 2 - 10;
 
-
-
-export default class GameScreen extends React.Component {
+export default class FeedScreen extends React.Component {
 
     static navigationOptions = {
         header: null,
@@ -48,32 +46,27 @@ export default class GameScreen extends React.Component {
 
     load() {
         this.setState({ loading: true });
-
-
-        var _self = this;
-
-
-        getGames().then((games) => {
-            this.setState({ loading: false });
-            games = games.map(item => {
-                console.log("item: ", item);
-                return {
-                    image: item.file.url,
-                    text: item.name,
-                    key: item.key,
-                    height: columnWidth / item.file.file.width * item.file.file.height
-                };
-
-            });
-            console.log("games:", games);
-            if (this.state.withHeight) {
-                this.refs.list.addItemsWithHeight(games);
-            } else {
-                this.refs.list.addItems(games);
+        fetch("http://huaban.com/boards/17649987/?limit=10", {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
             }
-
-        });
-
+        }).then(res => res.json())
+            .then(data => {
+                this.setState({ loading: false });
+                data = data.board.pins.map(item => {
+                    return {
+                        image: "http://img.hb.aicdn.com/" + item.file.key,
+                        text: item.raw_text,
+                        key: item.file.key,
+                        height: columnWidth / item.file.width * item.file.height
+                    }
+                });
+                if (this.state.withHeight) {
+                    this.refs.list.addItemsWithHeight(data);
+                } else {
+                    this.refs.list.addItems(data);
+                }
+            });
     }
 
     onScrollEnd(event) {
@@ -85,7 +78,7 @@ export default class GameScreen extends React.Component {
     }
 
     render() {
-        return <View style={{ flex: 1 }}>
+        return <View style={{ flex: 1, backgroundColor: "#EEE" }}>
             <Masonry onMomentumScrollEnd={this.onScrollEnd.bind(this)}
                 style={{ flex: 1, borderWidth: 1, borderColor: "red" }}
                 columns={2} ref="list"

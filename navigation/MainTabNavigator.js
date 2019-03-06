@@ -11,6 +11,8 @@ import FeedScreen from '../screens/Pages/FeedScreen';
 import GamesScreen from '../screens/Pages/GamesScreen';
 import GroupsScreen from '../screens/Pages/GroupsScreen';
 import ProfileScreen from '../screens/Pages/ProfileScreen';
+import SettingsScreen from '../screens/Pages/SettingsScreen';
+import NavigationService from '../components/services/NavigationService';
 const transitionConfig = () => {
     return {
         transitionSpec: {
@@ -95,6 +97,7 @@ ProfileStack.navigationOptions = {
 };
 const GroupsStack = createStackNavigator({
     Groups: GroupsScreen,
+    Test: SettingsScreen,
 },
     {
         headerMode: 'none',
@@ -103,6 +106,7 @@ const GroupsStack = createStackNavigator({
     });
 
 GroupsStack.navigationOptions = {
+    initialRouteName : 'Groups',
     tabBarLabel: 'Grupos',
     tabBarIcon: ({ focused }) => (
         <TabBarIcon
@@ -111,7 +115,9 @@ GroupsStack.navigationOptions = {
             type={'FontAwesome'}
         />
     ),
+
 };
+
 
 const MenuStack = {
     screen: () => null, // Empty screen
@@ -122,7 +128,6 @@ const MenuStack = {
         navigationDisabled: true
     }
 };
-
 
 export default createBottomTabNavigator({
     FeedStack,

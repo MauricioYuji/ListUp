@@ -23,21 +23,23 @@ export default class LoginScreen extends React.Component {
         const _self = this;
         this.setState({ loading: 'facebook' });
         signInWithFacebook().then(() => {
-            var user = firebase.auth().currentUser;
 
-            console.log("user: ", user);
-            var obj = {
-                uid: user.uid,
-                photoURL: user.photoURL,
-                displayName: user.displayName,
-                email: user.email,
-                flagtutorial: false
-            };
-            console.log("obj: ", obj);
-            setData('UserInfo/' + user.uid, obj).then((p) => {
-                console.log("p: ", p);
-                _self.setState({ errorMessage: null, loading: null });
-            });
+            _self.setState({ errorMessage: null, loading: null });
+            //var user = firebase.auth().currentUser;
+
+            //console.log("user: ", user);
+            //var obj = {
+            //    uid: user.uid,
+            //    photoURL: user.photoURL,
+            //    displayName: user.displayName,
+            //    email: user.email,
+            //    flagtutorial: false
+            //};
+            //console.log("obj: ", obj);
+            //setData('UserInfo/' + user.uid, obj).then((p) => {
+            //    console.log("p: ", p);
+            //    _self.setState({ errorMessage: null, loading: null });
+            //});
             //if (user.emailVerified) {
             //    _self.setState({ errorMessage: null, loading: null });
             //} else {

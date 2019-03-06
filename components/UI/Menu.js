@@ -34,10 +34,7 @@ class Menu extends Component {
             NavigationService.navigate(page);
         }
 
-
-        this.setState({
-            visible: false,
-        });
+        this.toggleView();
 
     }
     logoff() {
@@ -144,7 +141,7 @@ class Menu extends Component {
                             <View style={styles.menuContent}>
 
                                 <ScrollView style={styles.menuGrid} horizontal={true} showsHorizontalScrollIndicator={false}>
-                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Profile')}>
+                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Test')}>
                                         <View>
                                             <TabBarIcon
                                                 name={'format-list-bulleted-type'}
@@ -171,7 +168,7 @@ class Menu extends Component {
                                         <View style={styles.menuItem}>
                                             <TabBarIcon
                                                 name={'dice-5'}
-                                                type={'MaterialIcons'}
+                                                type={'MaterialCommunityIcons'}
                                                 style={styles.menuItemIcon}
                                             />
                                             <Text style={styles.menuLabel}>Random Game</Text>

@@ -5,6 +5,10 @@ import MainTabNavigator from './MainTabNavigator';
 import UserNavigator from './UserNavigator';
 import AuthNavigator from './AuthNavigator';
 import TutorialScreen from '../screens/Tutorial/TutorialTemplate';
+import FeedScreen from '../screens/Pages/FeedScreen';
+import GamesScreen from '../screens/Pages/GamesScreen';
+import GroupsScreen from '../screens/Pages/GroupsScreen';
+import ProfileScreen from '../screens/Pages/ProfileScreen';
 const transitionConfig = () => {
     return {
         transitionSpec: {
@@ -34,7 +38,8 @@ export default createAppContainer(createSwitchNavigator({
     App: MainTabNavigator,
     User: UserNavigator,
     Auth: AuthNavigator,
-    Tutorial: TutorialScreen
+    Tutorial: TutorialScreen,
+    Group: GroupsScreen
 }));
 
 

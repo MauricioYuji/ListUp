@@ -4,6 +4,31 @@ import * as firebase from 'firebase';
 import Layout from '../../constants/Layout';
 import { getData } from './Service';
 
+export const getGames = async () => {
+    let games = null;
+    var objgames = [];
+    await firebase.database().ref('/Games').once('value').then(function (snapshot) {
+        //console.log("snapshot: ", snapshot);
+        games = snapshot.val();
+    });
+
+    for (var key in games) {
+        //console.log("games[key]: ", games[key]);
+        var item = games[key];
+        var file = await firebase.database().ref('thumbs/' + games[key].img).once('value').then(function (snapshot) {
+            //console.log("snapshot: ", snapshot.val());
+            return snapshot.val();
+        });
+        var obj = {
+            key: key,
+            name: item.name,
+            file: file,
+            consoles: item.keyconsole
+        };
+        objgames.push(obj);
+    };
+    return objgames;
+};
 
 export const getUserGames = async (uid) => {
     //console.log("ASYNC CONST");
@@ -12,7 +37,7 @@ export const getUserGames = async (uid) => {
     let games = null;
     let companies = null;
     let consoles = null;
-
+    let list = require('../../files/consoles.json');
     //usergames = await getData('userGames/' + uid)
     //    .then((res) => {
     //        console.log("GET userGames");
@@ -41,14 +66,14 @@ export const getUserGames = async (uid) => {
         //console.log("snapshot: ", snapshot);
         usergames = snapshot.val();
     });
-    await firebase.database().ref('/Companies').once('value').then(function (snapshot) {
-        //console.log("snapshot: ", snapshot);
-        companies = snapshot.val();
-    });
-    await firebase.database().ref('/Consoles').once('value').then(function (snapshot) {
-        //console.log("snapshot: ", snapshot);
-        consoles = snapshot.val();
-    });
+    //await firebase.database().ref('/Companies').once('value').then(function (snapshot) {
+    //    //console.log("snapshot: ", snapshot);
+    //    companies = snapshot.val();
+    //});
+    //await firebase.database().ref('/Consoles').once('value').then(function (snapshot) {
+    //    //console.log("snapshot: ", snapshot);
+    //    consoles = snapshot.val();
+    //});
     await firebase.database().ref('/Games').once('value').then(function (snapshot) {
         //console.log("snapshot: ", snapshot);
         games = snapshot.val();
@@ -61,17 +86,20 @@ export const getUserGames = async (uid) => {
 
     var objgames = [];
 
-
+    //console.log("list: ", list);
     for (var key in usergames) {
         let obj = games[usergames[key].key];
         //console.log(usergames[key].key);
         //console.log(obj);
         obj.companies = [];
+        obj.consoles = [];
         for (var j = 0; j < obj.keyconsole.length; j++) {
-            var company = companies[consoles[obj.keyconsole[j]].keycompany];
+            var company = list.Companies[list.Consoles[obj.keyconsole[j]].keycompany];
+
+            obj.consoles.push(list.Consoles[obj.keyconsole[j]]);
             //console.log("consoles[obj.keyconsole[j]]: ", consoles[obj.keyconsole[j]]);
             //console.log("company: ", company);
-            company.key = consoles[obj.keyconsole[j]].keycompany;
+            company.key = list.Consoles[obj.keyconsole[j]].keycompany;
             if (!obj.companies.includes(company))
                 obj.companies.push(company);
 
