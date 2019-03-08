@@ -4,26 +4,36 @@ import * as firebase from 'firebase';
 import Layout from '../../constants/Layout';
 import { getData } from './Service';
 
-export const getGames = async () => {
+export const getGames = async (page) => {
     let games = null;
     var objgames = [];
+    let list = require('../../files/consoles.json');
     await firebase.database().ref('/Games').once('value').then(function (snapshot) {
-        //console.log("snapshot: ", snapshot);
         games = snapshot.val();
     });
 
     for (var key in games) {
-        //console.log("games[key]: ", games[key]);
+        var consoles = [];
+        var companies = [];
         var item = games[key];
         var file = await firebase.database().ref('thumbs/' + games[key].img).once('value').then(function (snapshot) {
-            //console.log("snapshot: ", snapshot.val());
             return snapshot.val();
         });
+        //console.log("item.keyconsole: ", item.keyconsole);
+        for (var j = 0; j < item.keyconsole.length; j++) {
+            var c = list.Companies[list.Consoles[item.keyconsole[j]].keycompany];
+            consoles.push(list.Consoles[item.keyconsole[j]]);
+            c.key = list.Consoles[item.keyconsole[j]].keycompany;
+            if (!companies.includes(c))
+                companies.push(c);
+
+        }
         var obj = {
             key: key,
             name: item.name,
             file: file,
-            consoles: item.keyconsole
+            consoles: consoles,
+            companies: companies
         };
         objgames.push(obj);
     };

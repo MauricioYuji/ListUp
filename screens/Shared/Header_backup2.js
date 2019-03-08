@@ -161,38 +161,6 @@ export default class Header extends React.Component {
             // Error retrieving data
         }
     }
-    _submitFilter = async (text) => {
-        DeviceEventEmitter.emit('getFilter', { show: text });
-    }
-
-    listPlatforms = () => {
-        let obj = [];
-        let list = require('../../files/consoles.json');
-        console.log("list: ", list);
-        for (var key in list.Companies) {
-            var item = list.Companies[key];
-            obj.push(
-                <TouchableHighlight onPress={() => this.changePage('Profile', this.state.user.uid)} key={key}>
-                    <Image source={{ uri: item.img }} resizeMode={'contain'} style={styles.filterButtonImg} />
-                </TouchableHighlight>);
-
-            //var result = list.Consoles.filter(p => {
-            //    return p.keycompany === item.key;
-            //});
-            //console.log("consoles: ", result);
-            //for (let j = 0; j < list.Companies.length; j++) {
-            //    obj.push(
-            //        <TouchableHighlight onPress={() => this.changePage('Profile', this.state.user.uid)} key={i} style={styles.filterButton}>
-            //            <Image source={{ uri: list.Companies[i].img }} resizeMode={'contain'} style={styles.filterButtonImg} />
-            //        </TouchableHighlight>);
-            //}
-        }
-        // Outer loop to create parent
-        //for (let i = 0; i < item.length; i++) {
-        //    obj.push(<Image key={i} source={{ uri: item[i].img }} resizeMode={'contain'} style={styles.logo} />);
-        //}
-        return obj;
-    }
     render() {
         const visible = this.state.visible;
         let { rotateAnim } = this.state;
@@ -201,49 +169,60 @@ export default class Header extends React.Component {
             inputRange: [false, true],
             outputRange: ["0deg", "450deg"] // degree of rotation
         });
-        //const user = this.state.user;
-        //let avatar;
-        //if (user !== null) {
-        //    const userdata = this.state.user;
-        //    //console.log("userdata: ", userdata);
+        const user = this.state.user;
+        let avatar;
+        if (user !== null) {
+            const userdata = this.state.user;
+            //console.log("userdata: ", userdata);
 
-        //    if (userdata.providerId === "facebook.com") {
-        //        avatar = <Image source={{ uri: userdata.photoURL + '?type=large' }} style={styles.profile} />;
-        //    } else if (userdata.photoURL !== null) {
-        //        avatar = <Image source={{ uri: userdata.photoURL }} style={styles.profile} />;
-        //    } else {
-        //        avatar = <Image source={require('../../assets/images/avatar.png')} style={styles.profile} />;
-        //    }
-        //}
+            if (userdata.providerId === "facebook.com") {
+                avatar = <Image source={{ uri: userdata.photoURL + '?type=large' }} style={styles.profile} />;
+            } else if (userdata.photoURL !== null) {
+                avatar = <Image source={{ uri: userdata.photoURL }} style={styles.profile} />;
+            } else {
+                avatar = <Image source={require('../../assets/images/avatar.png')} style={styles.profile} />;
+            }
+        }
         return (
             <View style={[styles.searchbar, visible ? styles.menushow : '']}>
+
+                <View style={styles.logobox}>
+                    <TouchableHighlight underlayColor="transparent" onPress={() => NavigationService.navigate('App')}>
+                        <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
+                    </TouchableHighlight>
+                </View>
                 <View style={styles.searchbox}>
-                    <TabBarIcon
-                        name={'search'}
-                        type={'FontAwesome'}
-                        style={styles.searchicon}
-                    />
+                    <Image source={require('../../assets/images/search-icon.png')} style={styles.searchicon} />
                     <TextInput
                         style={styles.inputsearch}
-                        onChangeText={(text) => this._submitFilter(text)}
+                        onChangeText={(text) => this.setState({ text })}
                     />
                 </View>
                 <TouchableHighlight underlayColor="transparent" onPress={() => this.showMenu()} style={styles.profileitem}>
                     <View style={styles.profilebox}>
-                        <TabBarIcon
-                            name={'filter'}
-                            type={'FontAwesome'}
-                            style={styles.filterIcon}
-                        />
+                        <FadeSpin style={styles.profile} visible={!visible}>
+                            {avatar}
+                        </FadeSpin>
+                        <FadeSpin style={styles.profile} visible={visible}>
+                            <TabBarIcon
+                                name={'ios-close'}
+                                type={'Ionicons'}
+                                style={styles.closeBtn}
+                            />
+                        </FadeSpin>
                     </View>
                 </TouchableHighlight>
 
                 <View style={[styles.sidemenu, visible ? '' : styles.hide]}>
-                    <Text style={styles.filterLabel}>PLATAFORMAS</Text>
-                    <ScrollView style={styles.menuContent} horizontal={true}>
-                        {this.listPlatforms()}
-                    </ScrollView>
-                    <Text style={styles.filterLabel}>GENEROS</Text>
+                    <Grow style={styles.menuArea} visible={visible}>
+                        <View style={styles.showMenu}>
+                            <View style={styles.contentMenu}>
+                                <View style={styles.scrollarea}>
+                                </View>
+                            </View>
+                        </View>
+                    </Grow>
+
                     <ScrollView style={styles.menuContent} horizontal={true}>
                         <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Profile', this.state.user.uid)}>
                             <View>
@@ -253,6 +232,76 @@ export default class Header extends React.Component {
                                     style={styles.menuIcon}
                                 />
                                 <Text style={styles.menuLabel}>Perfil</Text>
+                            </View>
+                        </TouchableHighlight>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'settings'}
+                                    type={'MaterialIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Editar</Text>
+                            </View>
+                        </TouchableHighlight>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'settings'}
+                                    type={'MaterialIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Editar</Text>
+                            </View>
+                        </TouchableHighlight>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'settings'}
+                                    type={'MaterialIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Editar</Text>
+                            </View>
+                        </TouchableHighlight>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'settings'}
+                                    type={'MaterialIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Editar</Text>
+                            </View>
+                        </TouchableHighlight>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'settings'}
+                                    type={'MaterialIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Editar</Text>
+                            </View>
+                        </TouchableHighlight>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Edit')}>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'settings'}
+                                    type={'MaterialIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Editar</Text>
+                            </View>
+                        </TouchableHighlight>
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.logoff()}>
+                            <View style={styles.menuItem}>
+                                <TabBarIcon
+                                    name={'logout'}
+                                    type={'MaterialCommunityIcons'}
+                                    style={styles.menuIcon}
+                                />
+                                <Text style={styles.menuLabel}>Logout</Text>
                             </View>
                         </TouchableHighlight>
 
@@ -274,8 +323,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 60,
         overflow: 'hidden',
-        //backgroundColor: 'rgba(255, 255, 255, 0.0)',
-        backgroundColor: '#333',
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
         flexDirection: 'row',
         alignSelf: 'flex-start',
         shadowColor: "#000",
@@ -287,16 +335,8 @@ const styles = StyleSheet.create({
         shadowRadius: 3.84,
         elevation: 5
     },
-    filterLabel: {
-        fontSize: 16,
-        color: '#FFF',
-        fontFamily: 'SourceSansPro-SemiBold'
-    },
-    filterIcon: {
-
-    },
     menushow: {
-        height: Dimensions.get('window').width / 2,
+        height: Dimensions.get('window').width / 3,
     },
     profileitem: {
         zIndex: 100
@@ -320,18 +360,18 @@ const styles = StyleSheet.create({
     },
     searchicon: {
         position: 'absolute',
-        top: 15,
-        left: 20,
-        color: '#FFF',
+        top: 20,
+        left: 10,
+        width: 24,
+        height: 20,
         zIndex: 0
     },
     inputsearch: {
-        backgroundColor: 'rgba(255,255,255,0.3)',
+        backgroundColor: 'rgba(0,0,0,0.4)',
         position: 'relative',
         borderRadius: 20,
         height: 40,
         marginTop: 10,
-        marginLeft: 10,
         paddingLeft: 40,
         paddingRight: 10,
         color: '#FFF'
@@ -348,12 +388,11 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
+        backgroundColor: '#006CD8',
         margin: 10,
         position: 'relative',
         overflow: 'hidden',
         marginRight: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
         zIndex: 100
     },
     profile: {
@@ -375,7 +414,7 @@ const styles = StyleSheet.create({
     },
     sidemenu: {
         position: 'absolute',
-        top: 60,
+        top: 0,
         right: 0,
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').width / 3,
@@ -423,9 +462,9 @@ const styles = StyleSheet.create({
     menuContent: {
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').width / 3 - 40,
-        //position: 'absolute',
-        //top: 50,
-        //left: 0,
+        position: 'absolute',
+        top: 40,
+        left: 0,
         zIndex: 10000000000,
     },
     menuItem: {
