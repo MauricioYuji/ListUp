@@ -22,7 +22,6 @@ import { getGames } from '../../components/services/UserHomeService';
 import { MonoText } from '../../components/UI/StyledText';
 import { GetImage } from '../../components/UI/GetImage';
 import LoadingScreen from '../Loading/LoadingScreen';
-import { parse } from 'qs';
 import Masonry from 'react-native-masonry-layout';
 const { width } = Dimensions.get("window");
 const columnWidth = (width - 10) / 2 - 10;

@@ -62,15 +62,6 @@ export default class Header extends React.Component {
 
     }
     componentDidMount() {
-        this._getUser().then((user) => {
-            console.log("GET user: ", user);
-            this.setState({
-                user: user,
-                loading: true
-            });
-        });
-
-
 
     }
     showMenu() {
@@ -109,88 +100,65 @@ export default class Header extends React.Component {
         });
 
     }
-    changePage(page, id) {
-        if (id !== undefined) {
-            NavigationService.navigate(page, { Id: id });
-        } else {
-            NavigationService.navigate(page);
-        }
+    filterActive(key, multiple) {
+        console.log("key: ", key);
+        console.log("multiple: ", multiple);
 
 
-        this.setState({
-            visible: false,
-        });
+        //this.setState({
+        //    visible: false,
+        //});
 
     }
-    logoff() {
-        //NavigationService.navigate('Profile', { Id: '1' });
-        //DeviceEventEmitter.emit('showMenu', { show: this.state.showMenu });
-        firebase.auth().signOut().then(function () {
-            // Sign-out successful.
 
-        }, function (error) {
-            // An error happened.
-        });
-    }
-    _storeUser = async (user) => {
-        try {
-            await AsyncStorage.setItem('user', user);
-        } catch (error) {
-            // Error saving data
-        }
-    }
-
-    _deleteUser = async () => {
-        try {
-            await AsyncStorage.removeItem('user');
-        } catch (error) {
-            // Error saving data
-        }
-    }
-    _getUser = async () => {
-        try {
-            const value = await AsyncStorage.getItem('user');
-            return JSON.parse(value);
-            //if (value !== null) {
-            //    // We have data!!
-            //    //this.setState({ test: value });
-            //    this.setState({ user: JSON.parse(value) });
-
-            //}
-        } catch (error) {
-            // Error retrieving data
-        }
-    }
     _submitFilter = async (text) => {
         DeviceEventEmitter.emit('getFilter', { show: text });
     }
 
     listPlatforms = () => {
         let obj = [];
+        let consoles = [];
         let list = require('../../files/consoles.json');
-        console.log("list: ", list);
+
+
+        for (var keyconsole in list.Consoles) {
+            var consoleitem = list.Consoles[keyconsole];
+            consoleitem.keyconsole = keyconsole;
+            consoles.push(consoleitem);
+        }
+
+        //console.log("list: ", list);
         for (var key in list.Companies) {
             var item = list.Companies[key];
+            //console.log("item: ", item);
             obj.push(
-                <TouchableHighlight onPress={() => this.changePage('Profile', this.state.user.uid)} key={key}>
-                    <Image source={{ uri: item.img }} resizeMode={'contain'} style={styles.filterButtonImg} />
-                </TouchableHighlight>);
+                <TouchableHighlight onPress={() => this.filterActive(key, true)} key={key} style={styles.filterButtonTab}>
+                    <View>
+                        <Image source={{ uri: item.img }} resizeMode={'contain'} style={[styles.filterButtonTabImg, { width: item.width / 3, height: item.height / 3 }]} />
+                    </View>
+                </TouchableHighlight>
+            );
 
-            //var result = list.Consoles.filter(p => {
-            //    return p.keycompany === item.key;
-            //});
+            var result = consoles.filter(p => p.keycompany === item.key);
             //console.log("consoles: ", result);
-            //for (let j = 0; j < list.Companies.length; j++) {
-            //    obj.push(
-            //        <TouchableHighlight onPress={() => this.changePage('Profile', this.state.user.uid)} key={i} style={styles.filterButton}>
-            //            <Image source={{ uri: list.Companies[i].img }} resizeMode={'contain'} style={styles.filterButtonImg} />
-            //        </TouchableHighlight>);
-            //}
+
+            for (let j = 0; j < result.length; j++) {
+                //console.log("result[j]: ", result[j]);
+                obj.push(
+                    <TouchableHighlight onPress={() => this.filterActive(result[j].keyconsole, false)} key={j + result[j].keyconsole} style={[styles.filterButton]}>
+                        <View>
+                            <Image source={{ uri: result[j].img }} resizeMode={'contain'} style={[styles.filterButtonImg, { width: result[j].width / 5, height: result[j].height / 5 }]} />
+                        </View>
+                    </TouchableHighlight>);
+            }
+
         }
+        //console.log("===========================");
         // Outer loop to create parent
         //for (let i = 0; i < item.length; i++) {
         //    obj.push(<Image key={i} source={{ uri: item[i].img }} resizeMode={'contain'} style={styles.logo} />);
         //}
+        //console.log("obj: ", obj);
         return obj;
     }
     render() {
@@ -245,7 +213,8 @@ export default class Header extends React.Component {
                     </ScrollView>
                     <Text style={styles.filterLabel}>GENEROS</Text>
                     <ScrollView style={styles.menuContent} horizontal={true}>
-                        <TouchableHighlight style={styles.menuItem} onPress={() => this.changePage('Profile', this.state.user.uid)}>
+
+                        <TouchableHighlight style={styles.menuItem} onPress={() => this.showMenu()}>
                             <View>
                                 <TabBarIcon
                                     name={'user-o'}
@@ -255,7 +224,6 @@ export default class Header extends React.Component {
                                 <Text style={styles.menuLabel}>Perfil</Text>
                             </View>
                         </TouchableHighlight>
-
                     </ScrollView>
                 </View>
             </View>
@@ -286,6 +254,28 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5
+    },
+    filterButtonTab: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 10,
+        height: 30
+    },
+    filterButton: {
+        backgroundColor: '#444444',
+        borderRadius: 4,
+        marginVertical: 10,
+        marginHorizontal: 5,
+        paddingHorizontal: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 30
+    },
+    filterButtonTabImg: {
+        marginHorizontal: 10,
+    },
+    filterButtonImg: {
+        margin: 5
     },
     filterLabel: {
         fontSize: 16,
@@ -433,6 +423,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
+        zIndex:1000
     },
     menuIcon: {
         fontSize: 30,

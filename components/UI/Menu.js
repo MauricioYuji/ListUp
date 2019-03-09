@@ -124,7 +124,7 @@ class Menu extends Component {
                     height,
                     borderRadius: radius,
                     bottom: menuPos,
-                    backgroundColor: '#48A2F8',
+                    backgroundColor: '#006CD8',
                     //opacity,
                     overflow: 'hidden',
                     zIndex: 100
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
         height: SIZE,
         borderRadius: SIZE / 2,
         zIndex: 1000,
-        backgroundColor: '#48A2F8'
+        backgroundColor: '#006CD8'
     },
     menuItem: {
         width: Layout.window.width / 4 - 10,

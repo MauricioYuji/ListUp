@@ -20,7 +20,6 @@ import { getUserGames } from '../../components/services/UserHomeService';
 import { MonoText } from '../../components/UI/StyledText';
 import { GetImage } from '../../components/UI/GetImage';
 import LoadingScreen from '../Loading/LoadingScreen';
-import { parse } from 'qs';
 
 export default class HomeScreen extends React.Component {
 
