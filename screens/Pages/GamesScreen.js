@@ -101,7 +101,6 @@ export default class GameScreen extends React.Component {
     }
     render() {
         return <View style={styles.container}>
-            <Header style={styles.header} />
             <Masonry onMomentumScrollEnd={this.onScrollEnd.bind(this)}
                 style={styles.grid}
                 columns={2} ref="list"
@@ -126,6 +125,7 @@ export default class GameScreen extends React.Component {
                     </View>
                 </View>} />
 
+            <Header style={styles.header} />
             {this.state.loading && <View style={styles.loadingBackground}>
                 <ActivityIndicator size="large" color="#FFFFFF" />
             </View>}

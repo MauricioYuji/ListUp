@@ -110,5 +110,119 @@
       "height": 60,
       "name": "Uplay"
     }
+  },
+  "Genres": {
+    "1": {
+      "name": "Platform",
+      "descricao": ""
+    },
+    "2": {
+      "name": "Shooter",
+      "descricao": ""
+    },
+    "3": {
+      "name": "Fighting",
+      "descricao": ""
+    },
+    "4": {
+      "name": "Beat em up",
+      "descricao": ""
+    },
+    "5": {
+      "name": "Stealth",
+      "descricao": ""
+    },
+    "6": {
+      "name": "Survival",
+      "descricao": ""
+    },
+    "7": {
+      "name": "Rhythm",
+      "descricao": ""
+    },
+    "8": {
+      "name": "Action-adventure",
+      "descricao": ""
+    },
+    "9": {
+      "name": "Survival horror",
+      "descricao": ""
+    },
+    "10": {
+      "name": "Metroidvania",
+      "descricao": ""
+    },
+    "11": {
+      "name": "Adventure",
+      "descricao": ""
+    },
+    "12": {
+      "name": "Visual novels",
+      "descricao": ""
+    },
+    "13": {
+      "name": "Interactive movie",
+      "descricao": ""
+    },
+    "14": {
+      "name": "Action RPG",
+      "descricao": ""
+    },
+    "15": {
+      "name": "MMORPG",
+      "descricao": ""
+    },
+    "16": {
+      "name": "Roguelikes",
+      "descricao": ""
+    },
+    "17": {
+      "name": "RPG",
+      "descricao": ""
+    },
+    "18": {
+      "name": "Simulator",
+      "descricao": ""
+    },
+    "19": {
+      "name": "Strategy",
+      "descricao": ""
+    },
+    "20": {
+      "name": "RTS",
+      "descricao": ""
+    },
+    "21": {
+      "name": "MOBA",
+      "descricao": ""
+    },
+    "22": {
+      "name": "Tower defense",
+      "descricao": ""
+    },
+    "23": {
+      "name": "Tactics",
+      "descricao": ""
+    },
+    "24": {
+      "name": "Sports",
+      "descricao": ""
+    },
+    "25": {
+      "name": "Racing",
+      "descricao": ""
+    },
+    "26": {
+      "name": "Party game",
+      "descricao": ""
+    },
+    "27": {
+      "name": "card game",
+      "descricao": ""
+    },
+    "28": {
+      "name": "Idle gaming",
+      "descricao": ""
+    }
   }
 }
