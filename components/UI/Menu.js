@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import { Animated, TouchableHighlight, View, Image, StyleSheet, ScrollView, Text } from "react-native";
+import { Animated, TouchableHighlight, View, Image, StyleSheet, ScrollView, Text, DeviceEventEmitter } from "react-native";
 import Icon from '@expo/vector-icons/FontAwesome';
 import Layout from '../../constants/Layout';
 import TabBarIcon from '../../components/UI/TabBarIcon';
@@ -27,6 +27,14 @@ class Menu extends Component {
 
     };
 
+    componentDidMount() {
+        DeviceEventEmitter.addListener('hideFilter', (data) => {
+            if (this.mode._value !== 0) {
+                this.toggleView();
+            }
+
+        });
+    }
     changePage(page, id) {
         if (id !== undefined) {
             NavigationService.navigate(page, { Id: id });

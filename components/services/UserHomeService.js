@@ -9,6 +9,7 @@ export const getGames = async (page) => {
     var objgames = [];
     let list = require('../../files/consoles.json');
     await firebase.database().ref('/Games').once('value').then(function (snapshot) {
+        console.log("snapshot: ", snapshot);
         games = snapshot.val();
     });
 
@@ -33,7 +34,7 @@ export const getGames = async (page) => {
             name: item.name,
             file: file,
             consoles: consoles,
-            companies: companies
+            companies: companies,
         };
         objgames.push(obj);
     };

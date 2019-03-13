@@ -58,6 +58,7 @@ FeedStack.navigationOptions = {
 
 const GamesStack = createStackNavigator({
     Games: GamesScreen,
+    Profile: ProfileScreen
 },
     {
         headerMode: 'none',

@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 
+import NavigationService from '../../components/services/NavigationService';
 import Layout from '../../constants/Layout';
 import { getData, setData } from '../../components/services/Service';
 import { getGames } from '../../components/services/UserHomeService';
@@ -40,28 +41,50 @@ export default class GameScreen extends React.Component {
         super(props);
         this.state = {
             withHeight: false,
-            loading: false,
-            page: 0
+            loading: true,
+            page: 0,
+            games: null,
+            filterObj: null
         };
     }
-
     componentDidMount() {
-        this.load();
+        var _self = this;
+        _self.startLoad();
         DeviceEventEmitter.addListener('getFilter', (data) => {
-            console.log("data: ", data);
-            //this.setState({ showMenu: data.show });
+            //console.log("data: ", data);
+
+            _self.setState({ filterObj: data },
+                () => {
+                    _self.filterObj();
+                }
+            );
         });
     }
+    filterObj() {
+        var obj = this.state.games;
+        var filterobj = this.state.filterObj;
+        console.log("obj: ", obj);
+        console.log("filterobj:", filterobj);
+        var result = obj.filter(p => {
+            console.log("p.consoles: ", p.consoles.key);
+            console.log("filterobj.consoles: ", filterobj.consoles);
+            p.consoles.some(r => filterobj.consoles.includes(r.key));
+        });
+        console.log("result: ", result);
+        console.log("=====================");
 
-    load() {
-        this.setState({ loading: true, page: this.state.page + 10 });
+        //const found = result.every(r => list.includes(r));
+    }
+    _onRefresh(event) {
+        this.setState({ isRefreshing: false });
 
+        this.startLoad();
 
-        var _self = this;
-
-
+    }
+    startLoad() {
+        this.setState({ loading: true });
+        this.refs.list.clear();
         getGames(this.state.page).then((games) => {
-            this.setState({ loading: false });
             games = games.map(item => {
                 //console.log("item: ", item);
                 return {
@@ -73,22 +96,42 @@ export default class GameScreen extends React.Component {
                 };
 
             });
-            //console.log("games:", games);
-            if (this.state.withHeight) {
-                this.refs.list.addItemsWithHeight(games);
+            console.log("games:", games);
+            this.setState({ page: 0, games: games });
+            this.load(false);
+        });
+    }
+
+    load(flag) {
+        if (!flag) {
+            const _self = this;
+
+            const registerPerPage = 6;
+            var returnarray = _self.state.games.slice(_self.state.page * registerPerPage, _self.state.page * registerPerPage + registerPerPage);
+
+            if (returnarray.length > 0) {
+                _self.setState({ loading: true });
+                if (_self.state.withHeight) {
+                    _self.refs.list.addItemsWithHeight(returnarray);
+                } else {
+                    _self.refs.list.addItems(returnarray);
+                }
+                _self.setState({ page: _self.state.page + 1 });
             } else {
-                this.refs.list.addItems(games);
+                console.log("ACABOU");
             }
 
-        });
-
+            setTimeout(function () {
+                _self.setState({ loading: false });
+            }, 1000);
+        }
     }
 
     onScrollEnd(event) {
         const scrollHeight = Math.floor(event.nativeEvent.contentOffset.y + event.nativeEvent.layoutMeasurement.height);
         const height = Math.floor(event.nativeEvent.contentSize.height);
         if (scrollHeight >= height) {
-            this.load();
+            this.load(this.state.loading);
         }
     }
     createTable = (item, key) => {
@@ -99,31 +142,44 @@ export default class GameScreen extends React.Component {
         }
         return table;
     }
+    handleScroll = () => {
+        DeviceEventEmitter.emit('hideFilter', true);
+    }
+    showGame = (key) => {
+        console.log("key: ", key);
+        NavigationService.navigate('Profile', { key: key });
+    }
     render() {
         return <View style={styles.container}>
             <Masonry onMomentumScrollEnd={this.onScrollEnd.bind(this)}
+                onScrollBeginDrag={this.handleScroll}
                 style={styles.grid}
                 columns={2} ref="list"
                 containerStyle={{ padding: 5 }}
-                refreshControl={<RefreshControl
+                refreshControl={(<RefreshControl
                     refreshing={this.state.isRefreshing}
-                    onRefresh={this._onRefresh}
+                    onRefresh={this._onRefresh.bind(this)}
                     tintColor="#FFFFFF"
                     title="Loading..."
                     titleColor="#CCCCCC"
                     colors={['#FFFFFF', '#CCCCCC', '#EEEEEE']}
                     progressBackgroundColor="#48A2F8"
-                />}
-                renderItem={item => <View key={item.key}
-                    style={styles.card}>
-                    <Image source={{ uri: item.image }} style={{ height: item.height }} />
-                    <View style={styles.cardHeader}>
-                        <Text style={styles.cardText}>{item.text}</Text>
-                    </View>
-                    <View style={styles.logosBox}>
-                        {this.createTable(item.consoles, item.key)}
-                    </View>
-                </View>} />
+                    pagingEnabled={true}
+                />)}
+                renderItem={(item) => (
+                    <TouchableHighlight underlayColor="transparent" onPress={() => this.showGame(item.key)} key={item.name}>
+                        <View key={item.key} style={styles.card}>
+                            <Image source={{ uri: item.image }} style={{ height: item.height }} />
+                            <View style={styles.cardHeader}>
+                                <Text style={styles.cardText}>{item.text}</Text>
+                            </View>
+                            <View style={styles.logosBox}>
+                                {this.createTable(item.consoles, item.key)}
+                            </View>
+                        </View>
+                    </TouchableHighlight>
+                )}
+            />
 
             <Header style={styles.header} />
             {this.state.loading && <View style={styles.loadingBackground}>

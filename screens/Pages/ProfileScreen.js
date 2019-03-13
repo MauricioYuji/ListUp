@@ -32,19 +32,21 @@ export default class ProfileScreen extends React.Component {
     }
 
     state = {
-        user: null,
-        usergames: [],
-        companies: null,
-        randomGame: null,
+        key: null,
         loaded: false
     };
     componentWillMount() {
+
+        const { navigation } = this.props;
+        const key = navigation.getParam('key', 'NO-ID');
+        this.setState({ key: key });
+
+
     }
     componentDidMount() {
 
         this.setState({ loaded: true });
-
-
+        
         //getData('Companies')
         //    .then((companies) => {
         //        companies = companies === undefined ? null : companies;
@@ -63,17 +65,15 @@ export default class ProfileScreen extends React.Component {
     }
     componentWillUnmount() {
         this.setState({
-            user: null,
-            usergames: [],
-            companies: null
         });
     }
     render() {
         let loaded = this.state.loaded;
+        let key = this.state.key;
         if (loaded) {
             return (
                 <View style={styles.container}>
-                    <Text style={styles.text}>Profile</Text>
+                    <Text style={styles.text}>Profile - {key}</Text>
                 </View>
             );
         } else {

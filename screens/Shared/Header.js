@@ -31,11 +31,14 @@ export default class Header extends React.Component {
         super(props);
         const { height, width } = Dimensions.get('window');
     }
+
+
     state = {
         consoles: [],
         consolesActive: [],
         genres: [],
         genresActive: [],
+        searchText: "",
         loading: false,
         showMenu: false,
         rotateAnim: new Animated.Value(0),  // Initial value for opacity: 0
@@ -46,8 +49,37 @@ export default class Header extends React.Component {
     }
     componentDidMount() {
 
+        DeviceEventEmitter.addListener('hideFilter', (data) => {
+            if (data) {
+                this.actionMenu(false);
+            }
+        });
+    }
+    mode = new Animated.Value(0);
+
+    toggleView = () => {
+        Animated.parallel([
+            Animated.timing(this.mode, {
+                toValue: this.mode._value === 0 ? 1 : 0,
+                duration: 300
+            })
+        ]).start(() => {
+            // callback
+        });
+
+    };
+    actionMenu(flag) {
+        if (this.mode._value !== 0)
+            this.toggleView();
+
+        this.setState({
+            visible: flag,
+        });
+
     }
     showMenu() {
+
+        this.toggleView();
         this.setState({
             visible: !this.state.visible,
         });
@@ -117,6 +149,7 @@ export default class Header extends React.Component {
         this.setState({
             genresActive: list
         });
+        this._submitFilter();
     }
 
     ActiveConsole(key, multiple) {
@@ -140,14 +173,24 @@ export default class Header extends React.Component {
         this.setState({
             consolesActive: list
         });
-
+        this._submitFilter();
     }
-
-    _submitFilter = async (text) => {
-        DeviceEventEmitter.emit('getFilter', { show: text });
+    _submitFilter = async () => {
+        DeviceEventEmitter.emit('getFilter', { search: this.state.searchText, consoles: this.state.consolesActive, genres: this.state.genresActive });
+    }
+    _submitSearch = async (text) => {
+        this.setState({
+            searchText: text
+        });
+        this._submitFilter();
+    }
+    _cleanSearch = async () => {
+        this.textInput.clear();
+        this.setState({
+            searchText: []
+        });
     }
     _cleanFilter = async () => {
-
         this.setState({
             consolesActive: []
         });
@@ -210,7 +253,7 @@ export default class Header extends React.Component {
                     imgcolor = '#BBBBBB';
                 }
                 obj.push(
-                    <TouchableHighlight underlayColor="transparent" onPress={(a) => this.filterActive(objarray[j].key, false)} key={objarray[j].name} style={[styleclass]}>
+                    <TouchableHighlight underlayColor="transparent" onPress={(a) => this.ActiveConsole(objarray[j].key, false)} key={objarray[j].name} style={[styleclass]}>
                         <View>
                             <Image source={{ uri: objarray[j].img }} resizeMode={'contain'} style={[styles.filterButtonImg, { width: objarray[j].width / 5, height: objarray[j].height / 5, tintColor: imgcolor }]} />
                         </View>
@@ -219,18 +262,60 @@ export default class Header extends React.Component {
         }
         return obj;
     }
+    cleanPlatformsRender = () => {
+        let obj = [];
+        let filteractive = this.state.consolesActive;
+        if (filteractive.length > 0) {
+            return (
+                <TouchableHighlight onPress={() => this._cleanFilter()}>
+                    <Text style={styles.cleanFilter}>LIMPAR</Text>
+                </TouchableHighlight>
+            );
+        } else {
+            return null;
+        }
+    }
+    cleanGenreRender = () => {
+        let obj = [];
+        let filteractive = this.state.genresActive;
+        if (filteractive.length > 0) {
+            obj.push(
+                <TouchableHighlight onPress={() => this._cleanGenre()}>
+                    <Text style={styles.cleanFilter}>LIMPAR</Text>
+                </TouchableHighlight>
+            );
+        }
+        return obj;
+    }
+    cleanSearchRender = () => {
+        let obj = [];
+        let filteractive = this.state.searchText;
+        if (filteractive != "") {
+            obj.push(
+                <TouchableHighlight underlayColor="transparent" onPress={() => this._cleanSearch()} style={styles.cleanSearch}>
+                    <TabBarIcon
+                        name={'close'}
+                        type={'FontAwesome'}
+                        style={styles.closeIcon}
+                    />
+                </TouchableHighlight>
+            );
+        }
+        return obj;
+    }
     render() {
+
+        const height = this.mode.interpolate({
+            inputRange: [0, 1],
+            outputRange: [60, Dimensions.get('window').width / 2]
+        });
         const genresactive = this.state.genresActive;
         const consolesactive = this.state.consolesActive;
         const visible = this.state.visible;
         let { rotateAnim } = this.state;
 
-        let rotation = rotateAnim.interpolate({
-            inputRange: [false, true],
-            outputRange: ["0deg", "450deg"] // degree of rotation
-        });
         return (
-            <View style={[styles.searchbar, visible ? styles.menushow : '']}>
+            <Animated.View style={[styles.searchbar, { height }]}>
                 <View style={styles.searchbox}>
                     <TabBarIcon
                         name={'search'}
@@ -239,8 +324,10 @@ export default class Header extends React.Component {
                     />
                     <TextInput
                         style={styles.inputsearch}
-                        onChangeText={(text) => this._submitFilter(text)}
+                        onChangeText={(text) => this._submitSearch(text)}
+                        ref={input => { this.textInput = input }}
                     />
+                    {this.cleanSearchRender()}
                 </View>
                 <TouchableHighlight underlayColor="transparent" onPress={() => this.showMenu()} style={styles.profileitem}>
                     <View style={styles.profilebox}>
@@ -255,9 +342,7 @@ export default class Header extends React.Component {
                 <View style={[styles.sidemenu, visible ? '' : styles.hide]}>
                     <View style={styles.labelBox}>
                         <Text style={styles.filterLabel}>PLATAFORMAS</Text>
-                        <TouchableHighlight onPress={() => this._cleanFilter()}>
-                            <Text style={styles.cleanFilter}>LIMPAR</Text>
-                        </TouchableHighlight>
+                        {this.cleanPlatformsRender()}
                     </View>
                     <ScrollView style={styles.menuContent} horizontal={true}>
                         {this.listPlatforms()}
@@ -265,15 +350,13 @@ export default class Header extends React.Component {
 
                     <View style={styles.labelBox}>
                         <Text style={styles.filterLabel}>GENEROS</Text>
-                        <TouchableHighlight onPress={() => this._cleanGenre()}>
-                            <Text style={styles.cleanFilter}>LIMPAR</Text>
-                        </TouchableHighlight>
+                        {this.cleanGenreRender()}
                     </View>
                     <ScrollView style={styles.menuContent} horizontal={true}>
                         {this.listGenres()}
                     </ScrollView>
                 </View>
-            </View>
+            </Animated.View>
         );
     }
 
@@ -392,6 +475,15 @@ const styles = StyleSheet.create({
         color: '#FFF',
         zIndex: 0
     },
+    cleanSearch: {
+        position: 'absolute',
+        top: 15,
+        right: 10,
+        zIndex: 1000
+    },
+    closeIcon: {
+        color: '#FFF',
+    },
     inputsearch: {
         backgroundColor: 'rgba(255,255,255,0.3)',
         position: 'relative',
@@ -400,7 +492,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginLeft: 10,
         paddingLeft: 40,
-        paddingRight: 10,
+        paddingRight: 40,
         color: '#FFF'
     },
     logobox: {

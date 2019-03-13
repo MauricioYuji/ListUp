@@ -11,3 +11,5 @@ npm-debug.*
 \.vs/slnx\.sqlite
 
 \.vs/VSWorkspaceState\.json
+
+dist/
