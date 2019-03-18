@@ -152,6 +152,16 @@ class Menu extends Component {
                                     <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Test')}>
                                         <View>
                                             <TabBarIcon
+                                                name={'gamepad-variant'}
+                                                type={'MaterialCommunityIcons'}
+                                                style={styles.menuItemIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>My Games</Text>
+                                        </View>
+                                    </TouchableHighlight>
+                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Test')}>
+                                        <View>
+                                            <TabBarIcon
                                                 name={'format-list-bulleted-type'}
                                                 type={'MaterialCommunityIcons'}
                                                 style={styles.menuItemIcon}
@@ -286,6 +296,7 @@ const styles = StyleSheet.create({
     },
     menuItemIcon: {
         fontSize: 30,
+        alignSelf: 'center',
         color: '#FFF',
         marginBottom: 10
     },

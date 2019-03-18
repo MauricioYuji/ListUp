@@ -26,9 +26,11 @@ import { GetImage } from '../../components/UI/GetImage';
 import Header from '../../screens/Shared/Header';
 import LoadingScreen from '../Loading/LoadingScreen';
 import { parse } from 'qs';
-import Masonry from 'react-native-masonry-layout';
+import MasonryList from '@appandflow/masonry-list';
+
 const { width } = Dimensions.get("window");
 const columnWidth = (width - 10) / 2 - 10;
+var process = false;
 
 
 
@@ -42,99 +44,169 @@ export default class GameScreen extends React.Component {
         this.state = {
             withHeight: false,
             loading: true,
+            listend: false,
             page: 0,
             games: null,
-            filterObj: null
+            gamesfiltered: [],
+            filterObj: { consoles: [], genres: [], search: "" }
         };
     }
     componentDidMount() {
         var _self = this;
-        _self.startLoad();
+
+        getGames(this.state.page).then((games) => {
+            games = games.map(item => {
+                //console.log("item: ", item);
+                return {
+                    image: item.file,
+                    name: item.name,
+                    key: item.key,
+                    consoles: item.consoles,
+                    genres: item.genres
+                };
+            });
+            //console.log("games:", games);
+
+            _self.setState({ page: 0, games: games, listend: false },
+                () => {
+                    _self.filterObj();
+                }
+            );
+
+        });
         DeviceEventEmitter.addListener('getFilter', (data) => {
             //console.log("data: ", data);
+            //console.log("CLEAN");
+            //this.refs.list.clear();
 
-            _self.setState({ filterObj: data },
+            _self.setState({ filterObj: data, page: 0, gamesfiltered: [], listend: false },
                 () => {
                     _self.filterObj();
                 }
             );
         });
     }
-    filterObj() {
-        var obj = this.state.games;
-        var filterobj = this.state.filterObj;
-        console.log("obj: ", obj);
-        console.log("filterobj:", filterobj);
-        var result = obj.filter(p => {
-            console.log("p.consoles: ", p.consoles.key);
-            console.log("filterobj.consoles: ", filterobj.consoles);
-            p.consoles.some(r => filterobj.consoles.includes(r.key));
-        });
-        console.log("result: ", result);
-        console.log("=====================");
-
-        //const found = result.every(r => list.includes(r));
-    }
-    _onRefresh(event) {
-        this.setState({ isRefreshing: false });
-
-        this.startLoad();
-
-    }
-    startLoad() {
-        this.setState({ loading: true });
-        this.refs.list.clear();
+    loadData = () => {
+        var _self = this;
         getGames(this.state.page).then((games) => {
             games = games.map(item => {
                 //console.log("item: ", item);
                 return {
-                    image: item.file.url,
-                    text: item.name,
+                    image: item.file,
+                    name: item.name,
                     key: item.key,
-                    height: columnWidth / item.file.file.width * item.file.file.height,
-                    consoles: item.consoles
+                    consoles: item.consoles,
+                    genres: item.genres
                 };
-
             });
-            console.log("games:", games);
-            this.setState({ page: 0, games: games });
-            this.load(false);
+            //console.log("games:", games);
+
+            _self.setState({ page: 0, games: games },
+                () => {
+                    _self.filterObj();
+                }
+            );
+
         });
     }
 
-    load(flag) {
-        if (!flag) {
-            const _self = this;
 
-            const registerPerPage = 6;
-            var returnarray = _self.state.games.slice(_self.state.page * registerPerPage, _self.state.page * registerPerPage + registerPerPage);
+    filterObj() {
+        var _self = this;
+        var obj = _self.state.games;
+        var filterobj = _self.state.filterObj;
+        var result = null;
+        if (filterobj.consoles.length == 0 && filterobj.genres.length == 0 && filterobj.search == "") {
+            result = obj;
+        } else {
+            var re = new RegExp(filterobj.search.toLowerCase(), 'g');
+            result = obj.filter(p => (p.consoles.some(r => filterobj.consoles.includes(r.key)) || filterobj.consoles.length == 0) && (p.genres.some(r => filterobj.genres.includes(r.key)) || filterobj.genres.length == 0) && ((p.name.toLowerCase().match(re) != null && filterobj.search != "") || filterobj.search == ""));
+        }
 
-            if (returnarray.length > 0) {
-                _self.setState({ loading: true });
-                if (_self.state.withHeight) {
-                    _self.refs.list.addItemsWithHeight(returnarray);
-                } else {
-                    _self.refs.list.addItems(returnarray);
+        const registerPerPage = 10;
+        var resultsliced = result.slice(_self.state.page * registerPerPage, _self.state.page * registerPerPage + registerPerPage);
+
+        _self.getImages(resultsliced);
+        var returnarray = _self.state.gamesfiltered.concat(resultsliced);
+        if (resultsliced.length > 0) {
+            _self.setState({ gamesfiltered: returnarray, page: _self.state.page + 1, loading: false },
+                () => {
+                    //_self.startLoad();
+                    process = false;
                 }
-                _self.setState({ page: _self.state.page + 1 });
-            } else {
-                console.log("ACABOU");
-            }
-
-            setTimeout(function () {
-                _self.setState({ loading: false });
-            }, 1000);
+            );
+        } else {
+            _self.setState({ listend: true },
+                () => {
+                    //_self.startLoad();
+                    process = true;
+                }
+            );
         }
     }
+    _onRefresh(event) {
+        var _self = this;
+        //console.log("CLEAN");
+        //this.refs.list.clear();
+        //_self.setState({ isRefreshing: false, page: 0, listend: false },
+        //    () => {
+        //        //_self.filterObj();
+        //    }
+        //);
+        process = false;
+        _self.setState({ isRefreshing: false, gamesfiltered: [], loading: true, listend: false },
+            () => {
+                _self.loadData();
+            }
+        );
+    }
+    //startLoad() {
+    //    var _self = this;
+    //    this.setState({ loading: true });
+
+    //    _self.load(false);
+    //}
+
+    //load(flag) {
+
+    //    if (!flag) {
+    //        const _self = this;
+
+    //        const registerPerPage = 10;
+    //        var returnarray = _self.state.gamesfiltered.slice(_self.state.page * registerPerPage, _self.state.page * registerPerPage + registerPerPage);
+
+    //        if (returnarray.length > 0) {
+    //            //_self.setState({ loading: true });
+    //            if (_self.state.withHeight) {
+    //                //console.log("render height: ", returnarray);
+    //                _self.refs.list.addItemsWithHeight(returnarray);
+    //            } else {
+    //                //console.log("render: ", returnarray);
+    //                _self.refs.list.addItems(returnarray);
+    //            }
+    //            //console.log("page: ", _self.state.page);
+    //            _self.setState({ page: _self.state.page + 1 });
+    //        } else {
+    //            _self.setState({ listend: true });
+    //        }
+
+    //        setTimeout(function () {
+    //            _self.setState({ loading: false });
+    //        }, 1000);
+    //    }
+    //}
 
     onScrollEnd(event) {
-        const scrollHeight = Math.floor(event.nativeEvent.contentOffset.y + event.nativeEvent.layoutMeasurement.height);
-        const height = Math.floor(event.nativeEvent.contentSize.height);
-        if (scrollHeight >= height) {
-            this.load(this.state.loading);
-        }
+        //if (!this.state.listend) {
+        //    const scrollHeight = Math.floor(event.nativeEvent.contentOffset.y + event.nativeEvent.layoutMeasurement.height);
+        //    const height = Math.floor(event.nativeEvent.contentSize.height);
+        //    if (scrollHeight >= height) {
+        //        this.setState({ loading: true });
+        //    }
+        //}
+        //this.setState({ loading: true });
     }
-    createTable = (item, key) => {
+    renderConsoles = (item, key) => {
         let table = [];
         // Outer loop to create parent
         for (let i = 0; i < item.length; i++) {
@@ -142,20 +214,82 @@ export default class GameScreen extends React.Component {
         }
         return table;
     }
+    getImages = async (obj) => {
+        for (let i = 0; i < obj.length; i++) {
+            //console.log("item: ", obj[i]);
+            await getData('thumbs/' + obj[i].image.key)
+                .then((img) => {
+                    obj[i].image.file = img.file;
+                    obj[i].image.url = img.url;
+                });
+        }
+
+        this.setState({ gamesfiltered: this.state.gamesfiltered });
+        //console.log("obj: ", this.state.gamesfiltered);
+    }
+    checkLoading = async (event) => {
+        DeviceEventEmitter.emit('hideFilter', true);
+        var _self = this;
+        const scrollHeight = Math.floor(event.nativeEvent.contentOffset.y + event.nativeEvent.layoutMeasurement.height);
+        const height = Math.floor(event.nativeEvent.contentSize.height);
+        //console.log("scrollHeight: ", scrollHeight);
+        //console.log("height: ", height);
+        if (scrollHeight >= height / 2) {
+            //console.log("LOAD");
+
+            if (!process) {
+                process = true;
+                _self.filterObj();
+
+                //_self.setState({ loadingContent: true },
+                //    () => {
+                //        _self.filterObj();
+                //    }
+                //);
+            }
+        }
+    }
     handleScroll = () => {
         DeviceEventEmitter.emit('hideFilter', true);
     }
     showGame = (key) => {
-        console.log("key: ", key);
-        NavigationService.navigate('Profile', { key: key });
+        //console.log("key: ", key);
+        NavigationService.navigate('GameDetail', { key: key });
     }
+    renderThumb = (item) => {
+        if (item.key == "" || item.file == null)
+            return (<Image source={require('../../assets/images/console-icon.png')} resizeMode={'center'} style={{ width: '100%', height: columnWidth }} />);
+        else {
+            return (<Image source={{ uri: item.url }} style={{ height: columnWidth / item.file.width * item.file.height }} />);
+        }
+
+        //if (item.file == null && item.key != "") {
+        //    getData('thumbs/' + item.key)
+        //        .then((img) => {
+        //            console.log("GET IMAGE");
+        //            item.file = img.file;
+        //            item.url = img.url;
+
+        //            return (<Image source={{ uri: item.url }} style={{ height: columnWidth / item.file.width * item.file.height }} />);
+        //        });
+        //} else {
+        //    return (<Image source={{ uri: item.url }} style={{ height: columnWidth / item.file.width * item.file.height }} />);
+        //}
+
+    }
+
+    //_refreshRequest = () => {
+    //    this.setState({ isRefreshing: true });
+    //    setTimeout(() => {
+    //        this.setState({ isRefreshing: false });
+    //    }, 1000);
+    //};
     render() {
         return <View style={styles.container}>
-            <Masonry onMomentumScrollEnd={this.onScrollEnd.bind(this)}
-                onScrollBeginDrag={this.handleScroll}
-                style={styles.grid}
-                columns={2} ref="list"
-                containerStyle={{ padding: 5 }}
+            <MasonryList
+                onMomentumScrollEnd={this.onScrollEnd.bind(this)}
+                onScrollBeginDrag={this.checkLoading.bind(this)}
+                onScrollEndDrag={this.checkLoading.bind(this)}
                 refreshControl={(<RefreshControl
                     refreshing={this.state.isRefreshing}
                     onRefresh={this._onRefresh.bind(this)}
@@ -164,21 +298,25 @@ export default class GameScreen extends React.Component {
                     titleColor="#CCCCCC"
                     colors={['#FFFFFF', '#CCCCCC', '#EEEEEE']}
                     progressBackgroundColor="#48A2F8"
-                    pagingEnabled={true}
                 />)}
-                renderItem={(item) => (
-                    <TouchableHighlight underlayColor="transparent" onPress={() => this.showGame(item.key)} key={item.name}>
-                        <View key={item.key} style={styles.card}>
-                            <Image source={{ uri: item.image }} style={{ height: item.height }} />
-                            <View style={styles.cardHeader}>
-                                <Text style={styles.cardText}>{item.text}</Text>
+                data={this.state.gamesfiltered}
+                renderItem={({ item }) =>
+                    (
+                        <TouchableHighlight underlayColor="transparent" onPress={() => this.showGame(item.key)} key={item.name}>
+                            <View key={item.key} style={styles.card}>
+                                {this.renderThumb(item.image)}
+                                <View style={styles.cardHeader}>
+                                    <Text style={styles.cardText}>{item.name}</Text>
+                                </View>
+                                <View style={styles.logosBox}>
+                                    {this.renderConsoles(item.consoles, item.key)}
+                                </View>
                             </View>
-                            <View style={styles.logosBox}>
-                                {this.createTable(item.consoles, item.key)}
-                            </View>
-                        </View>
-                    </TouchableHighlight>
-                )}
+                        </TouchableHighlight>
+                    )}
+                getHeightForItem={({ item }) => 300}
+                numColumns={2}
+                keyExtractor={item => item.key}
             />
 
             <Header style={styles.header} />

@@ -138,6 +138,7 @@ export default class Header extends React.Component {
         return a;
     }
     ActiveGenre(key) {
+        var _self = this;
         var list = this.state.genresActive;
         var genres = this.state.genres;
 
@@ -146,13 +147,16 @@ export default class Header extends React.Component {
         else
             list.push(key);
 
-        this.setState({
-            genresActive: list
-        });
-        this._submitFilter();
+        _self.setState({ genresActive: list },
+            () => {
+                _self._submitFilter();
+            }
+        );
+
     }
 
     ActiveConsole(key, multiple) {
+        var _self = this;
         var list = this.state.consolesActive;
         var consoles = this.state.consoles;
         if (!multiple) {
@@ -170,36 +174,53 @@ export default class Header extends React.Component {
             else
                 list = this.arrayUnique(list.concat(result));
         }
-        this.setState({
-            consolesActive: list
-        });
-        this._submitFilter();
+
+
+        _self.setState({ consolesActive: list },
+            () => {
+                _self._submitFilter();
+            }
+        );
+
     }
     _submitFilter = async () => {
         DeviceEventEmitter.emit('getFilter', { search: this.state.searchText, consoles: this.state.consolesActive, genres: this.state.genresActive });
     }
     _submitSearch = async (text) => {
-        this.setState({
-            searchText: text
-        });
-        this._submitFilter();
+        var _self = this;
+        _self.setState({ searchText: text },
+            () => {
+                _self._submitFilter();
+            }
+        );
     }
     _cleanSearch = async () => {
         this.textInput.clear();
-        this.setState({
-            searchText: []
-        });
+
+        var _self = this;
+        _self.setState({ searchText: "" },
+            () => {
+                _self._submitFilter();
+            }
+        );
     }
     _cleanFilter = async () => {
-        this.setState({
-            consolesActive: []
-        });
+
+        var _self = this;
+        _self.setState({ consolesActive: [] },
+            () => {
+                _self._submitFilter();
+            }
+        );
     }
     _cleanGenre = async () => {
 
-        this.setState({
-            genresActive: []
-        });
+        var _self = this;
+        _self.setState({ genresActive: [] },
+            () => {
+                _self._submitFilter();
+            }
+        );
     }
 
     listGenres = () => {
@@ -279,19 +300,20 @@ export default class Header extends React.Component {
         let obj = [];
         let filteractive = this.state.genresActive;
         if (filteractive.length > 0) {
-            obj.push(
+            return (
                 <TouchableHighlight onPress={() => this._cleanGenre()}>
                     <Text style={styles.cleanFilter}>LIMPAR</Text>
                 </TouchableHighlight>
             );
+        } else {
+            return null;
         }
-        return obj;
     }
     cleanSearchRender = () => {
         let obj = [];
         let filteractive = this.state.searchText;
-        if (filteractive != "") {
-            obj.push(
+        if (filteractive.length > 0) {
+            return (
                 <TouchableHighlight underlayColor="transparent" onPress={() => this._cleanSearch()} style={styles.cleanSearch}>
                     <TabBarIcon
                         name={'close'}
@@ -300,8 +322,9 @@ export default class Header extends React.Component {
                     />
                 </TouchableHighlight>
             );
+        } else {
+            return null;
         }
-        return obj;
     }
     render() {
 

@@ -10,6 +10,7 @@ import { Menu } from '../components/UI/Menu';
 import FeedScreen from '../screens/Pages/FeedScreen';
 import GamesScreen from '../screens/Pages/GamesScreen';
 import GroupsScreen from '../screens/Pages/GroupsScreen';
+import GameDetailScreen from '../screens/Pages/GameDetailScreen';
 import ProfileScreen from '../screens/Pages/ProfileScreen';
 import SettingsScreen from '../screens/Pages/SettingsScreen';
 import NavigationService from '../components/services/NavigationService';
@@ -58,7 +59,7 @@ FeedStack.navigationOptions = {
 
 const GamesStack = createStackNavigator({
     Games: GamesScreen,
-    Profile: ProfileScreen
+    GameDetail: GameDetailScreen
 },
     {
         headerMode: 'none',
