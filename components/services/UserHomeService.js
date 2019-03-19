@@ -84,6 +84,7 @@ export const getGameDetail = async (key) => {
         key: key,
         name: game.name,
         file: file,
+        description: game.description,
         genres: genres,
         consoles: consoles,
         companies: companies,

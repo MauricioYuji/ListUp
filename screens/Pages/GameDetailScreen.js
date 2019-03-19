@@ -143,9 +143,10 @@ export default class GameDetailScreen extends React.Component {
         return obj;
     }
     render() {
+        const listscount = 3;
         const height = this.mode.interpolate({
             inputRange: [0, 1],
-            outputRange: [0, 60]
+            outputRange: [0, 200]
         });
         const width = this.mode.interpolate({
             inputRange: [0, 1],
@@ -155,14 +156,26 @@ export default class GameDetailScreen extends React.Component {
         let game = this.state.game;
         if (loaded) {
             return (
-                <ScrollView style={styles.container}>
-                    <Image source={{ uri: game.file.url }} resizeMode={'cover'} style={[styles.backgroundBanner]} />
-                    <LinearGradient
-                        colors={['rgba(0,0,0,0.2)', 'rgba(0,0,0,1)']}
-                        useAngle
-                        angle={180}
-                        style={styles.backgroundOverlay}
-                    />
+                <View style={styles.container}>
+                    <ScrollView>
+                        <Image source={{ uri: game.file.url }} resizeMode={'cover'} style={[styles.backgroundBanner]} />
+                        <LinearGradient
+                            colors={['rgba(0,0,0,0.2)', 'rgba(0,0,0,1)']}
+                            useAngle
+                            angle={180}
+                            style={styles.backgroundOverlay}
+                        />
+                        <View style={styles.gameInfo}>
+                            <Text style={styles.name}>{game.name}</Text>
+                            <View style={styles.menuContent} horizontal={true}>
+                                {this.listGenres()}
+                            </View>
+                            <View style={styles.menuContent} horizontal={true}>
+                                {this.listPlatforms()}
+                            </View>
+                            <Text style={styles.description}>{game.description}</Text>
+                        </View>
+                    </ScrollView>
                     <TouchableHighlight underlayColor="transparent" onPress={() => NavigationService.goback()} style={styles.backIcon}>
                         <TabBarIcon
                             name={'ios-arrow-back'}
@@ -178,27 +191,24 @@ export default class GameDetailScreen extends React.Component {
                             style={styles.addButton}
                         />
                     </TouchableHighlight>
-
-                    <Animated.View style={[styles.addBox, { height, width }]}>
-                        <ScrollView>
-                            <TouchableHighlight underlayColor="transparent" style={styles.addItem} onPress={() => console.log("asd")}>
-                                <Text style={styles.addItemText}>Adicionar a meus jogos</Text>
-                            </TouchableHighlight>
-                            <TouchableHighlight underlayColor="transparent" style={styles.addItem} onPress={() => console.log("asd")}>
-                                <Text style={styles.addItemText}>Adicionar a minha lista de desejo</Text>
-                            </TouchableHighlight>
-                        </ScrollView>
-                    </Animated.View>
-                    <View style={styles.gameInfo}>
-                        <Text style={styles.name}>{game.name}</Text>
-                        <View style={styles.menuContent} horizontal={true}>
-                            {this.listGenres()}
-                        </View>
-                        <View style={styles.menuContent} horizontal={true}>
-                            {this.listPlatforms()}
-                        </View>
-                    </View>
-                </ScrollView>
+                    <Animated.ScrollView style={[styles.addBox, { height, width }]}>
+                        <TouchableHighlight underlayColor="transparent" style={styles.addItem} onPress={() => console.log("asd")}>
+                            <Text style={styles.addItemText}>Adicionar a meus jogos</Text>
+                        </TouchableHighlight>
+                        <TouchableHighlight underlayColor="transparent" style={styles.addItem} onPress={() => console.log("asd")}>
+                            <Text style={styles.addItemText}>Adicionar a minha lista de desejo</Text>
+                        </TouchableHighlight>
+                        <TouchableHighlight underlayColor="transparent" style={styles.addItem} onPress={() => console.log("asd")}>
+                            <Text style={styles.addItemText}>Adicionar a minha lista de desejo</Text>
+                        </TouchableHighlight>
+                        <TouchableHighlight underlayColor="transparent" style={styles.addItem} onPress={() => console.log("asd")}>
+                            <Text style={styles.addItemText}>Adicionar a minha lista de desejo</Text>
+                        </TouchableHighlight>
+                        <TouchableHighlight underlayColor="transparent" style={styles.addItem} onPress={() => console.log("asd")}>
+                            <Text style={styles.addItemText}>Adicionar a minha lista de desejo</Text>
+                        </TouchableHighlight>
+                    </Animated.ScrollView>
+                </View>
             );
         } else {
             return (<LoadingScreen />);
@@ -209,18 +219,28 @@ export default class GameDetailScreen extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        marginBottom: 40,
+    },
+    header: {
+        position: 'absolute',
+        width: '100%',
+        height: 50,
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 10000
     },
     addItem: {
-        padding: 5,
+        padding: 10,
         alignItems: 'center',
         borderBottomColor: '#FFF',
-        height: 30,
         borderBottomWidth: 1
     },
     addItemText: {
         color: '#FFF',
+        alignItems: 'center',
         fontFamily: 'SourceSansPro-SemiBold',
-        fontSize: 18
+        fontSize: 14
     },
     addBox: {
         position: 'absolute',
@@ -229,7 +249,8 @@ const styles = StyleSheet.create({
         zIndex: 10,
         overflow: 'hidden',
         backgroundColor: '#006CD8',
-        borderRadius: 10
+        borderRadius: 10,
+        maxHeight: 200
     },
     gameInfo: {
         marginTop: Layout.window.height / 2,
@@ -257,6 +278,12 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontSize: 30,
         fontFamily: 'SourceSansPro-SemiBold'
+    },
+    description: {
+        color: '#FFF',
+        fontSize: 16,
+        paddingBottom: 30,
+        fontFamily: 'SourceSansPro-Regular'
     },
     genreText: {
         color: '#FFF',
