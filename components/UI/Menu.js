@@ -152,6 +152,7 @@ class Menu extends Component {
                                     <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Test')}>
                                         <View>
                                             <TabBarIcon
+                                                size={26}
                                                 name={'gamepad-variant'}
                                                 type={'MaterialCommunityIcons'}
                                                 style={styles.menuItemIcon}
@@ -162,6 +163,7 @@ class Menu extends Component {
                                     <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Test')}>
                                         <View>
                                             <TabBarIcon
+                                                size={26}
                                                 name={'format-list-bulleted-type'}
                                                 type={'MaterialCommunityIcons'}
                                                 style={styles.menuItemIcon}
@@ -172,6 +174,7 @@ class Menu extends Component {
                                     <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Profile')}>
                                         <View style={styles.menuItem}>
                                             <TabBarIcon
+                                                size={26}
                                                 name={'playlist-add'}
                                                 type={'MaterialIcons'}
                                                 style={styles.menuItemIcon}
@@ -185,6 +188,7 @@ class Menu extends Component {
                                     <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Tutorial')}>
                                         <View style={styles.menuItem}>
                                             <TabBarIcon
+                                                size={26}
                                                 name={'dice-5'}
                                                 type={'MaterialCommunityIcons'}
                                                 style={styles.menuItemIcon}
@@ -195,6 +199,7 @@ class Menu extends Component {
                                     <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Tutorial')}>
                                         <View style={styles.menuItem}>
                                             <TabBarIcon
+                                                size={26}
                                                 name={'star'}
                                                 type={'FontAwesome'}
                                                 style={styles.menuItemIcon}
@@ -205,6 +210,7 @@ class Menu extends Component {
                                     <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Tutorial')}>
                                         <View style={styles.menuItem}>
                                             <TabBarIcon
+                                                size={26}
                                                 name={'cards-outline'}
                                                 type={'MaterialCommunityIcons'}
                                                 style={styles.menuItemIcon}
@@ -219,6 +225,7 @@ class Menu extends Component {
                                     <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Tutorial')}>
                                         <View>
                                             <TabBarIcon
+                                                size={26}
                                                 name={'book'}
                                                 type={'Octicons'}
                                                 style={styles.menuItemIcon}
@@ -229,6 +236,7 @@ class Menu extends Component {
                                     <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Configuracoes')}>
                                         <View style={styles.menuItem}>
                                             <TabBarIcon
+                                                size={26}
                                                 name={'gear'}
                                                 type={'FontAwesome'}
                                                 style={styles.menuItemIcon}
@@ -239,6 +247,7 @@ class Menu extends Component {
                                     <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.logoff()}>
                                         <View style={styles.menuItem}>
                                             <TabBarIcon
+                                                size={26}
                                                 name={'logout'}
                                                 type={'MaterialCommunityIcons'}
                                                 style={styles.menuItemIcon}

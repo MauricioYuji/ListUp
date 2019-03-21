@@ -300,6 +300,7 @@ export default class RegisterScreen extends React.Component {
                         ) : (
                                 <TouchableOpacity onPress={() => { this.facebookloggin(); }} style={styles.buttonGroup}>
                                     <TabBarIcon
+                                        size={26}
                                         name={'facebook'}
                                         type={'FontAwesome'}
                                         style={styles.facebooklogo}

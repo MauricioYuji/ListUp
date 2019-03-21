@@ -53,6 +53,17 @@ export const setData = (table, obj) => {
         console.log('error ', error);
     });
 };
+export const insertData = (table, obj) => {
+    console.log('table ', table);
+    console.log('obj ', obj);
+    return firebase.database().ref('/' + table).push(obj).then((data) => {
+        //success callback
+        return data;
+    }).catch((error) => {
+        //error callback
+        console.log('error ', error);
+    });
+};
 
 export const getData = (table) => {
     //firebase.database().ref('/Games').on('value', function (snapshot) {

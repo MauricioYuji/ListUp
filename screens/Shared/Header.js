@@ -341,6 +341,7 @@ export default class Header extends React.Component {
             <Animated.View style={[styles.searchbar, { height }]}>
                 <View style={styles.searchbox}>
                     <TabBarIcon
+                        size={26}
                         name={'search'}
                         type={'FontAwesome'}
                         style={styles.searchicon}
@@ -355,6 +356,7 @@ export default class Header extends React.Component {
                 <TouchableHighlight underlayColor="transparent" onPress={() => this.showMenu()} style={styles.profileitem}>
                     <View style={styles.profilebox}>
                         <TabBarIcon
+                            size={26}
                             name={'filter'}
                             type={'FontAwesome'}
                             style={styles.filterIcon}
