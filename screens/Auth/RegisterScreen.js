@@ -4,9 +4,9 @@ import { ExpoLinksView } from '@expo/samples';
 import Layout from '../../constants/Layout';
 import { Constants } from 'expo';
 import * as firebase from 'firebase';
-//import { getUserInfo, saveUserInfo } from '../components/Service';
+//import { getUserInfo, saveUserInfo } from '../components/baseService';
 import { signInWithFacebook } from '../../components/services/facebookAuth';
-import { setData } from '../../components/services/Service';
+import { setData } from '../../components/services/baseService';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 
 export default class RegisterScreen extends React.Component {

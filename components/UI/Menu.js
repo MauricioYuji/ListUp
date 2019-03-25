@@ -149,7 +149,7 @@ class Menu extends Component {
                             <View style={styles.menuContent}>
 
                                 <ScrollView style={styles.menuGrid} horizontal={true} showsHorizontalScrollIndicator={false}>
-                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Test')}>
+                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Lists')}>
                                         <View>
                                             <TabBarIcon
                                                 size={26}
@@ -160,7 +160,7 @@ class Menu extends Component {
                                             <Text style={styles.menuLabel}>My Games</Text>
                                         </View>
                                     </TouchableHighlight>
-                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Test')}>
+                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Lists')}>
                                         <View>
                                             <TabBarIcon
                                                 size={26}
@@ -171,7 +171,73 @@ class Menu extends Component {
                                             <Text style={styles.menuLabel}>Fav List</Text>
                                         </View>
                                     </TouchableHighlight>
-                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Profile')}>
+                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Lists')}>
+                                        <View style={styles.menuItem}>
+                                            <TabBarIcon
+                                                size={26}
+                                                name={'playlist-add'}
+                                                type={'MaterialIcons'}
+                                                style={styles.menuItemIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>Criar lista</Text>
+                                        </View>
+                                    </TouchableHighlight>
+                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Lists')}>
+                                        <View style={styles.menuItem}>
+                                            <TabBarIcon
+                                                size={26}
+                                                name={'playlist-add'}
+                                                type={'MaterialIcons'}
+                                                style={styles.menuItemIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>Criar lista</Text>
+                                        </View>
+                                    </TouchableHighlight>
+                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Lists')}>
+                                        <View style={styles.menuItem}>
+                                            <TabBarIcon
+                                                size={26}
+                                                name={'playlist-add'}
+                                                type={'MaterialIcons'}
+                                                style={styles.menuItemIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>Criar lista</Text>
+                                        </View>
+                                    </TouchableHighlight>
+                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Lists')}>
+                                        <View style={styles.menuItem}>
+                                            <TabBarIcon
+                                                size={26}
+                                                name={'playlist-add'}
+                                                type={'MaterialIcons'}
+                                                style={styles.menuItemIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>Criar lista</Text>
+                                        </View>
+                                    </TouchableHighlight>
+                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Lists')}>
+                                        <View style={styles.menuItem}>
+                                            <TabBarIcon
+                                                size={26}
+                                                name={'playlist-add'}
+                                                type={'MaterialIcons'}
+                                                style={styles.menuItemIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>Criar lista</Text>
+                                        </View>
+                                    </TouchableHighlight>
+                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Lists')}>
+                                        <View style={styles.menuItem}>
+                                            <TabBarIcon
+                                                size={26}
+                                                name={'playlist-add'}
+                                                type={'MaterialIcons'}
+                                                style={styles.menuItemIcon}
+                                            />
+                                            <Text style={styles.menuLabel}>Criar lista</Text>
+                                        </View>
+                                    </TouchableHighlight>
+                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Lists')}>
                                         <View style={styles.menuItem}>
                                             <TabBarIcon
                                                 size={26}

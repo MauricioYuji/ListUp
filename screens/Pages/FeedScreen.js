@@ -17,8 +17,8 @@ import {
 import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 
 import Layout from '../../constants/Layout';
-import { getData, setData } from '../../components/services/Service';
-import { getGames } from '../../components/services/UserHomeService';
+import { getData, setData } from '../../components/services/baseService';
+import { getGames } from '../../components/services/Service';
 import { MonoText } from '../../components/UI/StyledText';
 import { GetImage } from '../../components/UI/GetImage';
 import LoadingScreen from '../Loading/LoadingScreen';

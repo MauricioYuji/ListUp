@@ -4,7 +4,7 @@ import {
     Image,
     Dimensions
 } from 'react-native';
-import { getData } from '../../components/services/Service';
+import { getData } from '../../components/services/baseService';
 const { width } = Dimensions.get("window");
 const columnWidth = (width - 10) / 2 - 10;
 

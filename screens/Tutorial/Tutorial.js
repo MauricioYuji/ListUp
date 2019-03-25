@@ -14,7 +14,7 @@ import {
 import * as firebase from 'firebase';
 import { Font, Icon } from 'expo';
 import Swiper from 'react-native-swiper';
-import { setData } from '../../components/services/Service';
+import { setData } from '../../components/services/baseService';
 
 export default class Tutorial extends React.Component {
     static navigationOptions = {

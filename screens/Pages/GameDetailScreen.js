@@ -20,8 +20,8 @@ import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 
 import NavigationService from '../../components/services/NavigationService';
 import Layout from '../../constants/Layout';
-import { getData, setData } from '../../components/services/Service';
-import { getGameDetail } from '../../components/services/UserHomeService';
+import { getData, setData } from '../../components/services/baseService';
+import { getGameDetail } from '../../components/services/Service';
 import { MonoText } from '../../components/UI/StyledText';
 import { GetImage } from '../../components/UI/GetImage';
 import LoadingScreen from '../Loading/LoadingScreen';
@@ -43,7 +43,9 @@ export default class GameDetailScreen extends React.Component {
         game: null,
         loaded: false,
         modalVisible: false,
-        mounted: false
+        modalVisibleAddGame: false,
+        mounted: false,
+        consolesActive: []
     };
     componentWillMount() {
 
@@ -102,6 +104,9 @@ export default class GameDetailScreen extends React.Component {
     setModalVisible(visible) {
         this.setState({ modalVisible: visible });
     }
+    setModalVisibleAddGame(visible) {
+        this.setState({ modalVisibleAddGame: visible });
+    }
     listGenres = () => {
         let obj = [];
         let objarray = this.state.game.genres;
@@ -138,11 +143,103 @@ export default class GameDetailScreen extends React.Component {
         }
         return obj;
     }
+    listPlatformsAdd = () => {
+        let obj = [];
+        let objarray = this.state.game.consoles;
+        let filteractive = this.state.consolesActive;
 
+
+        for (let j = 0; j < objarray.length; j++) {
+            var styleclass = null;
+            var imgcolor = '';
+            if (filteractive.includes(objarray[j].key)) {
+                styleclass = styles.filterButtonActive;
+                imgcolor = '#FFFFFF';
+            } else {
+                styleclass = styles.filterButton;
+                imgcolor = '#BBBBBB';
+            }
+            obj.push(
+                <TouchableHighlight underlayColor="transparent" onPress={(a) => this.ActiveConsole(objarray[j].key, false)} key={objarray[j].name} style={[styleclass]}>
+                    <View>
+                        <Image source={{ uri: objarray[j].img }} resizeMode={'contain'} style={[styles.filterButtonImg, { width: objarray[j].width / 5, height: objarray[j].height / 5, tintColor: imgcolor }]} />
+                    </View>
+                </TouchableHighlight>);
+        }
+        return obj;
+    }
+    addGame = () => {
+        this.setState({ modalVisible: false, modalVisibleAddGame: true });
+    }
     addToList = (list) => {
         //console.log("list: ", list);
 
         this.setState({ modalVisible: false });
+    }
+    closeModal = () => {
+        this.setState({ modalVisible: false, modalVisibleAddGame: false });
+    }
+
+    arrayRemove(arr, value) {
+        return arr.filter(function (el) {
+            return !value.includes(el);
+        });
+    }
+    ActiveConsole(key) {
+        var _self = this;
+        var list = this.state.consolesActive;
+        if (list.includes(key))
+            list = this.arrayRemove(list, [key]);
+        else
+            list.push(key);
+
+
+        _self.setState({ consolesActive: list },
+            () => {
+                //_self._submitFilter();
+            }
+        );
+
+    }
+
+    SalvarItem = () => {
+        var _self = this;
+
+        var user = firebase.auth().currentUser;
+        setData('userGames/' + user.uid + '/' + this.state.game.key, this.state.consolesActive)
+            .then((resp) => {
+                //_self.setState({ process: 3 });
+                //setTimeout(function () {
+                //    _self.setState({ process: 4 });
+                //    _self.props.callback(_self.props.list + " list add");
+                //}, 1000);
+            });
+
+    }
+    headernav() {
+        if (this.state.modalVisible || this.state.modalVisibleAddGame) {
+            return null;
+        } else {
+            let obj = [];
+            obj.push(<TouchableHighlight key={"back"} underlayColor="transparent" onPress={() => NavigationService.goback()} style={styles.backIcon}>
+                <TabBarIcon
+                    name={'ios-arrow-back'}
+                    type={'Ionicons'}
+                    style={styles.backButton}
+                />
+            </TouchableHighlight>);
+            obj.push(
+
+                <TouchableHighlight key={"add"} underlayColor="transparent" onPress={() => this.setModalVisible(!this.state.modalVisible)} style={styles.addIcon}>
+                    <TabBarIcon
+                        name={'folder-plus'}
+                        type={'MaterialCommunityIcons'}
+                        style={styles.addButton}
+                    />
+                </TouchableHighlight>);
+            return obj;
+        }
+
     }
     render() {
         const listscount = 3;
@@ -169,22 +266,8 @@ export default class GameDetailScreen extends React.Component {
                             </View>
                             <Text style={styles.description}>{game.description}</Text>
                         </View>
+                        {this.headernav()}
 
-                        <TouchableHighlight underlayColor="transparent" onPress={() => NavigationService.goback()} style={styles.backIcon}>
-                            <TabBarIcon
-                                name={'ios-arrow-back'}
-                                type={'Ionicons'}
-                                style={styles.backButton}
-                            />
-                        </TouchableHighlight>
-
-                        <TouchableHighlight underlayColor="transparent" onPress={() => this.setModalVisible(!this.state.modalVisible)} style={styles.addIcon}>
-                            <TabBarIcon
-                                name={'folder-plus'}
-                                type={'MaterialCommunityIcons'}
-                                style={styles.addButton}
-                            />
-                        </TouchableHighlight>
                     </ScrollView>
 
                     <Modal
@@ -206,6 +289,10 @@ export default class GameDetailScreen extends React.Component {
                                     <TouchableWithoutFeedback>
                                         <View style={styles.listBox}>
                                             <Text style={styles.menuTitle}>-ADICIONAR GAMES-</Text>
+
+                                            <TouchableHighlight underlayColor="transparent" style={styles.addItem} onPress={() => this.addGame()}>
+                                                <Text style={styles.addItemText}>Meus jogos</Text>
+                                            </TouchableHighlight>
                                             <AddGameButton list={"games"} game={game} label={"Meus jogos"} callback={this.addToList.bind(this)} />
                                             <AddGameButton list={"wishlist"} game={game} label={"Lista de desejo"} callback={this.addToList.bind(this)} />
                                             <Text style={styles.menuTitle}>-ADICIONAR A LISTAS-</Text>
@@ -217,7 +304,54 @@ export default class GameDetailScreen extends React.Component {
                                     </TouchableWithoutFeedback>
                                 </TouchableHighlight>
                             </ScrollView>
-                            <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.setModalVisible(!this.state.modalVisible)}>
+                            <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.closeModal()}>
+                                <TabBarIcon
+                                    name={'close'}
+                                    type={'MaterialIcons'}
+                                    style={styles.closeBoxIcon}
+                                />
+                            </TouchableHighlight>
+                        </View>
+                    </Modal>
+
+
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={this.state.mounted && this.state.modalVisibleAddGame}
+                        onRequestClose={() => {
+                            this.setState({ modalVisible: false, modalVisibleAddGame: false });
+                        }}>
+                        <View style={styles.addBox}>
+                            <ScrollView style={styles.menuList}>
+                                <LinearGradient
+                                    colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.9)']}
+                                    useAngle
+                                    angle={180}
+                                    style={styles.backgroundOverlayModal}
+                                />
+                                <TouchableHighlight>
+                                    <TouchableWithoutFeedback>
+                                        <View style={styles.listBox}>
+
+                                            <View style={styles.selectBox}>
+                                                <Text style={styles.addItemText}>Selecione os consoles</Text>
+
+                                                <View style={styles.consolesList} horizontal={true}>
+                                                    {this.listPlatformsAdd()}
+                                                </View>
+
+                                                <TouchableHighlight underlayColor="transparent" onPress={(a) => this.SalvarItem()}>
+                                                    <View style={styles.addGameButton}>
+                                                        <Text style={styles.addGameButtonText}>ADICIONAR</Text>
+                                                    </View>
+                                                </TouchableHighlight>
+                                            </View>
+                                        </View>
+                                    </TouchableWithoutFeedback>
+                                </TouchableHighlight>
+                            </ScrollView>
+                            <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.closeModal()}>
                                 <TabBarIcon
                                     name={'close'}
                                     type={'MaterialIcons'}
@@ -361,6 +495,15 @@ const styles = StyleSheet.create({
         flexWrap: "wrap",
         marginBottom: 10
     },
+    consolesList: {
+        width: Dimensions.get('window').width - 40,
+        textAlign: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        flexDirection: "row",
+        flexWrap: "wrap",
+        marginVertical: 15
+    },
     filterButton: {
         backgroundColor: '#444444',
         borderRadius: 4,
@@ -376,5 +519,36 @@ const styles = StyleSheet.create({
     },
     filterButtonImg: {
         marginHorizontal: 5
+    },
+
+    addGameButton: {
+        backgroundColor: '#006CD8',
+        borderRadius: 4,
+        flex: 1,
+        textAlign: 'center',
+        alignItems: 'center',
+        height: 50
+    },
+    addGameButtonText: {
+        color: '#FFF',
+        alignSelf: "center",
+        fontFamily: 'SourceSansPro-SemiBold',
+        fontSize: 24,
+        marginVertical: 10,
+        height: 50
+    },
+
+    filterButtonTextActive: {
+        color: '#FFFFFF',
+    },
+    filterButtonActive: {
+        backgroundColor: '#006CD8',
+        borderRadius: 4,
+        marginVertical: 5,
+        marginHorizontal: 5,
+        paddingHorizontal: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 30
     },
 });

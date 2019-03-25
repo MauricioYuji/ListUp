@@ -23,7 +23,7 @@ import { FadeSpin } from '../../components/animations/FadeSpin';
 import { MonoText } from '../../components/UI/StyledText';
 import NavigationService from '../../components/services/NavigationService';
 import TabBarIcon from '../../components/UI/TabBarIcon';
-import { setData } from '../../components/services/Service';
+import { setData } from '../../components/services/baseService';
 
 export default class Header extends React.Component {
 

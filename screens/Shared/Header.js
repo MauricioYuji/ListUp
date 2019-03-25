@@ -23,7 +23,7 @@ import { FadeSpin } from '../../components/animations/FadeSpin';
 import { MonoText } from '../../components/UI/StyledText';
 import NavigationService from '../../components/services/NavigationService';
 import TabBarIcon from '../../components/UI/TabBarIcon';
-import { setData } from '../../components/services/Service';
+import { setData } from '../../components/services/baseService';
 
 export default class Header extends React.Component {
 
@@ -42,7 +42,8 @@ export default class Header extends React.Component {
         loading: false,
         showMenu: false,
         rotateAnim: new Animated.Value(0),  // Initial value for opacity: 0
-        visible: false
+        visible: false,
+        selectMode: false
     };
     componentWillMount() {
         this.getFilters();
@@ -52,6 +53,14 @@ export default class Header extends React.Component {
         DeviceEventEmitter.addListener('hideFilter', (data) => {
             if (data) {
                 this.actionMenu(false);
+            }
+        });
+
+        DeviceEventEmitter.addListener('selectMode', (data) => {
+            if (data) {
+                this.setState({ selectMode: true });
+            } else {
+                this.setState({ selectMode: false });
             }
         });
     }
@@ -222,7 +231,22 @@ export default class Header extends React.Component {
             }
         );
     }
-
+    deleteElements = () => {
+        var _self = this;
+        _self.setState({ selectMode: false },
+            () => {
+                _self.props.callbackDelete();
+            }
+        );
+    }
+    addElements = () => {
+        var _self = this;
+        _self.setState({ selectMode: false },
+            () => {
+                _self.props.callbackAdd();
+            }
+        );
+    }
     listGenres = () => {
         let obj = [];
         let objarray = this.state.genres;
@@ -336,59 +360,142 @@ export default class Header extends React.Component {
         const consolesactive = this.state.consolesActive;
         const visible = this.state.visible;
         let { rotateAnim } = this.state;
-
-        return (
-            <Animated.View style={[styles.searchbar, { height }]}>
-                <View style={styles.searchbox}>
-                    <TabBarIcon
-                        size={26}
-                        name={'search'}
-                        type={'FontAwesome'}
-                        style={styles.searchicon}
-                    />
-                    <TextInput
-                        style={styles.inputsearch}
-                        onChangeText={(text) => this._submitSearch(text)}
-                        ref={input => { this.textInput = input }}
-                    />
-                    {this.cleanSearchRender()}
-                </View>
-                <TouchableHighlight underlayColor="transparent" onPress={() => this.showMenu()} style={styles.profileitem}>
-                    <View style={styles.profilebox}>
+        if (this.props.type == "search") {
+            return (
+                <Animated.View style={[styles.searchbar, { height }]}>
+                    <View style={styles.searchbox}>
                         <TabBarIcon
                             size={26}
-                            name={'filter'}
+                            name={'search'}
                             type={'FontAwesome'}
-                            style={styles.filterIcon}
+                            style={styles.searchicon}
                         />
+                        <TextInput
+                            style={styles.inputsearch}
+                            onChangeText={(text) => this._submitSearch(text)}
+                            ref={input => { this.textInput = input }}
+                        />
+                        {this.cleanSearchRender()}
                     </View>
-                </TouchableHighlight>
+                    <TouchableHighlight underlayColor="transparent" onPress={() => this.showMenu()} style={styles.profileitem}>
+                        <View style={styles.profilebox}>
+                            <TabBarIcon
+                                size={26}
+                                name={'filter'}
+                                type={'FontAwesome'}
+                                style={styles.filterIcon}
+                            />
+                        </View>
+                    </TouchableHighlight>
 
-                <View style={[styles.sidemenu, visible ? '' : styles.hide]}>
-                    <View style={styles.labelBox}>
-                        <Text style={styles.filterLabel}>PLATAFORMAS</Text>
-                        {this.cleanPlatformsRender()}
-                    </View>
-                    <ScrollView style={styles.menuContent} horizontal={true}>
-                        {this.listPlatforms()}
-                    </ScrollView>
+                    <View style={[styles.sidemenu, visible ? '' : styles.hide]}>
+                        <View style={styles.labelBox}>
+                            <Text style={styles.filterLabel}>PLATAFORMAS</Text>
+                            {this.cleanPlatformsRender()}
+                        </View>
+                        <ScrollView style={styles.menuContent} horizontal={true}>
+                            {this.listPlatforms()}
+                        </ScrollView>
 
-                    <View style={styles.labelBox}>
-                        <Text style={styles.filterLabel}>GENEROS</Text>
-                        {this.cleanGenreRender()}
+                        <View style={styles.labelBox}>
+                            <Text style={styles.filterLabel}>GENEROS</Text>
+                            {this.cleanGenreRender()}
+                        </View>
+                        <ScrollView style={styles.menuContent} horizontal={true}>
+                            {this.listGenres()}
+                        </ScrollView>
                     </View>
-                    <ScrollView style={styles.menuContent} horizontal={true}>
-                        {this.listGenres()}
-                    </ScrollView>
+                </Animated.View>
+            );
+        } else {
+            return (
+                <View style={[styles.searchbar]}>
+                    <View style={[styles.flexGroupMax, styles.flexLeft]}>
+                        {this.props.back &&
+                            <TouchableHighlight underlayColor="transparent" onPress={() => NavigationService.goback()} style={styles.sideIcon}>
+                                <TabBarIcon
+                                    name={'ios-arrow-back'}
+                                    type={'Ionicons'}
+                                    style={styles.backButton}
+                                />
+                            </TouchableHighlight>
+                        }
+                    </View>
+                    <View style={[styles.flexGroupMax, styles.labelArea]}>
+                        <Text style={styles.labelTitle}>{this.props.label}</Text>
+                        <Text style={styles.labelDetail}>{this.props.detail}</Text>
+                    </View>
+                    <View style={[styles.flexGroupMax, styles.flexRight]}>
+
+                        {this.state.selectMode ?
+                            (<TouchableHighlight underlayColor="transparent" onPress={() => this.deleteElements()} style={styles.sideIcon}>
+                                <TabBarIcon
+                                    name={'trash-can-outline'}
+                                    type={'MaterialCommunityIcons'}
+                                    style={styles.backButton}
+                                />
+                            </TouchableHighlight>) :
+                            (<TouchableHighlight underlayColor="transparent" onPress={() => this.addElements()} style={styles.sideIcon}>
+                                <TabBarIcon
+                                    name={'playlist-plus'}
+                                    type={'MaterialCommunityIcons'}
+                                    style={styles.backButton}
+                                />
+                            </TouchableHighlight>)
+                        }
+
+                    </View>
                 </View>
-            </Animated.View>
-        );
+            );
+        }
     }
 
 
 }
 
 const styles = StyleSheet.create({
+    flexGroupMax: {
+        flex: 1
+    },
+    flexGroupMin: {
+        flex: 0
+    },
+    labelArea: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    sideIcon: {
+        padding: 5
+    },
+    flexLeft: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+    },
+    flexRight: {
+        flexDirection: 'row-reverse',
+        alignItems: 'flex-end',
+    },
+    labelTitle: {
+        fontSize: 24,
+        color: '#FFF',
+        fontFamily: 'SourceSansPro-SemiBold'
+    },
+    labelDetail: {
+        fontSize: 14,
+        color: '#FFF',
+        fontFamily: 'SourceSansPro-SemiBold'
+    },
+
+    backIcon: {
+        position: 'absolute',
+        top: 10,
+        left: 10,
+        zIndex: 10
+    },
+    backButton: {
+        fontSize: 50
+    },
     searchbar: {
         position: 'absolute',
         top: 0,

@@ -1,6 +1,6 @@
 import firebase from 'firebase';
 import { Constants, Facebook } from 'expo';
-//import { getUserInfo, saveUserInfo } from './Service';
+//import { getUserInfo, saveUserInfo } from './baseService';
 
 //export const signInWithFacebook = () => {
 

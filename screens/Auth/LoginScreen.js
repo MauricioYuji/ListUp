@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, Text, View, TextInput, CheckBox, DeviceEventEmi
 import { ExpoLinksView } from '@expo/samples';
 import Layout from '../../constants/Layout';
 import { signInWithFacebook } from '../../components/services/facebookAuth';
-import { setData } from '../../components/services/Service';
+import { setData } from '../../components/services/baseService';
 import { Constants } from 'expo';
 import * as firebase from 'firebase';
 import TabBarIcon from '../../components/UI/TabBarIcon';

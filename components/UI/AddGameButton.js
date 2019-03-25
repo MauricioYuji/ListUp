@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import * as firebase from 'firebase';
 import TabBarIcon from '../UI/TabBarIcon';
-import { getData, setData, insertData } from '../services/Service';
+import { getData, setData, insertData } from '../services/baseService';
 
 
 
@@ -70,13 +70,9 @@ export default class AddGameButton extends React.Component {
     }
     SalvarItem = () => {
         var _self = this;
-        var obj = {
-            key: this.props.game.key,
-            consoles: this.state.consolesActive
-        };
 
         var user = firebase.auth().currentUser;
-        insertData('userGames/' + user.uid, obj)
+        setData('userGames/' + user.uid + '/' + this.props.game.key, this.state.consolesActive)
             .then((resp) => {
                 _self.setState({ process: 3 });
                 setTimeout(function () {

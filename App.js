@@ -23,7 +23,7 @@ import AppNavigator from './navigation/AppNavigator';
 import Auth from './navigation/AuthNavigator';
 import Header from './screens/Shared/Header';
 import Layout from './constants/Layout';
-import { setData, getData } from './components/services/Service';
+import { setData, getData } from './components/services/baseService';
 
 import * as firebase from 'firebase';
 import LoginScreen from './screens/Auth/LoginScreen';
