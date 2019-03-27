@@ -63,6 +63,11 @@ export default class Header extends React.Component {
                 this.setState({ selectMode: false });
             }
         });
+        DeviceEventEmitter.addListener('confirmDelete', (data) => {
+            if (data) {
+                this.setState({ selectMode: false });
+            }
+        });
     }
     mode = new Animated.Value(0);
 
@@ -233,11 +238,12 @@ export default class Header extends React.Component {
     }
     deleteElements = () => {
         var _self = this;
-        _self.setState({ selectMode: false },
-            () => {
-                _self.props.callbackDelete();
-            }
-        );
+        _self.props.callbackDelete();
+    }
+    cancelDelete = () => {
+        var _self = this;
+
+        DeviceEventEmitter.emit('selectMode', false);
     }
     addElements = () => {
         var _self = this;
@@ -407,18 +413,26 @@ export default class Header extends React.Component {
                     </View>
                 </Animated.View>
             );
-        } else {
+        } else if (this.props.type == "info-lists") {
             return (
                 <View style={[styles.searchbar]}>
                     <View style={[styles.flexGroupMax, styles.flexLeft]}>
-                        {this.props.back &&
-                            <TouchableHighlight underlayColor="transparent" onPress={() => NavigationService.goback()} style={styles.sideIcon}>
+                        {this.props.back && !this.state.selectMode ?
+                            (<TouchableHighlight underlayColor="transparent" onPress={() => NavigationService.goback()} style={styles.sideIcon}>
                                 <TabBarIcon
                                     name={'ios-arrow-back'}
                                     type={'Ionicons'}
                                     style={styles.backButton}
                                 />
+                            </TouchableHighlight>) :
+                            (<TouchableHighlight underlayColor="transparent" onPress={() => this.cancelDelete()} style={styles.sideIcon}>
+                                <TabBarIcon
+                                    name={'close'}
+                                    type={'MaterialCommunityIcons'}
+                                    style={styles.backButton}
+                                />
                             </TouchableHighlight>
+                            )
                         }
                     </View>
                     <View style={[styles.flexGroupMax, styles.labelArea]}>
@@ -447,6 +461,67 @@ export default class Header extends React.Component {
                     </View>
                 </View>
             );
+        } else if (this.props.type == "info-list") {
+            return (
+                <View style={[styles.searchbar]}>
+                    <View style={[styles.flexGroupMax, styles.flexLeft]}>
+                        {this.props.back && !this.state.selectMode ?
+                            (<TouchableHighlight underlayColor="transparent" onPress={() => NavigationService.goback()} style={styles.sideIcon}>
+                                <TabBarIcon
+                                    name={'ios-arrow-back'}
+                                    type={'Ionicons'}
+                                    style={styles.backButton}
+                                />
+                            </TouchableHighlight>) :
+                            (<TouchableHighlight underlayColor="transparent" onPress={() => this.cancelDelete()} style={styles.sideIcon}>
+                                <TabBarIcon
+                                    name={'close'}
+                                    type={'MaterialCommunityIcons'}
+                                    style={styles.backButton}
+                                />
+                            </TouchableHighlight>
+                            )
+                        }
+                    </View>
+                    <View style={[styles.flexGroupMax, styles.labelArea]}>
+                        <Text style={styles.labelTitle}>{this.props.label}</Text>
+                        <Text style={styles.labelDetail}>{this.props.detail}</Text>
+                    </View>
+
+                    {this.state.selectMode ?
+                        (
+                            <View style={[styles.flexGroupMax, styles.flexRight]}>
+                                <TouchableHighlight underlayColor="transparent" onPress={() => this.deleteElements()} style={styles.sideIcon}>
+                                    <TabBarIcon
+                                        name={'trash-can-outline'}
+                                        type={'MaterialCommunityIcons'}
+                                        style={styles.backButton}
+                                    />
+                                </TouchableHighlight>
+                            </View>
+                        ) : (
+                            <View style={[styles.flexGroupMax, styles.flexRight]}>
+                                <TouchableHighlight underlayColor="transparent" onPress={() => this.addElements()} style={styles.sideIcon}>
+                                    <TabBarIcon
+                                        name={'edit'}
+                                        type={'MaterialIcons'}
+                                        style={styles.backButton}
+                                    />
+                                </TouchableHighlight>
+                                <TouchableHighlight underlayColor="transparent" onPress={() => this.addElements()} style={styles.sideIcon}>
+                                    <TabBarIcon
+                                        name={'library-plus'}
+                                        type={'MaterialCommunityIcons'}
+                                        style={styles.backButton}
+                                    />
+                                </TouchableHighlight>
+                            </View>
+                        )
+                    }
+                </View>
+            );
+        } else {
+            return null;
         }
     }
 
@@ -470,11 +545,11 @@ const styles = StyleSheet.create({
     },
     flexLeft: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
+        alignItems: 'center',
     },
     flexRight: {
         flexDirection: 'row-reverse',
-        alignItems: 'flex-end',
+        alignItems: 'center',
     },
     labelTitle: {
         fontSize: 24,
@@ -494,7 +569,7 @@ const styles = StyleSheet.create({
         zIndex: 10
     },
     backButton: {
-        fontSize: 50
+        fontSize: 40
     },
     searchbar: {
         position: 'absolute',

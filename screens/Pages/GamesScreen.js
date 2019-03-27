@@ -50,13 +50,14 @@ export default class GameScreen extends React.Component {
             gamesfiltered: [],
             filterObj: { consoles: [], genres: [], search: "" }
         };
+
+        DeviceEventEmitter.emit('reloading', true);
     }
     componentDidMount() {
         var _self = this;
 
         getGames(this.state.page).then((games) => {
             games = games.map(item => {
-                //console.log("item: ", item);
                 return {
                     image: item.file,
                     name: item.name,
@@ -65,7 +66,6 @@ export default class GameScreen extends React.Component {
                     genres: item.genres
                 };
             });
-            //console.log("games:", games);
 
             _self.setState({ page: 0, games: games, listend: false },
                 () => {
@@ -75,9 +75,6 @@ export default class GameScreen extends React.Component {
 
         });
         DeviceEventEmitter.addListener('getFilter', (data) => {
-            //console.log("data: ", data);
-            //console.log("CLEAN");
-            //this.refs.list.clear();
 
             _self.setState({ filterObj: data, page: 0, gamesfiltered: [], listend: false },
                 () => {
@@ -90,7 +87,6 @@ export default class GameScreen extends React.Component {
         var _self = this;
         getGames(this.state.page).then((games) => {
             games = games.map(item => {
-                //console.log("item: ", item);
                 return {
                     image: item.file,
                     name: item.name,
@@ -99,7 +95,6 @@ export default class GameScreen extends React.Component {
                     genres: item.genres
                 };
             });
-            //console.log("games:", games);
 
             _self.setState({ page: 0, games: games },
                 () => {
@@ -129,16 +124,15 @@ export default class GameScreen extends React.Component {
         _self.getImages(resultsliced);
         var returnarray = _self.state.gamesfiltered.concat(resultsliced);
         if (resultsliced.length > 0) {
+            DeviceEventEmitter.emit('reloading', false);
             _self.setState({ gamesfiltered: returnarray, page: _self.state.page + 1, loading: false },
                 () => {
-                    //_self.startLoad();
                     process = false;
                 }
             );
         } else {
             _self.setState({ listend: true },
                 () => {
-                    //_self.startLoad();
                     process = true;
                 }
             );
@@ -146,69 +140,19 @@ export default class GameScreen extends React.Component {
     }
     _onRefresh(event) {
         var _self = this;
-        //console.log("CLEAN");
-        //this.refs.list.clear();
-        //_self.setState({ isRefreshing: false, page: 0, listend: false },
-        //    () => {
-        //        //_self.filterObj();
-        //    }
-        //);
         process = false;
+        DeviceEventEmitter.emit('reloading', true);
         _self.setState({ isRefreshing: false, gamesfiltered: [], loading: true, listend: false },
             () => {
                 _self.loadData();
             }
         );
     }
-    //startLoad() {
-    //    var _self = this;
-    //    this.setState({ loading: true });
-
-    //    _self.load(false);
-    //}
-
-    //load(flag) {
-
-    //    if (!flag) {
-    //        const _self = this;
-
-    //        const registerPerPage = 10;
-    //        var returnarray = _self.state.gamesfiltered.slice(_self.state.page * registerPerPage, _self.state.page * registerPerPage + registerPerPage);
-
-    //        if (returnarray.length > 0) {
-    //            //_self.setState({ loading: true });
-    //            if (_self.state.withHeight) {
-    //                //console.log("render height: ", returnarray);
-    //                _self.refs.list.addItemsWithHeight(returnarray);
-    //            } else {
-    //                //console.log("render: ", returnarray);
-    //                _self.refs.list.addItems(returnarray);
-    //            }
-    //            //console.log("page: ", _self.state.page);
-    //            _self.setState({ page: _self.state.page + 1 });
-    //        } else {
-    //            _self.setState({ listend: true });
-    //        }
-
-    //        setTimeout(function () {
-    //            _self.setState({ loading: false });
-    //        }, 1000);
-    //    }
-    //}
 
     onScrollEnd(event) {
-        //if (!this.state.listend) {
-        //    const scrollHeight = Math.floor(event.nativeEvent.contentOffset.y + event.nativeEvent.layoutMeasurement.height);
-        //    const height = Math.floor(event.nativeEvent.contentSize.height);
-        //    if (scrollHeight >= height) {
-        //        this.setState({ loading: true });
-        //    }
-        //}
-        //this.setState({ loading: true });
     }
     renderConsoles = (item, key) => {
         let table = [];
-        // Outer loop to create parent
         for (let i = 0; i < item.length; i++) {
             table.push(<Image key={i} source={{ uri: item[i].img }} resizeMode={'contain'} style={styles.logo} />);
         }
@@ -216,7 +160,6 @@ export default class GameScreen extends React.Component {
     }
     getImages = async (obj) => {
         for (let i = 0; i < obj.length; i++) {
-            //console.log("item: ", obj[i]);
             await getData('thumbs/' + obj[i].image.key)
                 .then((img) => {
                     obj[i].image.file = img.file;
@@ -225,27 +168,18 @@ export default class GameScreen extends React.Component {
         }
 
         this.setState({ gamesfiltered: this.state.gamesfiltered });
-        //console.log("obj: ", this.state.gamesfiltered);
     }
     checkLoading = async (event) => {
         DeviceEventEmitter.emit('hideFilter', true);
         var _self = this;
         const scrollHeight = Math.floor(event.nativeEvent.contentOffset.y + event.nativeEvent.layoutMeasurement.height);
         const height = Math.floor(event.nativeEvent.contentSize.height);
-        //console.log("scrollHeight: ", scrollHeight);
-        //console.log("height: ", height);
         if (scrollHeight >= height / 2) {
-            //console.log("LOAD");
 
             if (!process) {
                 process = true;
                 _self.filterObj();
-
-                //_self.setState({ loadingContent: true },
-                //    () => {
-                //        _self.filterObj();
-                //    }
-                //);
+                
             }
         }
     }
@@ -253,7 +187,6 @@ export default class GameScreen extends React.Component {
         DeviceEventEmitter.emit('hideFilter', true);
     }
     showGame = (key) => {
-        //console.log("key: ", key);
         NavigationService.navigate('GameDetail', { key: key });
     }
     renderThumb = (item) => {
@@ -263,27 +196,7 @@ export default class GameScreen extends React.Component {
             return (<Image source={{ uri: item.url }} style={{ height: columnWidth / item.file.width * item.file.height }} />);
         }
 
-        //if (item.file == null && item.key != "") {
-        //    getData('thumbs/' + item.key)
-        //        .then((img) => {
-        //            console.log("GET IMAGE");
-        //            item.file = img.file;
-        //            item.url = img.url;
-
-        //            return (<Image source={{ uri: item.url }} style={{ height: columnWidth / item.file.width * item.file.height }} />);
-        //        });
-        //} else {
-        //    return (<Image source={{ uri: item.url }} style={{ height: columnWidth / item.file.width * item.file.height }} />);
-        //}
-
     }
-
-    //_refreshRequest = () => {
-    //    this.setState({ isRefreshing: true });
-    //    setTimeout(() => {
-    //        this.setState({ isRefreshing: false });
-    //    }, 1000);
-    //};
     render() {
         return <View style={styles.container}>
             <MasonryList
@@ -320,9 +233,6 @@ export default class GameScreen extends React.Component {
             />
 
             <Header style={styles.header} type={"search"} />
-            {this.state.loading && <View style={styles.loadingBackground}>
-                <ActivityIndicator size="large" color="#FFFFFF" />
-            </View>}
         </View>
     }
 }

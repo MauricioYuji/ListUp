@@ -2,7 +2,7 @@ import React from 'react';
 import { Text } from 'react-native';
 import * as firebase from 'firebase';
 import Layout from '../../constants/Layout';
-import { getData } from './baseService';
+import { getData, deleteData, setData } from './baseService';
 
 export const getGames = async (page) => {
     let games = null;
@@ -19,7 +19,7 @@ export const getGames = async (page) => {
         var companies = [];
         var item = games[key];
         //console.log("item: ", item);
-        var file = { key: games[key].img, url: "", file: null};
+        var file = { key: games[key].img, url: "", file: null };
         //if (games[key].img != "") {
         //    var file = firebase.database().ref('thumbs/' + games[key].img).once('value').then(function (snapshot) {
         //        return snapshot.val();
@@ -92,4 +92,56 @@ export const getGameDetail = async (key) => {
     return obj;
 };
 
+export const getuserList = async (page) => {
+    var user = firebase.auth().currentUser;
+    let lists = null;
+    var objgames = [];
+    await firebase.database().ref('/userLists/' + user.uid).once('value').then(function (snapshot) {
+        //console.log("snapshot: ", snapshot.val());
+        lists = snapshot.val();
+    });
 
+    for (var key in lists) {
+
+        var item = lists[key];
+        var obj = {
+            key: key,
+            title: item.title,
+            games: item.games == undefined ? [] : item.games,
+            description: item.description
+        };
+        objgames.push(obj);
+    }
+    return objgames;
+};
+
+export const getListByKey = async (key) => {
+    var user = firebase.auth().currentUser;
+    let list = null;
+    await firebase.database().ref('/userLists/' + user.uid + '/' + key).once('value').then(function (snapshot) {
+        //console.log("snapshot: ", snapshot.val());
+        list = snapshot.val();
+    });
+
+    return list;
+};
+
+export const deleteItemsFromList = async (keys) => {
+
+    var user = firebase.auth().currentUser;
+
+
+    let lists = null;
+    var objgames = [];
+    await firebase.database().ref('/userLists/' + user.uid).once('value').then(function (snapshot) {
+        //console.log("snapshot: ", snapshot.val());
+        lists = snapshot.val();
+        for (var i = 0; i < keys.length; i++) {
+            lists[keys[i]] = null;
+        }
+        setData('/userLists/' + user.uid + '/', lists)
+            .then((img) => {
+            });
+    });
+
+};

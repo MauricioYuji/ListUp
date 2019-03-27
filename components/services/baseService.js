@@ -26,3 +26,9 @@ export const getData = (table) => {
     });
 };
 
+export const deleteData = (table, key) => {
+    return firebase.database().ref('/' + table).child(key).remove().then(function (snapshot) {
+        return snapshot.val();
+    });
+};
+

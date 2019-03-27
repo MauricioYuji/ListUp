@@ -23,8 +23,8 @@ import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 
 import NavigationService from '../../components/services/NavigationService';
 import Layout from '../../constants/Layout';
-import { getData, setData, insertData } from '../../components/services/baseService';
-import { getListByKey } from '../../components/services/Service';
+import { getData, setData, insertData, deleteData } from '../../components/services/baseService';
+import { getuserList, deleteItemsFromList } from '../../components/services/Service';
 import { MonoText } from '../../components/UI/StyledText';
 import ListItem from '../../components/UI/ListItem';
 import TabBarIcon from '../../components/UI/TabBarIcon';
@@ -51,12 +51,7 @@ export default class ListScreen extends React.Component {
             loading: true,
             listend: false,
             page: 0,
-            list: {
-                title: "",
-                games: [],
-                key: "",
-                description: ""
-            },
+            lists: [],
             multiSelect: false,
             selectedItens: [],
             modalVisible: false,
@@ -66,20 +61,14 @@ export default class ListScreen extends React.Component {
             inputText: "",
             inputLimit: "",
             modelInvalid: false,
-            key: ""
+            confirmDelete: false
         };
     }
     componentDidMount() {
         var _self = this;
 
         DeviceEventEmitter.emit('reloading', true);
-
-
-        const { navigation } = this.props;
-        const key = navigation.getParam('key', 'NO-ID');
-
-        this.loadData(key);
-
+        this.loadData();
     }
     componentWillUnmount() {
         this.setState({ mounted: false });
@@ -89,20 +78,19 @@ export default class ListScreen extends React.Component {
     setModalVisible(visible) {
         this.setState({ modalVisible: visible });
     }
-    loadData = (key) => {
+    loadData = () => {
         var _self = this;
-        if (key == "") {
-            key = this.state.key;
-        }
-        getListByKey(key).then((list) => {
+        getuserList(this.state.page).then((list) => {
             console.log("list: ", list);
-            var obj = {
-                title: list.title,
-                games: list.games == undefined ? [] : list.games,
-                key: key,
-                description: list.description
-            };
-            _self.setState({ page: 0, list: obj, listend: false, loading: false, mounted: true, key: key },
+            list = list.map(item => {
+                return {
+                    title: item.title,
+                    games: item.games,
+                    key: item.key,
+                    description: item.description
+                };
+            });
+            _self.setState({ page: 0, lists: list, listend: false, loading: false, mounted: true },
                 () => {
                     DeviceEventEmitter.emit('reloading', false);
                     //_self.filterObj();
@@ -114,31 +102,54 @@ export default class ListScreen extends React.Component {
     itemAction = () => {
 
     }
+
+    arrayRemove(arr, value) {
+        return arr.filter(function (el) {
+            return !value.includes(el);
+        });
+    }
     selectItem = (id) => {
         console.log("id: ", id);
         var arrayobj = this.state.selectedItens;
         if (!arrayobj.includes(id)) {
             arrayobj.push(id);
+        } else {
+            arrayobj = this.arrayRemove(arrayobj, [id]);
         }
+        console.log("arrayobj: ", arrayobj);
+        console.log("================");
         this.setState({ selectedItens: arrayobj },
             () => {
-                DeviceEventEmitter.emit('selectMode', true);
+                //DeviceEventEmitter.emit('selectMode', true);
             }
         );
     }
+    confirmdeleteItens = () => {
+        var _self = this;
+
+        DeviceEventEmitter.emit('reloading', true);
+        deleteItemsFromList(this.state.selectedItens).then(() => {
+            _self.setState({ selectedItens: [], confirmDelete: false },
+                () => {
+                    DeviceEventEmitter.emit('confirmDelete', true);
+                    DeviceEventEmitter.emit('selectMode', false);
+                    this.loadData();
+                }
+            );
+        });
+    }
     deleteItens = () => {
-        console.log("DELETE all: ", this.state.selectedItens);
-        this.setState({ selectedItens: [] },
+        var _self = this;
+        _self.setState({ confirmDelete: true },
             () => {
-                DeviceEventEmitter.emit('selectMode', false);
             }
         );
     }
     addItens = () => {
-        console.log("ADD");
         this.setModalVisible(!this.state.modalVisible);
     }
     addList = () => {
+
         var obj = {
             title: this.state.inputTitle,
             type: this.state.inputSelect,
@@ -149,17 +160,15 @@ export default class ListScreen extends React.Component {
         if (this.state.inputTitle == "" || this.state.inputSelect == "" || this.state.inputText == "" || this.state.inputLimit == "") {
             this.setState({ modelInvalid: true });
         } else {
+            DeviceEventEmitter.emit('reloading', true);
             this.setState({ modelInvalid: false });
             var _self = this;
 
-            console.log("ADD TO LIST");
-            console.log("obj: ", obj);
             var user = firebase.auth().currentUser;
             insertData('userLists/' + user.uid + '/', obj)
                 .then((resp) => {
                     _self.setModalVisible(false);
-                    console.log("resp: ", resp);
-                    console.log("=============================");
+                    _self.loadData();
                 });
         }
     }
@@ -167,27 +176,21 @@ export default class ListScreen extends React.Component {
         this.setState({ modalVisible: false });
     }
 
-    _searchGame(value) {
-        console.log("Search: ", value);
-        var _self = this;
-        getGames(this.state.page).then((games) => {
-            games = games.map(item => {
-                return {
-                    image: item.file,
-                    name: item.name,
-                    key: item.key,
-                    consoles: item.consoles,
-                    genres: item.genres
-                };
-            });
+    closeConfirm = () => {
+        this.setState({ confirmDelete: false });
+    }
 
-            _self.setState({ games: games },
-                () => {
-                    //_self.filterObj();
-                }
-            );
-
-        });
+    _setTitle(value) {
+        this.setState({ inputTitle: value });
+    }
+    _setLimit(value) {
+        this.setState({ inputLimit: value });
+    }
+    _setSelect(value) {
+        this.setState({ inputSelect: value });
+    }
+    _setText(value) {
+        this.setState({ inputText: value });
     }
     renderLists() {
         let lists = this.state.lists;
@@ -196,33 +199,48 @@ export default class ListScreen extends React.Component {
             items.push(<ListItem key={i} label={lists[i].title} games={lists[i].games} callback={this.selectItem.bind(this)} id={lists[i].key} />);
         }
         return items;
-
-    }
-
-    renderLists() {
-        let list = this.state.list.games;
-        let items = [];
-        for (let i = 0; i < list.length; i++) {
-            items.push(<ListItem key={i} label={list[i].title} games={lists[i].games} callback={this.selectItem.bind(this)} id={lists[i].key} />);
-        }
-        return items;
     }
     render() {
         return (
             <View style={styles.container}>
-                <ScrollView style={styles.scrollArea}>
-                    <View style={styles.titleBox}>
-                        <Text style={styles.labelTitle}>{this.state.list.title}</Text>
-                        <Text style={styles.labelDetail}>{this.state.list.games.length} jogos</Text>
+                <ScrollView>
+                    <View style={styles.scrollArea}>
+                        {this.renderLists()}
                     </View>
-
                 </ScrollView>
 
-                <Header style={styles.header} type={"info-list"} back={true} callbackDelete={this.deleteItens.bind(this)} callbackAdd={this.addItens.bind(this)} label={"Lista"} detail={""} />
+                <Header style={styles.header} type={"info-lists"} back={true} callbackDelete={this.deleteItens.bind(this)} callbackAdd={this.addItens.bind(this)} label={"Minhas Listas"} detail={this.state.lists.length + " listas"} />
 
-                <View style={styles.scrollArea}>
-                    {this.renderLists()}
-                </View>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={this.state.mounted && this.state.confirmDelete}
+                    onRequestClose={() => {
+                        this.setState({ confirmDelete: false });
+                    }}>
+                    <View style={styles.backgroundModal}>
+                        <Text style={styles.addItemText}>DESEJA EXCLUIR?</Text>
+                        <View style={styles.buttonBox}>
+                            <TouchableHighlight underlayColor="transparent" onPress={() => this.confirmdeleteItens()}>
+                                <View style={styles.addItem}>
+                                    <Text style={styles.addItemText}>Deletar</Text>
+                                </View>
+                            </TouchableHighlight>
+                            <TouchableHighlight underlayColor="transparent" onPress={() => this.closeConfirm()}>
+                                <View style={styles.addItem}>
+                                    <Text style={styles.addItemText}>Cancelar</Text>
+                                </View>
+                            </TouchableHighlight>
+                        </View>
+                        <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.closeConfirm()}>
+                            <TabBarIcon
+                                name={'close'}
+                                type={'MaterialIcons'}
+                                style={styles.closeBoxIcon}
+                            />
+                        </TouchableHighlight>
+                    </View>
+                </Modal>
 
                 <Modal
                     animationType="slide"
@@ -242,16 +260,47 @@ export default class ListScreen extends React.Component {
                             <TouchableHighlight>
                                 <TouchableWithoutFeedback>
                                     <View style={styles.listBox}>
-                                        <Text style={styles.menuTitle}>-ADICIONAR JOGO-</Text>
+                                        <Text style={styles.menuTitle}>-CRIAR LISTA-</Text>
+                                        {this.state.modelInvalid &&
+                                            <Text style={styles.erroText}>Preencha todos os campos.</Text>
+                                        }
                                         <TextInput
                                             placeholder={"Nome"}
                                             style={[styles.inputsearch, styles.inputText]}
-                                            onChangeText={(text) => this._searchGame(text)}
+                                            onChangeText={(text) => this._setTitle(text)}
                                             ref={input => { this.titleInput = input }}
                                         />
                                         <View style={styles.inputSelect}>
-                                            <Text>Procure pelo nome o jogo que gostaria de adicionar</Text>
+                                            <Picker
+                                                selectedValue={this.state.inputSelect}
+                                                onValueChange={(itemValue, itemIndex) =>
+                                                    this._setSelect(itemValue)
+                                                }>
+                                                <Picker.Item label="Selecione um tipo" value="" />
+                                                <Picker.Item label="Lista Padrão" value="padrao" />
+                                                <Picker.Item label="Ranking" value="ranking" />
+                                            </Picker>
                                         </View>
+                                        <TextInput
+                                            placeholder={"Limite de jogos"}
+                                            keyboardType='numeric'
+                                            maxLength={10}
+                                            style={[styles.inputsearch, styles.inputText]}
+                                            onChangeText={(text) => this._setLimit(text)}
+                                            ref={input => { this.limitInput = input }}
+                                        />
+                                        <TextInput
+                                            placeholder={"Descrição"}
+                                            multiline={true}
+                                            numberOfLines={4}
+                                            style={[styles.inputsearch, styles.inputMulti, styles.inputText]}
+                                            onChangeText={(text) => this._setText(text)}
+                                            ref={input => { this.textInput = input }} />
+                                        <TouchableHighlight underlayColor="transparent" onPress={() => this.addList()}>
+                                            <View style={styles.addItem}>
+                                                <Text style={styles.addItemText}>Criar Lista</Text>
+                                            </View>
+                                        </TouchableHighlight>
                                     </View>
                                 </TouchableWithoutFeedback>
                             </TouchableHighlight>
@@ -274,6 +323,17 @@ const styles = {
         flex: 1,
         paddingBottom: 50,
         paddingTop: 60
+    },
+    backgroundModal: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        flex: 1,
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000
+    },
+    scrollArea: {
+        paddingBottom: 40
     },
     erroText: {
         color: "#F00",
@@ -300,12 +360,6 @@ const styles = {
     itemInfo: {
         flex: 1,
         paddingHorizontal: 20,
-    },
-    titleBox: {
-        flex: 1,
-        padding: 15,
-        marginBottom: 15,
-        backgroundColor: "#006CD8"
     },
     labelTitle: {
         fontSize: 24,
@@ -358,6 +412,10 @@ const styles = {
     closeBoxIcon: {
         color: '#FFF',
         fontSize: 50
+    },
+    buttonBox: {
+        flex: 1,
+        flexDirection: 'row'
     },
     addItem: {
         flex: 1,
