@@ -52,14 +52,18 @@ export default class ListScreen extends React.Component {
             listend: false,
             page: 0,
             lists: [],
+            list: {
+                title: "",
+                games: [],
+                key: "",
+                description: "",
+                type: "",
+                limit: ""
+            },
             multiSelect: false,
             selectedItens: [],
             modalVisible: false,
             mounted: false,
-            inputTitle: "",
-            inputSelect: "",
-            inputText: "",
-            inputLimit: "",
             modelInvalid: false,
             confirmDelete: false
         };
@@ -149,15 +153,9 @@ export default class ListScreen extends React.Component {
         this.setModalVisible(!this.state.modalVisible);
     }
     addList = () => {
-
-        var obj = {
-            title: this.state.inputTitle,
-            type: this.state.inputSelect,
-            description: this.state.inputText,
-            limit: this.state.inputLimit,
-            games: []
-        };
-        if (this.state.inputTitle == "" || this.state.inputSelect == "" || this.state.inputText == "" || this.state.inputLimit == "") {
+        console.log("ADD ITEM");
+        var obj = this.state.list;
+        if (this.state.list.title == "" || this.state.list.type == "" || this.state.list.text == "" || this.state.list.limit == "") {
             this.setState({ modelInvalid: true });
         } else {
             DeviceEventEmitter.emit('reloading', true);
@@ -173,7 +171,17 @@ export default class ListScreen extends React.Component {
         }
     }
     closeModal = () => {
-        this.setState({ modalVisible: false });
+        this.setState({
+            modalVisible: false,
+            list: {
+                title: "",
+                games: [],
+                key: "",
+                description: "",
+                type: "",
+                limit: ""
+            }
+        });
     }
 
     closeConfirm = () => {
@@ -181,16 +189,24 @@ export default class ListScreen extends React.Component {
     }
 
     _setTitle(value) {
-        this.setState({ inputTitle: value });
+        var obj = this.state.list;
+        obj.title = value;
+        this.setState({ list: obj });
     }
     _setLimit(value) {
-        this.setState({ inputLimit: value });
+        var obj = this.state.list;
+        obj.limit = value;
+        this.setState({ list: obj });
     }
     _setSelect(value) {
-        this.setState({ inputSelect: value });
+        var obj = this.state.list;
+        obj.type = value;
+        this.setState({ list: obj });
     }
     _setText(value) {
-        this.setState({ inputText: value });
+        var obj = this.state.list;
+        obj.text = value;
+        this.setState({ list: obj });
     }
     renderLists() {
         let lists = this.state.lists;
@@ -201,6 +217,12 @@ export default class ListScreen extends React.Component {
         return items;
     }
     render() {
+        let pickerState = null;
+        if (this.state.list.type == "") {
+            pickerState = styles.unselected;
+        }
+        console.log("pickerState: ", pickerState);
+
         return (
             <View style={styles.container}>
                 <ScrollView>
@@ -218,12 +240,13 @@ export default class ListScreen extends React.Component {
                     onRequestClose={() => {
                         this.setState({ confirmDelete: false });
                     }}>
+
                     <View style={styles.backgroundModal}>
                         <Text style={styles.addItemText}>DESEJA EXCLUIR?</Text>
                         <View style={styles.buttonBox}>
                             <TouchableHighlight underlayColor="transparent" onPress={() => this.confirmdeleteItens()}>
-                                <View style={styles.addItem}>
-                                    <Text style={styles.addItemText}>Deletar</Text>
+                                <View style={[styles.addItem, styles.dangerButton]}>
+                                    <Text style={[styles.addItemText]}>Deletar</Text>
                                 </View>
                             </TouchableHighlight>
                             <TouchableHighlight underlayColor="transparent" onPress={() => this.closeConfirm()}>
@@ -249,62 +272,55 @@ export default class ListScreen extends React.Component {
                     onRequestClose={() => {
                         this.setState({ modalVisible: false });
                     }}>
-                    <View style={styles.addBox}>
-                        <ScrollView style={styles.menuList}>
-                            <LinearGradient
-                                colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.9)']}
-                                useAngle
-                                angle={180}
-                                style={styles.backgroundOverlayModal}
+                    <View style={styles.backgroundModal}>
+
+                        <View style={styles.listBox}>
+                            <Text style={styles.menuTitle}>-CRIAR LISTA-</Text>
+                            {this.state.modelInvalid &&
+                                <Text style={styles.erroText}>Preencha todos os campos.</Text>
+                            }
+                            <TextInput
+                                placeholder={"Nome"}
+                                style={[styles.inputsearch, styles.inputText]}
+                                onChangeText={(text) => this._setTitle(text)}
+                                ref={input => { this.titleInput = input }}
                             />
-                            <TouchableHighlight>
-                                <TouchableWithoutFeedback>
-                                    <View style={styles.listBox}>
-                                        <Text style={styles.menuTitle}>-CRIAR LISTA-</Text>
-                                        {this.state.modelInvalid &&
-                                            <Text style={styles.erroText}>Preencha todos os campos.</Text>
-                                        }
-                                        <TextInput
-                                            placeholder={"Nome"}
-                                            style={[styles.inputsearch, styles.inputText]}
-                                            onChangeText={(text) => this._setTitle(text)}
-                                            ref={input => { this.titleInput = input }}
-                                        />
-                                        <View style={styles.inputSelect}>
-                                            <Picker
-                                                selectedValue={this.state.inputSelect}
-                                                onValueChange={(itemValue, itemIndex) =>
-                                                    this._setSelect(itemValue)
-                                                }>
-                                                <Picker.Item label="Selecione um tipo" value="" />
-                                                <Picker.Item label="Lista Padrão" value="padrao" />
-                                                <Picker.Item label="Ranking" value="ranking" />
-                                            </Picker>
-                                        </View>
-                                        <TextInput
-                                            placeholder={"Limite de jogos"}
-                                            keyboardType='numeric'
-                                            maxLength={10}
-                                            style={[styles.inputsearch, styles.inputText]}
-                                            onChangeText={(text) => this._setLimit(text)}
-                                            ref={input => { this.limitInput = input }}
-                                        />
-                                        <TextInput
-                                            placeholder={"Descrição"}
-                                            multiline={true}
-                                            numberOfLines={4}
-                                            style={[styles.inputsearch, styles.inputMulti, styles.inputText]}
-                                            onChangeText={(text) => this._setText(text)}
-                                            ref={input => { this.textInput = input }} />
-                                        <TouchableHighlight underlayColor="transparent" onPress={() => this.addList()}>
-                                            <View style={styles.addItem}>
-                                                <Text style={styles.addItemText}>Criar Lista</Text>
-                                            </View>
-                                        </TouchableHighlight>
+                            <View style={styles.inputSelect}>
+                                <Picker
+                                    selectedValue={this.state.list.type}
+                                    style={[styles.pickerStyle, pickerState]}
+                                    itemStyle={[styles.itempickerStyle]}
+                                    onValueChange={(itemValue, itemIndex) =>
+                                        this._setSelect(itemValue)
+                                    }>
+                                    <Picker.Item label="Selecione um tipo" value="" />
+                                    <Picker.Item label="Lista Padrão" value="padrao" />
+                                    <Picker.Item label="Ranking" value="ranking" />
+                                </Picker>
+                            </View>
+                            <TextInput
+                                placeholder={"Limite de jogos"}
+                                keyboardType='numeric'
+                                maxLength={10}
+                                style={[styles.inputsearch, styles.inputText]}
+                                onChangeText={(text) => this._setLimit(text)}
+                                ref={input => { this.limitInput = input }}
+                            />
+                            <TextInput
+                                placeholder={"Descrição"}
+                                multiline={true}
+                                numberOfLines={4}
+                                style={[styles.inputsearch, styles.inputMulti, styles.inputText]}
+                                onChangeText={(text) => this._setText(text)}
+                                ref={input => { this.textInput = input }} />
+                            <View style={styles.buttonBox}>
+                                <TouchableHighlight underlayColor="transparent" onPress={() => this.addList()}>
+                                    <View style={styles.addItem}>
+                                        <Text style={styles.addItemText}>Criar Lista</Text>
                                     </View>
-                                </TouchableWithoutFeedback>
-                            </TouchableHighlight>
-                        </ScrollView>
+                                </TouchableHighlight>
+                            </View>
+                        </View>
                         <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.closeModal()}>
                             <TabBarIcon
                                 name={'close'}
@@ -323,6 +339,18 @@ const styles = {
         flex: 1,
         paddingBottom: 50,
         paddingTop: 60
+    },
+    menuList: {
+        flex: 1,
+    },
+    contentModal: {
+        flex: 1,
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    unselected: {
+        color: '#CCC'
     },
     backgroundModal: {
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -391,9 +419,13 @@ const styles = {
         zIndex: 0
     },
     listBox: {
-        backgroundColor: 'rgba(0,0,0,0.9)',
-        paddingTop: 100,
-        minHeight: Dimensions.get('window').height - 100
+        paddingTop: 50,
+        width: '100%',
+        padding: 15,
+        flex: 1,
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
         //paddingBottom: 100
     },
     menuTitle: {
@@ -414,7 +446,6 @@ const styles = {
         fontSize: 50
     },
     buttonBox: {
-        flex: 1,
         flexDirection: 'row'
     },
     addItem: {
@@ -429,27 +460,36 @@ const styles = {
         paddingLeft: 30,
         paddingRight: 30,
         color: '#FFF',
+        minHeight: 50,
         fontFamily: 'SourceSansPro-Bold',
-        borderRadius: 5
+        borderRadius: 5,
+        justifyContent: "center",
+        alignItems: "center",
     },
     addItemText: {
         fontSize: 16,
         color: '#FFF',
         fontFamily: 'SourceSansPro-SemiBold'
     },
+    dangerButton: {
+        backgroundColor: '#F00'
+    },
     inputSelect: {
         backgroundColor: '#444',
         margin: 10,
         padding: 0,
         borderRadius: 10,
-        minHeight: 50
+        minHeight: 50,
+        width: '100%'
     },
     inputsearch: {
         backgroundColor: '#444',
         margin: 10,
-        padding: 10,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
         borderRadius: 10,
-        minHeight: 50
+        minHeight: 50,
+        width: '100%'
     },
     inputText: {
         color: '#FFF',
@@ -458,5 +498,15 @@ const styles = {
     },
     inputMulti: {
         textAlignVertical: 'top',
-    }
+    },
+    itempickerStyle: {
+        color: '#FFF',
+        width: '100%'
+    },
+    pickerStyle: {
+        backgroundColor: '#444',
+        margin: 10,
+        borderRadius: 10,
+        color: '#FFF'
+    },
 }

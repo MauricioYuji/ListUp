@@ -1,40 +1,22 @@
 ﻿import React from 'react';
-//import * as firebase from 'firebase';
 import {
     Image,
-    Platform,
-    ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
-    Button,
     DeviceEventEmitter
 } from 'react-native';
 import * as firebase from 'firebase';
 import { Font, Icon } from 'expo';
 import Swiper from 'react-native-swiper';
-import { setData } from '../../components/services/baseService';
 
 export default class Tutorial extends React.Component {
     static navigationOptions = {
         header: null,
     };
 
-    state = {
-        currentPage: 0
-    };
     componentDidMount() {
-        var _self = this;
-        //firebase.database().ref('/Games').on('value', function (snapshot) {
-        //    console.log(snapshot.val());
-        //    _self.setState({
-        //        isLoading: false,
-        //        dataSource: snapshot.val(),
-        //    }, function () {
-
-        //    });
-        //});
     }
 
     _doneTutorial = () => {
@@ -48,9 +30,6 @@ export default class Tutorial extends React.Component {
             email: user.email,
             flagtutorial: true
         };
-        //setData('UserInfo/' + user.uid, obj).then((p) => {
-        //    this.setState({ user: newuser });
-        //});
 
         DeviceEventEmitter.emit('updateUser', { user: newuser });
     };
@@ -60,8 +39,8 @@ export default class Tutorial extends React.Component {
                 loop={false}
                 showsPagination={true}
                 showsButtons={true}
-                dot={<View style={{ backgroundColor: '#FFF', width: 16, height: 16, borderRadius: 8, marginLeft: 6, marginRight: 6, marginTop: 6, marginBottom: 6, }} />}
-                activeDot={<View style={{ backgroundColor: '#006CD8', width: 16, height: 16, borderRadius: 8, marginLeft: 6, marginRight: 6, marginTop: 6, marginBottom: 6, }} />}
+                dot={<View style={styles.dotStyle} />}
+                activeDot={<View style={styles.dotActiveStyle} />}
                 nextButton={<Icon.FontAwesome
                     name='chevron-right'
                     size={40}
@@ -73,10 +52,6 @@ export default class Tutorial extends React.Component {
                     color='#FFF'
                 />}
                 onIndexChanged={(index) => {
-                    console.log('index >>> ', index);
-                    this.setState({
-                        currentPage: index
-                    })
                 }}
                 index={0}>
 
@@ -107,7 +82,7 @@ export default class Tutorial extends React.Component {
             </Swiper>
         );
     }
-    
+
 }
 
 const styles = StyleSheet.create({
@@ -117,16 +92,25 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    skipButton: {
-        position: 'absolute',
-        top: 10,
-        right: 10,
-        zIndex: 1
+    dotStyle: {
+        backgroundColor: '#FFF',
+        width: 16,
+        height: 16,
+        borderRadius: 8,
+        marginLeft: 6,
+        marginRight: 6,
+        marginTop: 6,
+        marginBottom: 6
     },
-    skipText: {
-
-        fontSize: 24,
-        color: '#FFF',
+    dotActiveStyle: {
+        backgroundColor: '#006CD8',
+        width: 16,
+        height: 16,
+        borderRadius: 8,
+        marginLeft: 6,
+        marginRight: 6,
+        marginTop: 6,
+        marginBottom: 6
     },
     startButton: {
         paddingBottom: 10,

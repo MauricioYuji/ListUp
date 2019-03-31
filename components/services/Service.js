@@ -1,13 +1,11 @@
-import React from 'react';
-import { Text } from 'react-native';
 import * as firebase from 'firebase';
-import Layout from '../../constants/Layout';
 import { getData, deleteData, setData } from './baseService';
 
 export const getGames = async (page) => {
     let games = null;
     var objgames = [];
     let list = require('../../files/consoles.json');
+    
     await firebase.database().ref('/Games').once('value').then(function (snapshot) {
         //console.log("snapshot: ", snapshot.val());
         games = snapshot.val();

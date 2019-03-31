@@ -1,11 +1,10 @@
 import React from 'react';
-import { Platform, Easing, Animated, TouchableWithoutFeedback } from 'react-native';
-import { createStackNavigator, createBottomTabNavigator, createMaterialTopTabNavigator } from 'react-navigation';
-import ViewOverflow from 'react-native-view-overflow';
+import { Easing, Animated } from 'react-native';
+import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
 
 import { MultiBar } from './MultiBar';
 
-import TabBarIcon from '../components/UI/TabBarIcon';
+import MenuIcon from '../components/UI/MenuIcon';
 import { Menu } from '../components/UI/Menu';
 import FeedScreen from '../screens/Pages/FeedScreen';
 import GamesScreen from '../screens/Pages/GamesScreen';
@@ -14,8 +13,6 @@ import GameDetailScreen from '../screens/Pages/GameDetailScreen';
 import ListScreen from '../screens/Pages/ListScreen';
 import ListsScreen from '../screens/Pages/ListsScreen';
 import ProfileScreen from '../screens/Pages/ProfileScreen';
-import SettingsScreen from '../screens/Pages/SettingsScreen';
-import NavigationService from '../components/services/NavigationService';
 const transitionConfig = () => {
     return {
         transitionSpec: {
@@ -51,7 +48,7 @@ const FeedStack = createStackNavigator({
 FeedStack.navigationOptions = {
     tabBarLabel: 'Feed',
     tabBarIcon: ({ focused }) => (
-        <TabBarIcon
+        <MenuIcon
             focused={focused}
             name={'list-alt'}
             type={'FontAwesome'}
@@ -74,12 +71,12 @@ const GamesStack = createStackNavigator({
 GamesStack.navigationOptions = {
     tabBarLabel: 'Games',
     tabBarIcon: ({ focused }) => (
-        <TabBarIcon
+        <MenuIcon
             focused={focused}
             name={'gamepad'}
             type={'FontAwesome'}
         />
-    ),
+    )
 };
 
 const ProfileStack = createStackNavigator({
@@ -94,7 +91,7 @@ const ProfileStack = createStackNavigator({
 ProfileStack.navigationOptions = {
     tabBarLabel: 'Profile',
     tabBarIcon: ({ focused }) => (
-        <TabBarIcon
+        <MenuIcon
             focused={focused}
             name={'user'}
             type={'FontAwesome'}
@@ -103,7 +100,6 @@ ProfileStack.navigationOptions = {
 };
 const GroupsStack = createStackNavigator({
     Groups: GroupsScreen,
-    Test: SettingsScreen,
 },
     {
         headerMode: 'none',
@@ -112,10 +108,10 @@ const GroupsStack = createStackNavigator({
     });
 
 GroupsStack.navigationOptions = {
-    initialRouteName : 'Groups',
+    initialRouteName: 'Groups',
     tabBarLabel: 'Grupos',
     tabBarIcon: ({ focused }) => (
-        <TabBarIcon
+        <MenuIcon
             focused={focused}
             name={'users'}
             type={'FontAwesome'}

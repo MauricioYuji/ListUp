@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { SafeAreaView, TouchableOpacity, View } from 'react-native';
 
+import NavigationService from '../components/services/NavigationService';
 import { Colors } from '../utils/Colors';
 
 const MultiBar = ({ style, navigation, activeTintColor, inactiveTintColor, renderIcon, jumpTo }) => {
@@ -82,11 +83,13 @@ MultiBar.defaultProps = {
     activeTintColor: Colors.activeTintColor,
     inactiveTintColor: Colors.inactiveTintColor
 };
-
+goTopage = (page) => {
+    NavigationService.navigate(page);
+}
 const TabIcon = ({ route, renderIcon, focused, activeTintColor, inactiveTintColor, onPress }) => (
     <TouchableOpacity
         style={Styles.tabStyle}
-        onPress={() => onPress && onPress()}
+        onPress={() => onPress && goTopage(route.routes[0].routeName)}
     >
         {
             renderIcon({

@@ -1,34 +1,23 @@
 import React from 'react';
 import {
-    Platform,
     StatusBar,
     StyleSheet,
     ScrollView,
     View,
-    TouchableWithoutFeedback,
-    Keyboard,
-    Text,
-    Button,
     AsyncStorage,
     DeviceEventEmitter,
     LayoutAnimation,
     Animated,
-    ImageBackground,
     Image,
-    TouchableHighlight,
-    TouchableOpacity,
     Modal,
     ActivityIndicator
 } from 'react-native';
 import { AppLoading, Asset, Font, Icon, Constants } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
 import Auth from './navigation/AuthNavigator';
-import Header from './screens/Shared/Header';
 import Layout from './constants/Layout';
 import { setData, getData } from './components/services/baseService';
-
 import * as firebase from 'firebase';
-import LoginScreen from './screens/Auth/LoginScreen';
 import NavigationService from './components/services/NavigationService';
 
 
@@ -41,10 +30,6 @@ export default class App extends React.Component {
     state = {
         isLoadingComplete: false,
         skipLoadingScreen: false,
-        showHeader: true,
-        logged: false,
-        user: null,
-        showMenu: false,
         loading: false
     };
 
@@ -60,8 +45,6 @@ export default class App extends React.Component {
 
     }
     componentDidMount() {
-
-
         LayoutAnimation.easeInEaseOut();
     }
     _storeUser = async (user) => {
@@ -78,22 +61,10 @@ export default class App extends React.Component {
             // Error saving data
         }
     }
-    _doneTutorial = () => {
-
-        var user = firebase.auth().currentUser;
-
-        var newuser = {
-            uid: user.uid,
-            photoURL: user.photoURL,
-            displayName: user.displayName,
-            email: user.email,
-            flagtutorial: true
-        };
-        this._updateUser(newuser);
-    };
     _updateUser = (user) => {
+        var _self = this;
         setData('UserInfo/' + user.uid, user).then((p) => {
-            this.setState({ user: user });
+            _self._storeUser(user);
         });
     };
     _loadResourcesAsync = async () => {
@@ -138,7 +109,7 @@ export default class App extends React.Component {
             if (user != null && (user.emailVerified || user.providerData[0].providerId === "facebook.com")) {
                 getData('UserInfo/' + user.uid).then((p) => {
                     this._storeUser(JSON.stringify(p));
-                    this.setState({ logged: true, user: p, isLoadingComplete: true });
+                    this.setState({ isLoadingComplete: true });
                     if (p.flagtutorial) {
                         NavigationService.navigate('App');
                     } else {
@@ -146,7 +117,7 @@ export default class App extends React.Component {
                     }
                 });
             } else {
-                this.setState({ logged: false, isLoadingComplete: true });
+                this.setState({ isLoadingComplete: true });
                 this._deleteUser();
 
                 NavigationService.navigate('Auth');
@@ -197,17 +168,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         zIndex: 1000
     },
-    skipButton: {
-        position: 'absolute',
-        top: 10,
-        right: 10,
-        zIndex: 1
-    },
-    skipText: {
-
-        fontSize: 24,
-        color: '#FFF',
-    },
     container: {
         flex: 1,
         marginTop: Constants.statusBarHeight,
@@ -223,11 +183,4 @@ const styles = StyleSheet.create({
         bottom: 0,
         zIndex: 0,
     },
-    showMenu: {
-        marginRight: 200,
-        marginLeft: -200
-    },
-    header: {
-        zIndex: 100,
-    }
 });

@@ -24,7 +24,6 @@ class Menu extends Component {
         ]).start(() => {
             // callback
         });
-
     };
 
     componentDidMount() {

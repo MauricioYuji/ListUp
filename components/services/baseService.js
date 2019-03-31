@@ -1,7 +1,5 @@
-import React from 'react';
-import { Text } from 'react-native';
+
 import * as firebase from 'firebase';
-import Layout from '../../constants/Layout';
 
 
 

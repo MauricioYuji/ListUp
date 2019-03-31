@@ -2,30 +2,19 @@ import React from 'react';
 import * as firebase from 'firebase';
 import {
     Image,
-    Platform,
-    ScrollView,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View,
-    Button,
     TouchableHighlight,
     Dimensions,
     RefreshControl,
-    ActivityIndicator,
     DeviceEventEmitter
 } from 'react-native';
-import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 
 import NavigationService from '../../components/services/NavigationService';
-import Layout from '../../constants/Layout';
-import { getData, setData } from '../../components/services/baseService';
+import { getData } from '../../components/services/baseService';
 import { getGames } from '../../components/services/Service';
-import { MonoText } from '../../components/UI/StyledText';
-import { GetImage } from '../../components/UI/GetImage';
 import Header from '../../screens/Shared/Header';
-import LoadingScreen from '../Loading/LoadingScreen';
-import { parse } from 'qs';
 import MasonryList from '@appandflow/masonry-list';
 
 const { width } = Dimensions.get("window");
@@ -42,9 +31,6 @@ export default class GameScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            withHeight: false,
-            loading: true,
-            listend: false,
             page: 0,
             games: null,
             gamesfiltered: [],
@@ -55,28 +41,10 @@ export default class GameScreen extends React.Component {
     }
     componentDidMount() {
         var _self = this;
-
-        getGames(this.state.page).then((games) => {
-            games = games.map(item => {
-                return {
-                    image: item.file,
-                    name: item.name,
-                    key: item.key,
-                    consoles: item.consoles,
-                    genres: item.genres
-                };
-            });
-
-            _self.setState({ page: 0, games: games, listend: false },
-                () => {
-                    _self.filterObj();
-                }
-            );
-
-        });
+        this.loadData();
         DeviceEventEmitter.addListener('getFilter', (data) => {
 
-            _self.setState({ filterObj: data, page: 0, gamesfiltered: [], listend: false },
+            _self.setState({ filterObj: data, page: 0, gamesfiltered: [] },
                 () => {
                     _self.filterObj();
                 }
@@ -125,24 +93,20 @@ export default class GameScreen extends React.Component {
         var returnarray = _self.state.gamesfiltered.concat(resultsliced);
         if (resultsliced.length > 0) {
             DeviceEventEmitter.emit('reloading', false);
-            _self.setState({ gamesfiltered: returnarray, page: _self.state.page + 1, loading: false },
+            _self.setState({ gamesfiltered: returnarray, page: _self.state.page + 1 },
                 () => {
                     process = false;
                 }
             );
         } else {
-            _self.setState({ listend: true },
-                () => {
-                    process = true;
-                }
-            );
+            process = true;
         }
     }
     _onRefresh(event) {
         var _self = this;
         process = false;
         DeviceEventEmitter.emit('reloading', true);
-        _self.setState({ isRefreshing: false, gamesfiltered: [], loading: true, listend: false },
+        _self.setState({ isRefreshing: false, gamesfiltered: [] },
             () => {
                 _self.loadData();
             }
@@ -152,11 +116,11 @@ export default class GameScreen extends React.Component {
     onScrollEnd(event) {
     }
     renderConsoles = (item, key) => {
-        let table = [];
+        let content = [];
         for (let i = 0; i < item.length; i++) {
-            table.push(<Image key={i} source={{ uri: item[i].img }} resizeMode={'contain'} style={styles.logo} />);
+            content.push(<Image key={i} source={{ uri: item[i].img }} resizeMode={'contain'} style={styles.logo} />);
         }
-        return table;
+        return content;
     }
     getImages = async (obj) => {
         for (let i = 0; i < obj.length; i++) {
@@ -179,12 +143,9 @@ export default class GameScreen extends React.Component {
             if (!process) {
                 process = true;
                 _self.filterObj();
-                
+
             }
         }
-    }
-    handleScroll = () => {
-        DeviceEventEmitter.emit('hideFilter', true);
     }
     showGame = (key) => {
         NavigationService.navigate('GameDetail', { key: key });
@@ -195,7 +156,6 @@ export default class GameScreen extends React.Component {
         else {
             return (<Image source={{ uri: item.url }} style={{ height: columnWidth / item.file.width * item.file.height }} />);
         }
-
     }
     render() {
         return <View style={styles.container}>
@@ -245,9 +205,6 @@ const styles = {
     header: {
         zIndex: 100,
     },
-    grid: {
-        flex: 1
-    },
     logosBox: {
         flex: 1,
         flexDirection: 'row',
@@ -276,15 +233,5 @@ const styles = {
         padding: 5,
         color: "#FFF",
         fontSize: 20
-    },
-    loadingBackground: {
-        position: "absolute",
-        justifyContent: "center",
-        alignItems: "center",
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: "rgba(0,0,0,0.3)"
     }
 }

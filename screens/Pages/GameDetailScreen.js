@@ -2,32 +2,25 @@
 import * as firebase from 'firebase';
 import {
     Image,
-    Platform,
     ScrollView,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View,
-    Button,
     TouchableHighlight,
     Dimensions,
-    Animated,
     DeviceEventEmitter,
     Modal,
     TouchableWithoutFeedback
 } from 'react-native';
-import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
+import { LinearGradient } from 'expo';
 
 import NavigationService from '../../components/services/NavigationService';
 import Layout from '../../constants/Layout';
-import { getData, setData } from '../../components/services/baseService';
+import { setData } from '../../components/services/baseService';
 import { getGameDetail } from '../../components/services/Service';
-import { MonoText } from '../../components/UI/StyledText';
-import { GetImage } from '../../components/UI/GetImage';
 import LoadingScreen from '../Loading/LoadingScreen';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 import AddGameButton from '../../components/UI/AddGameButton';
-import { parse } from 'qs';
 
 export default class GameDetailScreen extends React.Component {
 
@@ -61,38 +54,9 @@ export default class GameDetailScreen extends React.Component {
         var _self = this;
 
         getGameDetail(this.state.key).then((game) => {
-            //games = games.map(item => {
-            //    //console.log("item: ", item);
-            //    return {
-            //        image: item.file.url,
-            //        name: item.name,
-            //        key: item.key,
-            //        height: columnWidth / item.file.file.width * item.file.file.height,
-            //        consoles: item.consoles,
-            //        genres: item.genres
-            //    };
-            //});
-            //console.log("game:", game);
-
             _self.setState({ loaded: true, game: game, mounted: true });
 
         });
-
-
-        //getData('Companies')
-        //    .then((companies) => {
-        //        companies = companies === undefined ? null : companies;
-        //        //console.log("companies: ", companies);
-        //        this.setState({ companies: companies });
-        //        getUserGames(user.uid).then((usergames) => {
-        //            var game = null;
-        //            if (usergames.length > 0) {
-        //                game = usergames[Math.floor(Math.random() * usergames.length)];
-        //            }
-        //            this.setState({ usergames: usergames, randomGame: game, loaded: true });
-        //        });
-        //    });
-
 
     }
     componentWillUnmount() {
@@ -196,7 +160,6 @@ export default class GameDetailScreen extends React.Component {
 
         _self.setState({ consolesActive: list },
             () => {
-                //_self._submitFilter();
             }
         );
 
@@ -208,11 +171,6 @@ export default class GameDetailScreen extends React.Component {
         var user = firebase.auth().currentUser;
         setData('userGames/' + user.uid + '/' + this.state.game.key, this.state.consolesActive)
             .then((resp) => {
-                //_self.setState({ process: 3 });
-                //setTimeout(function () {
-                //    _self.setState({ process: 4 });
-                //    _self.props.callback(_self.props.list + " list add");
-                //}, 1000);
             });
 
     }

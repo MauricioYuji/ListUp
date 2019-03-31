@@ -253,6 +253,14 @@ export default class Header extends React.Component {
             }
         );
     }
+    editElements = () => {
+        var _self = this;
+        _self.setState({ selectMode: false },
+            () => {
+                _self.props.callbackEdit();
+            }
+        );
+    }
     listGenres = () => {
         let obj = [];
         let objarray = this.state.genres;
@@ -501,7 +509,7 @@ export default class Header extends React.Component {
                             </View>
                         ) : (
                             <View style={[styles.flexGroupMax, styles.flexRight]}>
-                                <TouchableHighlight underlayColor="transparent" onPress={() => this.addElements()} style={styles.sideIcon}>
+                                <TouchableHighlight underlayColor="transparent" onPress={() => this.editElements()} style={styles.sideIcon}>
                                     <TabBarIcon
                                         name={'edit'}
                                         type={'MaterialIcons'}
