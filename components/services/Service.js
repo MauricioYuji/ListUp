@@ -5,7 +5,7 @@ export const getGames = async (page) => {
     let games = null;
     var objgames = [];
     let list = require('../../files/consoles.json');
-    
+
     await firebase.database().ref('/Games').once('value').then(function (snapshot) {
         //console.log("snapshot: ", snapshot.val());
         games = snapshot.val();
@@ -99,13 +99,21 @@ export const getuserList = async (page) => {
         lists = snapshot.val();
     });
 
+    
     for (var key in lists) {
 
+
+
         var item = lists[key];
+
+        let consoles = [];
+        for (var games in item.games) {
+            consoles.push(item.games[games]);
+        }
         var obj = {
             key: key,
             title: item.title,
-            games: item.games == undefined ? [] : item.games,
+            games: consoles,
             description: item.description
         };
         objgames.push(obj);
@@ -121,7 +129,21 @@ export const getListByKey = async (key) => {
         list = snapshot.val();
     });
 
-    return list;
+    let consoles = [];
+    for (var games in list.games) {
+        var objgame = {
+            key: games,
+            consoles: list.games[games]
+        };
+        consoles.push(objgame);
+    }
+    var obj = {
+        key: key,
+        title: list.title,
+        games: consoles,
+        description: list.description
+    };
+    return obj;
 };
 
 export const deleteItemsFromList = async (keys) => {
@@ -142,4 +164,32 @@ export const deleteItemsFromList = async (keys) => {
             });
     });
 
+};
+
+export const deleteGamesFromList = async (keys, keylist) => {
+
+    var user = firebase.auth().currentUser;
+
+
+    let lists = null;
+    var objgames = [];
+    await firebase.database().ref('/userLists/' + user.uid + '/' + keylist + '/games/').once('value').then(function (snapshot) {
+        //console.log("snapshot: ", snapshot.val());
+        lists = snapshot.val();
+        for (var i = 0; i < keys.length; i++) {
+            lists[keys[i]] = null;
+        }
+        setData('/userLists/' + user.uid + '/' + keylist + '/games/', lists)
+            .then((img) => {
+            });
+    });
+
+};
+
+export const addGamestoList = async (keylist, keygame, obj) => {
+    var user = firebase.auth().currentUser;
+    let list = null;
+    setData('/userLists/' + user.uid + '/' + keylist + '/games/' + keygame, obj)
+        .then((res) => {
+        });
 };

@@ -71,6 +71,13 @@ export default class ListScreen extends React.Component {
     componentDidMount() {
         var _self = this;
 
+
+        DeviceEventEmitter.addListener('refresh', (data) => {
+            if (data) {
+                _self.loadData();
+            }
+        });
+
         DeviceEventEmitter.emit('reloading', true);
         this.loadData();
     }
@@ -85,7 +92,7 @@ export default class ListScreen extends React.Component {
     loadData = () => {
         var _self = this;
         getuserList(this.state.page).then((list) => {
-            console.log("list: ", list);
+            //console.log("list: ", list);
             list = list.map(item => {
                 return {
                     title: item.title,
@@ -113,15 +120,15 @@ export default class ListScreen extends React.Component {
         });
     }
     selectItem = (id) => {
-        console.log("id: ", id);
+        //console.log("id: ", id);
         var arrayobj = this.state.selectedItens;
         if (!arrayobj.includes(id)) {
             arrayobj.push(id);
         } else {
             arrayobj = this.arrayRemove(arrayobj, [id]);
         }
-        console.log("arrayobj: ", arrayobj);
-        console.log("================");
+        //console.log("arrayobj: ", arrayobj);
+        //console.log("================");
         this.setState({ selectedItens: arrayobj },
             () => {
                 //DeviceEventEmitter.emit('selectMode', true);
@@ -153,7 +160,7 @@ export default class ListScreen extends React.Component {
         this.setModalVisible(!this.state.modalVisible);
     }
     addList = () => {
-        console.log("ADD ITEM");
+        //console.log("ADD ITEM");
         var obj = this.state.list;
         if (this.state.list.title == "" || this.state.list.type == "" || this.state.list.text == "" || this.state.list.limit == "") {
             this.setState({ modelInvalid: true });
@@ -221,7 +228,7 @@ export default class ListScreen extends React.Component {
         if (this.state.list.type == "") {
             pickerState = styles.unselected;
         }
-        console.log("pickerState: ", pickerState);
+        //console.log("pickerState: ", pickerState);
 
         return (
             <View style={styles.container}>
@@ -314,10 +321,8 @@ export default class ListScreen extends React.Component {
                                 onChangeText={(text) => this._setText(text)}
                                 ref={input => { this.textInput = input }} />
                             <View style={styles.buttonBox}>
-                                <TouchableHighlight underlayColor="transparent" onPress={() => this.addList()}>
-                                    <View style={styles.addItem}>
-                                        <Text style={styles.addItemText}>Criar Lista</Text>
-                                    </View>
+                                <TouchableHighlight underlayColor="transparent" style={styles.addItem} onPress={() => this.addList()}>
+                                    <Text style={styles.addItemText}>Criar Lista</Text>
                                 </TouchableHighlight>
                             </View>
                         </View>
@@ -353,7 +358,7 @@ const styles = {
         color: '#CCC'
     },
     backgroundModal: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
         flex: 1,
         textAlign: 'center',
         alignItems: 'center',
@@ -454,14 +459,11 @@ const styles = {
         marginTop: 30,
         marginLeft: 10,
         marginRight: 10,
-        fontSize: 20,
         paddingTop: 15,
         paddingBottom: 15,
         paddingLeft: 30,
         paddingRight: 30,
-        color: '#FFF',
         minHeight: 50,
-        fontFamily: 'SourceSansPro-Bold',
         borderRadius: 5,
         justifyContent: "center",
         alignItems: "center",

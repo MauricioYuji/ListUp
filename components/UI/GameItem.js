@@ -13,6 +13,7 @@ import {
 import * as firebase from 'firebase';
 import TabBarIcon from '../UI/TabBarIcon';
 import { getData, setData, insertData } from '../services/baseService';
+import { getGameDetail } from '../services/Service';
 import NavigationService from '../services/NavigationService';
 
 
@@ -24,12 +25,23 @@ export default class GameItem extends React.Component {
     }
 
     state = {
+        key: "",
+        game: {
+            name: "",
+            file: {
+                image: null
+            }
+        },
         selected: false,
         selectMode: false,
     };
 
     componentDidMount() {
         var _self = this;
+        //console.log("this.props.id: ", this.props.id);
+
+        DeviceEventEmitter.emit('reloading', true);
+        this.loadData(this.props.id);
         DeviceEventEmitter.addListener('selectMode', (data) => {
             if (data) {
                 _self.setState({ selectMode: true });
@@ -38,7 +50,24 @@ export default class GameItem extends React.Component {
             }
         });
     }
+    loadData = (key) => {
+        var _self = this;
+        if (key == "") {
+            key = this.state.key;
+        }
+        //console.log("key: ", key);
+        getGameDetail(key).then((game) => {
+            //console.log("game: ", game);
+            _self.setState({ game: game },
+                () => {
+                    DeviceEventEmitter.emit('reloading', false);
+                    //_self.getImages([game]);
+                    //_self.filterObj();
+                }
+            );
 
+        });
+    }
     itemAction() {
         var _self = this;
         if (this.state.selectMode) {
@@ -62,6 +91,26 @@ export default class GameItem extends React.Component {
         );
 
     }
+
+    renderThumb = (item) => {
+        //console.log("item: ", item);
+        if (item == "" || item == null)
+            return (<Image source={require('../../assets/images/console-icon.png')} resizeMode={'cover'} style={styles.thumb} />);
+        else {
+            return (<Image source={{ uri: item.url }} resizeMode={'cover'} style={styles.thumb} />);
+        }
+    }
+    getImages = async (obj) => {
+        for (let i = 0; i < obj.length; i++) {
+            await getData('thumbs/' + obj[i].image.key)
+                .then((img) => {
+                    obj[i].image.file = img.file;
+                    obj[i].image.url = img.url;
+                });
+        }
+
+        this.setState({ games: this.state.games });
+    }
     render() {
         let itemStyle = null;
         if (this.state.selected) {
@@ -71,13 +120,10 @@ export default class GameItem extends React.Component {
             <TouchableHighlight onLongPress={() => this.allowSelect()} onPress={() => this.itemAction()}>
                 <View style={[styles.listItem, itemStyle]}>
                     <View style={styles.itemInfo}>
-                        <Text style={styles.labelTitle}>{this.props.label}</Text>
-                        <Text style={styles.labelDetail}>{this.props.games.length} jogos</Text>
+                        <Text style={styles.labelTitle}>{this.state.game.name}</Text>
                     </View>
                     <View style={styles.thumbArea}>
-                        <Image source={{ uri: "https://firebasestorage.googleapis.com/v0/b/teste-925f4.appspot.com/o/thumbs%2F3WTL16ZI80.png?alt=media&token=b2ddc5a8-a610-4a6d-b526-f05198b23854" }} resizeMode={'cover'} style={styles.thumb} />
-                        <Image source={{ uri: "https://firebasestorage.googleapis.com/v0/b/teste-925f4.appspot.com/o/thumbs%2F3WTL16ZI80.png?alt=media&token=b2ddc5a8-a610-4a6d-b526-f05198b23854" }} resizeMode={'cover'} style={styles.thumb} />
-                        <Image source={{ uri: "https://firebasestorage.googleapis.com/v0/b/teste-925f4.appspot.com/o/thumbs%2F3WTL16ZI80.png?alt=media&token=b2ddc5a8-a610-4a6d-b526-f05198b23854" }} resizeMode={'cover'} style={styles.thumb} />
+                        {this.renderThumb(this.state.game.file.image)}
                     </View>
                 </View>
             </TouchableHighlight>

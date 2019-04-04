@@ -28,7 +28,11 @@ export default class ListItem extends React.Component {
         selectMode: false,
     };
 
+    componentWillMount() {
+        console.log("componentWillMount");
+    }
     componentDidMount() {
+        console.log("componentDidMount");
         var _self = this;
         DeviceEventEmitter.addListener('selectMode', (data) => {
             if (data) {
@@ -48,7 +52,7 @@ export default class ListItem extends React.Component {
                 }
             );
         } else {
-            console.log("GO TO PAGE: ", this.props.id);
+            //console.log("GO TO PAGE: ", this.props.id);
             NavigationService.navigate("List", { key: this.props.id });
         }
     }

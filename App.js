@@ -161,7 +161,7 @@ export default class App extends React.Component {
 
 const styles = StyleSheet.create({
     backgroundModal: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
         flex: 1,
         textAlign: 'center',
         alignItems: 'center',

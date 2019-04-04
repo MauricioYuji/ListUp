@@ -24,7 +24,8 @@ import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 import NavigationService from '../../components/services/NavigationService';
 import Layout from '../../constants/Layout';
 import { getData, setData, insertData } from '../../components/services/baseService';
-import { getListByKey, getGames } from '../../components/services/Service';
+import { getListByKey, getGames, deleteGamesFromList } from '../../components/services/Service';
+import GameItem from '../../components/UI/GameItem';
 import AddGameItem from '../../components/UI/AddGameItem';
 import ListItem from '../../components/UI/ListItem';
 import TabBarIcon from '../../components/UI/TabBarIcon';
@@ -50,6 +51,7 @@ export default class ListScreen extends React.Component {
             listend: false,
             games: [],
             page: 0,
+            confirmDelete: false,
             list: {
                 title: "",
                 games: [],
@@ -111,6 +113,7 @@ export default class ListScreen extends React.Component {
             _self.setState({ page: 0, list: obj, listend: false, loading: false, mounted: true, key: key },
                 () => {
                     DeviceEventEmitter.emit('reloading', false);
+                    //_self.getImages(obj);
                     //_self.filterObj();
                 }
             );
@@ -132,11 +135,25 @@ export default class ListScreen extends React.Component {
             }
         );
     }
+    confirmdeleteItens = () => {
+        var _self = this;
+
+        var list = this.state.list;
+        DeviceEventEmitter.emit('reloading', true);
+        deleteGamesFromList(this.state.selectedItens, list.key).then(() => {
+            _self.setState({ selectedItens: [], confirmDelete: false },
+                () => {
+                    DeviceEventEmitter.emit('confirmDelete', true);
+                    DeviceEventEmitter.emit('selectMode', false);
+                    _self.loadData("");
+                }
+            );
+        });
+    }
     deleteItens = () => {
-        console.log("DELETE all: ", this.state.selectedItens);
-        this.setState({ selectedItens: [] },
+        var _self = this;
+        _self.setState({ confirmDelete: true },
             () => {
-                DeviceEventEmitter.emit('selectMode', false);
             }
         );
     }
@@ -150,7 +167,7 @@ export default class ListScreen extends React.Component {
 
     }
     editList = () => {
-
+        console.log("SEND EDIT");
         var list = this.state.list;
         if (this.state.list.title == "" || this.state.list.type == "" || this.state.list.text == "" || this.state.list.limit == "") {
             this.setState({ modelInvalid: true });
@@ -172,13 +189,21 @@ export default class ListScreen extends React.Component {
             setData('userLists/' + user.uid + '/' + list.key, obj)
                 .then((resp) => {
                     _self.setModalVisibleEdit(false);
+                    _self.loadData("");
                     console.log("resp: ", resp);
                     console.log("=============================");
                 });
         }
     }
+    addGame = () => {
+        console.log("ADD GAME");
+        this.loadData("");
+    }
     closeModal = () => {
         this.setState({ games: [], modalVisible: false, modalVisibleEdit: false });
+    }
+    closeConfirm = () => {
+        this.setState({ confirmDelete: false });
     }
     _setTitle(value) {
         var obj = this.state.list;
@@ -228,7 +253,7 @@ export default class ListScreen extends React.Component {
 
                 _self.setState({ games: games },
                     () => {
-                        _self.getImages(games);
+                        //_self.getImages(games);
                         //_self.filterObj();
                     }
                 );
@@ -263,15 +288,16 @@ export default class ListScreen extends React.Component {
         let list = this.state.games;
         let items = [];
         for (let i = 0; i < list.length; i++) {
-            items.push(<AddGameItem key={i} label={list[i].name} img={list[i].image} consoles={list[i].consoles} callback={this.selectItem.bind(this)} id={list[i].key} />);
+            items.push(<AddGameItem key={i} gamekey={list[i].key} label={list[i].name} img={list[i].image} consoles={list[i].consoles} callback={this.addGame.bind(this)} id={this.state.list.key} />);
         }
         return items;
     }
-    renderLists() {
-        let list = this.state.list.games == undefined ? [] : this.state.list.games;
+    renderGamesList() {
+        let list = this.state.list.games;
+
         let items = [];
         for (let i = 0; i < list.length; i++) {
-            //items.push(<ListItem key={i} label={list[i].title} games={list[i].games} callback={this.selectItem.bind(this)} id={list[i].key} />);
+            items.push(<GameItem key={i} consoles={list[i].consoles} callback={this.selectItem.bind(this)} id={list[i].key} />);
         }
         return items;
     }
@@ -280,7 +306,6 @@ export default class ListScreen extends React.Component {
         if (this.state.list.type == "") {
             pickerState = styles.unselected;
         }
-        console.log("pickerState: ", pickerState);
         return (
             <View style={styles.container}>
                 <ScrollView style={styles.scrollArea}>
@@ -289,13 +314,42 @@ export default class ListScreen extends React.Component {
                         <Text style={styles.labelDetail}>{this.state.list.games.length} jogos</Text>
                     </View>
 
+                    {this.renderGamesList()}
                 </ScrollView>
 
                 <Header style={styles.header} type={"info-list"} back={true} callbackDelete={this.deleteItens.bind(this)} callbackAdd={this.addItens.bind(this)} callbackEdit={this.editItens.bind(this)} label={"Lista"} detail={""} />
 
-                <View style={styles.scrollArea}>
-                    {this.renderLists()}
-                </View>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={this.state.mounted && this.state.confirmDelete}
+                    onRequestClose={() => {
+                        this.setState({ confirmDelete: false });
+                    }}>
+
+                    <View style={styles.backgroundModal}>
+                        <Text style={styles.addItemText}>DESEJA EXCLUIR?</Text>
+                        <View style={styles.buttonBox}>
+                            <TouchableHighlight underlayColor="transparent" onPress={() => this.confirmdeleteItens()}>
+                                <View style={[styles.addItem, styles.dangerButton]}>
+                                    <Text style={[styles.addItemText]}>Deletar</Text>
+                                </View>
+                            </TouchableHighlight>
+                            <TouchableHighlight underlayColor="transparent" onPress={() => this.closeConfirm()}>
+                                <View style={styles.addItem}>
+                                    <Text style={styles.addItemText}>Cancelar</Text>
+                                </View>
+                            </TouchableHighlight>
+                        </View>
+                        <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.closeConfirm()}>
+                            <TabBarIcon
+                                name={'close'}
+                                type={'MaterialIcons'}
+                                style={styles.closeBoxIcon}
+                            />
+                        </TouchableHighlight>
+                    </View>
+                </Modal>
 
                 <Modal
                     animationType="slide"
@@ -305,36 +359,33 @@ export default class ListScreen extends React.Component {
                         this.setState({ modalVisible: false });
                     }}>
                     <View style={styles.backgroundModal}>
-                        <ScrollView style={styles.menuList}>
-                            <LinearGradient
-                                colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.9)']}
-                                useAngle
-                                angle={180}
-                                style={styles.backgroundOverlayModal}
-                            />
-                            <TouchableHighlight>
-                                <TouchableWithoutFeedback>
-                                    <View style={styles.listBox}>
-                                        <Text style={styles.menuTitle}>-ADICIONAR JOGO-</Text>
-                                        <TextInput
-                                            placeholder={"Nome"}
-                                            style={[styles.inputsearch, styles.inputText]}
-                                            onChangeText={(text) => this._searchGame(text)}
-                                            ref={input => { this.titleInput = input }}
-                                        />
-                                        <View style={styles.inputSelect}>
-                                            {(this.state.games.length == 0) ? (
-                                                <Text>Procure pelo nome o jogo que gostaria de adicionar</Text>
-                                            ) : (
-                                                    this.renderGames()
-                                                )
-                                            }
+                        <View style={styles.menuList}>
+                            <View style={styles.scrollBox}>
+                                <Text style={styles.menuTitle}>-ADICIONAR JOGO-</Text>
+                                <TextInput
+                                    placeholder={"Nome"}
+                                    style={[styles.inputsearch, styles.inputText]}
+                                    onChangeText={(text) => this._searchGame(text)}
+                                    ref={input => { this.titleInput = input }}
+                                />
+                            </View>
 
-                                        </View>
-                                    </View>
-                                </TouchableWithoutFeedback>
-                            </TouchableHighlight>
-                        </ScrollView>
+                            <ScrollView style={styles.gamebox}>
+                                <TouchableHighlight>
+                                    <TouchableWithoutFeedback>
+                                        {(this.state.games.length == 0) ? (
+                                            <Text style={styles.TextclearList}>Procure pelo nome o jogo que gostaria de adicionar</Text>
+                                        ) : (
+                                                <View>
+                                                    {this.renderGames()}
+                                                </View>
+                                            )
+                                        }
+
+                                    </TouchableWithoutFeedback>
+                                </TouchableHighlight>
+                            </ScrollView>
+                        </View>
                         <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.closeModal()}>
                             <TabBarIcon
                                 name={'close'}
@@ -361,7 +412,7 @@ export default class ListScreen extends React.Component {
                             }
                             <TextInput
                                 placeholder={"Nome"}
-                                value={this.state.list.name}
+                                value={this.state.list.title}
                                 style={[styles.inputsearch, styles.inputText]}
                                 onChangeText={(text) => this._setTitle(text)}
                                 ref={input => { this.titleInput = input }}
@@ -397,10 +448,8 @@ export default class ListScreen extends React.Component {
                                 onChangeText={(text) => this._setText(text)}
                                 ref={input => { this.textInput = input }} />
                             <View style={styles.buttonBox}>
-                                <TouchableHighlight underlayColor="transparent" onPress={() => this.addList()}>
-                                    <View style={styles.addItem}>
-                                        <Text style={styles.addItemText}>Criar Lista</Text>
-                                    </View>
+                                <TouchableHighlight style={styles.addItem} underlayColor="transparent" onPress={() => this.editList()}>
+                                    <Text style={styles.addItemText}>Criar Lista</Text>
                                 </TouchableHighlight>
                             </View>
                         </View>
@@ -429,12 +478,19 @@ const styles = {
         fontFamily: 'SourceSansPro-SemiBold'
     },
     backgroundModal: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
         flex: 1,
         textAlign: 'center',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 1000
+    },
+    menuList: {
+        width: '100%',
+        flex: 1,
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     loadingBackground: {
         position: "absolute",
@@ -492,6 +548,15 @@ const styles = {
         bottom: 0,
         zIndex: 0
     },
+    scrollBox: {
+        width: '100%',
+        height: 150,
+        paddingHorizontal: 15,
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center'
+        //paddingBottom: 100
+    },
     listBox: {
         paddingTop: 50,
         width: '100%',
@@ -528,14 +593,11 @@ const styles = {
         marginTop: 30,
         marginLeft: 10,
         marginRight: 10,
-        fontSize: 20,
         paddingTop: 15,
         paddingBottom: 15,
         paddingLeft: 30,
         paddingRight: 30,
-        color: '#FFF',
         minHeight: 50,
-        fontFamily: 'SourceSansPro-Bold',
         borderRadius: 5,
         justifyContent: "center",
         alignItems: "center",
@@ -555,6 +617,12 @@ const styles = {
         borderRadius: 10,
         minHeight: 50,
         width: '100%'
+    },
+    gamebox: {
+        padding: 0,
+        width: '100%',
+        paddingHorizontal: 15,
+        height: Dimensions.get('window').height / 150
     },
     inputsearch: {
         backgroundColor: '#444',
@@ -585,5 +653,12 @@ const styles = {
     },
     unselected: {
         color: '#CCC'
+    },
+    TextclearList: {
+        color: '#FFF',
+        fontFamily: 'SourceSansPro-Bold',
+        fontSize: 18,
+        textAlign: 'center',
+        padding: 40,
     },
 }
