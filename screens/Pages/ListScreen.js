@@ -110,6 +110,7 @@ export default class ListScreen extends React.Component {
                 type: list.type,
                 description: list.description
             };
+            console.log("OBJ: ", obj);
             _self.setState({ page: 0, list: obj, listend: false, loading: false, mounted: true, key: key },
                 () => {
                     DeviceEventEmitter.emit('reloading', false);
@@ -311,7 +312,7 @@ export default class ListScreen extends React.Component {
                 <ScrollView style={styles.scrollArea}>
                     <View style={styles.titleBox}>
                         <Text style={styles.labelTitle}>{this.state.list.title}</Text>
-                        <Text style={styles.labelDetail}>{this.state.list.games.length} jogos</Text>
+                        <Text style={styles.labelDetail}>{this.state.list.games.length} jogos - Lista {this.state.list.type}</Text>
                     </View>
 
                     {this.renderGamesList()}
@@ -370,9 +371,7 @@ export default class ListScreen extends React.Component {
                                 />
                             </View>
 
-                            <ScrollView style={styles.gamebox}>
-                                <TouchableHighlight>
-                                    <TouchableWithoutFeedback>
+                            <ScrollView keyboardShouldPersistTaps={true} style={styles.gamebox}>
                                         {(this.state.games.length == 0) ? (
                                             <Text style={styles.TextclearList}>Procure pelo nome o jogo que gostaria de adicionar</Text>
                                         ) : (
@@ -381,9 +380,7 @@ export default class ListScreen extends React.Component {
                                                 </View>
                                             )
                                         }
-
-                                    </TouchableWithoutFeedback>
-                                </TouchableHighlight>
+                                    
                             </ScrollView>
                         </View>
                         <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.closeModal()}>
@@ -517,7 +514,9 @@ const styles = {
         flex: 1,
         padding: 15,
         marginBottom: 15,
-        backgroundColor: "#006CD8"
+        backgroundColor: "#333",
+        borderTopColor: "#006CD8",
+        borderTopWidth: 4
     },
     labelTitle: {
         fontSize: 24,

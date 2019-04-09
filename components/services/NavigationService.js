@@ -18,7 +18,7 @@ function navigate(routeName, params) {
 function goback() {
     console.log("GO BACK");
 
-    DeviceEventEmitter.emit('refresh', true);
+    //DeviceEventEmitter.emit('refresh', true);
     _navigator.dispatch(
         NavigationActions.back()
     );

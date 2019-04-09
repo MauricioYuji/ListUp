@@ -29,10 +29,8 @@ export default class ListItem extends React.Component {
     };
 
     componentWillMount() {
-        console.log("componentWillMount");
     }
     componentDidMount() {
-        console.log("componentDidMount");
         var _self = this;
         DeviceEventEmitter.addListener('selectMode', (data) => {
             if (data) {
@@ -66,7 +64,30 @@ export default class ListItem extends React.Component {
         );
 
     }
+    renderGamesThumbs() {
+        let lists = this.props.obj.games;
+        var lista = lists.slice(0, 3);
+        let items = [];
+        for (let i = 0; i < lista.length; i++) {
+            items.push(<Image key={i} source={{ uri: lista[i].img.url }} resizeMode={'cover'} style={styles.thumb} />);
+        }
+        return items;
+    }
+    renderGamesNames() {
+        let lists = this.props.obj.games;
+        var lista = lists.slice(0, 3);
+        let items = "";
+        for (let i = 0; i < lista.length; i++) {
+            if (lista.length - 1 === i) {
+                items += lista[i].name;
+            } else {
+                items += lista[i].name + ", ";
+            }
+        }
+        return (<Text style={styles.nameList}>{items}</Text>);
+    }
     render() {
+        //console.log("OBJ: ", this.props.obj);
         let itemStyle = null;
         if (this.state.selected) {
             itemStyle = styles.selected;
@@ -75,13 +96,12 @@ export default class ListItem extends React.Component {
             <TouchableHighlight onLongPress={() => this.allowSelect()} onPress={() => this.itemAction()}>
                 <View style={[styles.listItem, itemStyle]}>
                     <View style={styles.itemInfo}>
-                        <Text style={styles.labelTitle}>{this.props.label}</Text>
-                        <Text style={styles.labelDetail}>{this.props.games.length} jogos</Text>
+                        <Text style={styles.labelTitle}>{this.props.obj.title}</Text>
+                        <Text style={styles.labelDetail}>{this.props.obj.games.length} jogos - Lista {this.props.obj.type}</Text>
+                        {this.renderGamesNames()}
                     </View>
                     <View style={styles.thumbArea}>
-                        <Image source={{ uri: "https://firebasestorage.googleapis.com/v0/b/teste-925f4.appspot.com/o/thumbs%2F3WTL16ZI80.png?alt=media&token=b2ddc5a8-a610-4a6d-b526-f05198b23854" }} resizeMode={'cover'} style={styles.thumb} />
-                        <Image source={{ uri: "https://firebasestorage.googleapis.com/v0/b/teste-925f4.appspot.com/o/thumbs%2F3WTL16ZI80.png?alt=media&token=b2ddc5a8-a610-4a6d-b526-f05198b23854" }} resizeMode={'cover'} style={styles.thumb} />
-                        <Image source={{ uri: "https://firebasestorage.googleapis.com/v0/b/teste-925f4.appspot.com/o/thumbs%2F3WTL16ZI80.png?alt=media&token=b2ddc5a8-a610-4a6d-b526-f05198b23854" }} resizeMode={'cover'} style={styles.thumb} />
+                        {this.renderGamesThumbs()}
                     </View>
                 </View>
             </TouchableHighlight>
@@ -90,6 +110,7 @@ export default class ListItem extends React.Component {
 }
 const styles = StyleSheet.create({
     listItem: {
+        paddingVertical: 10,
         marginTop: 10,
         flexDirection: 'row',
         justifyContent: "center",
@@ -97,11 +118,20 @@ const styles = StyleSheet.create({
         backgroundColor: "#222222"
     },
     selected: {
-        backgroundColor: '#006CD8',
+        borderLeftColor: '#006CD8',
+        borderLeftWidth: 20,
+        opacity: 0.5,
+        marginRight: -20
     },
     itemInfo: {
         flex: 1,
         paddingHorizontal: 20,
+    },
+    nameList: {
+        fontSize: 14,
+        color: '#FFF',
+        fontFamily: 'SourceSansPro-SemiBold',
+        textDecorationLine: 'underline'
     },
     labelTitle: {
         fontSize: 24,

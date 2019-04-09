@@ -90,6 +90,112 @@ export const getGameDetail = async (key) => {
     return obj;
 };
 
+export const structureUserList = async (obj) => {
+    return new Promise((resolve, reject) => {
+        var keys = [];
+        for (var list in obj) {
+            for (var games in obj[list].games) {
+                if (!keys.includes(games))
+                    keys.push(games);
+            }
+        }
+        getGame(keys).then((game) => {
+            var imgkeys = [];
+            for (var list in obj) {
+                var games = [];
+                for (var key in obj[list].games) {
+                    var item = game[key];
+                    if (!imgkeys.includes(item.img) && item.img != "") {
+                        imgkeys.push(item.img);
+                    }
+
+                    item.userConsoles = obj[list].games[key];
+                    games.push(item);
+                }
+                obj[list].key = list;
+                obj[list].games = games;
+            }
+            getImages(imgkeys).then((imgs) => {
+                for (var list in obj) {
+                    for (var key in obj[list].games) {
+                        obj[list].games[key].img = imgs[obj[list].games[key].img];
+                    }
+                }
+                resolve(obj);
+            });
+        });
+
+    });
+};
+
+getGame = async (keys) => {
+    return new Promise((resolve, reject) => {
+        var promises = keys.map(function (key) {
+            return firebase.database().ref("/Games/").child(key).once("value");
+        });
+        Promise.all(promises).then(function (snapshots) {
+            var obj = {};
+            snapshots.forEach(function (snapshot) {
+                obj[snapshot.key] = snapshot.val();
+
+            });
+            resolve(obj);
+        });
+    });
+
+};
+getImages = async (keys) => {
+    return new Promise((resolve, reject) => {
+        var promises = keys.map(function (key) {
+            return firebase.database().ref("/thumbs/").child(key).once("value");
+        });
+        Promise.all(promises).then(function (snapshots) {
+            var obj = {};
+            snapshots.forEach(function (snapshot) {
+                obj[snapshot.key] = snapshot.val();
+
+            });
+            resolve(obj);
+        });
+    });
+};
+//export const RefLists = () => {
+//    var user = firebase.auth().currentUser;
+//    let lists = null;
+//    var objgames = [];
+//    return firebase.database().ref('/userLists/' + user.uid);
+//};
+//export function RefLists2() {
+//    // Get the current 'global' time from an API using Promise
+//    return new Promise((resolve, reject) => {
+//        //setTimeout(function () {
+//        //    resolve(new Date());
+//        //    console.log("CHANGE");
+//        //}, 2000);
+//        var user = firebase.auth().currentUser;
+//        let lists = null;
+//        var objgames = [];
+//        firebase.database().ref('/userLists/' + user.uid).on('value', function (snapshot) {
+//            console.log("content LOAD");
+//            //console.log("snapshot.val(): ", snapshot.val());
+//            obj = Object.keys(snapshot.val()).map(item => {
+//                var objitem = snapshot.val()[item];
+//                return {
+//                    title: objitem.title,
+//                    games: objitem.games == undefined ? [] : objitem.games,
+//                    limit: objitem.limit,
+//                    type: objitem.type,
+//                    key: item,
+//                    description: objitem.description
+//                };
+//            });
+
+//            //console.log("obj: ", obj);
+//            resolve(obj);
+//        });
+//    });
+//}
+
 export const getuserList = async (page) => {
     var user = firebase.auth().currentUser;
     let lists = null;
@@ -99,20 +205,27 @@ export const getuserList = async (page) => {
         lists = snapshot.val();
     });
 
-    
+
     for (var key in lists) {
 
 
 
         var item = lists[key];
 
+
         let consoles = [];
         for (var games in item.games) {
-            consoles.push(item.games[games]);
+            var objgame = {
+                key: games,
+                consoles: item.games[games]
+            };
+            consoles.push(objgame);
         }
         var obj = {
             key: key,
             title: item.title,
+            limit: item.limit,
+            type: item.type,
             games: consoles,
             description: item.description
         };
@@ -140,11 +253,15 @@ export const getListByKey = async (key) => {
     var obj = {
         key: key,
         title: list.title,
+        limit: list.limit,
+        type: list.type,
         games: consoles,
         description: list.description
     };
     return obj;
 };
+
+
 
 export const deleteItemsFromList = async (keys) => {
 

@@ -139,7 +139,10 @@ const styles = StyleSheet.create({
         backgroundColor: "#222222"
     },
     selected: {
-        backgroundColor: '#006CD8',
+        borderLeftColor: '#006CD8',
+        borderLeftWidth: 20,
+        opacity: 0.5,
+        marginRight: -20
     },
     itemInfo: {
         flex: 1,

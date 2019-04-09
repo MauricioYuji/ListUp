@@ -206,7 +206,8 @@ export default class AddGameItem extends React.Component {
                         </View>
                     </View>
                     <View style={styles.thumbArea}>
-                        <TouchableHighlight onPress={() => this.showButtons()}>
+
+                        <TouchableHighlight underlayColor="transparent" onPress={this.showButtons.bind(this)}>
                             <TabBarIcon
                                 name={'add'}
                                 type={'MaterialIcons'}
