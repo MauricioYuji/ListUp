@@ -13,7 +13,7 @@ import {
 
 import NavigationService from '../../components/services/NavigationService';
 import { getData } from '../../components/services/baseService';
-import { getGames } from '../../components/services/Service';
+import { getGames, structureGames } from '../../components/services/Service';
 import Header from '../../screens/Shared/Header';
 import MasonryList from '@appandflow/masonry-list';
 
@@ -53,24 +53,44 @@ export default class GameScreen extends React.Component {
     }
     loadData = () => {
         var _self = this;
-        getGames(this.state.page).then((games) => {
-            games = games.map(item => {
-                return {
-                    image: item.file,
-                    name: item.name,
-                    key: item.key,
-                    consoles: item.consoles,
-                    genres: item.genres
-                };
-            });
 
-            _self.setState({ page: 0, games: games },
-                () => {
-                    _self.filterObj();
-                }
-            );
 
+
+
+        firebase.database().ref('/Games/').on('value', function (snapshot) {
+
+
+            structureGames(snapshot.val()).then(games => {
+                _self.setState({ page: 0, games: games },
+                    () => {
+                        _self.filterObj();
+                    }
+                );
+                return true;
+            }).catch(err => console.log('There was an error:' + err));
         });
+
+
+
+        //getGames(this.state.page).then((games) => {
+        //    games = games.map(item => {
+        //        return {
+        //            image: item.file,
+        //            name: item.name,
+        //            key: item.key,
+        //            consoles: item.consoles,
+        //            genres: item.genres
+        //        };
+        //    });
+
+        //    console.log("games: ", games);
+        //    _self.setState({ page: 0, games: games },
+        //        () => {
+        //            _self.filterObj();
+        //        }
+        //    );
+
+        //});
     }
 
 
@@ -89,7 +109,7 @@ export default class GameScreen extends React.Component {
         const registerPerPage = 10;
         var resultsliced = result.slice(_self.state.page * registerPerPage, _self.state.page * registerPerPage + registerPerPage);
 
-        _self.getImages(resultsliced);
+        //_self.getImages(resultsliced);
         var returnarray = _self.state.gamesfiltered.concat(resultsliced);
         if (resultsliced.length > 0) {
             DeviceEventEmitter.emit('reloading', false);
@@ -122,17 +142,17 @@ export default class GameScreen extends React.Component {
         }
         return content;
     }
-    getImages = async (obj) => {
-        for (let i = 0; i < obj.length; i++) {
-            await getData('thumbs/' + obj[i].image.key)
-                .then((img) => {
-                    obj[i].image.file = img.file;
-                    obj[i].image.url = img.url;
-                });
-        }
+    //getImages = async (obj) => {
+    //    for (let i = 0; i < obj.length; i++) {
+    //        await getData('thumbs/' + obj[i].image.key)
+    //            .then((img) => {
+    //                obj[i].image.file = img.file;
+    //                obj[i].image.url = img.url;
+    //            });
+    //    }
 
-        this.setState({ gamesfiltered: this.state.gamesfiltered });
-    }
+    //    this.setState({ gamesfiltered: this.state.gamesfiltered });
+    //}
     checkLoading = async (event) => {
         DeviceEventEmitter.emit('hideFilter', true);
         var _self = this;

@@ -68,8 +68,9 @@ export default class ListItem extends React.Component {
         let lists = this.props.obj.games;
         var lista = lists.slice(0, 3);
         let items = [];
+        
         for (let i = 0; i < lista.length; i++) {
-            items.push(<Image key={i} source={{ uri: lista[i].img.url }} resizeMode={'cover'} style={styles.thumb} />);
+            items.push(<Image key={i} source={{ uri: lista[i].image.url }} resizeMode={'cover'} style={styles.thumb} />);
         }
         return items;
     }
@@ -128,6 +129,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     nameList: {
+        marginTop: 10,
         fontSize: 14,
         color: '#FFF',
         fontFamily: 'SourceSansPro-SemiBold',

@@ -28,9 +28,7 @@ export default class GameItem extends React.Component {
         key: "",
         game: {
             name: "",
-            file: {
-                image: null
-            }
+            img: null
         },
         selected: false,
         selectMode: false,
@@ -55,18 +53,23 @@ export default class GameItem extends React.Component {
         if (key == "") {
             key = this.state.key;
         }
-        //console.log("key: ", key);
-        getGameDetail(key).then((game) => {
-            //console.log("game: ", game);
-            _self.setState({ game: game },
+             _self.setState({ game: this.props.obj },
                 () => {
                     DeviceEventEmitter.emit('reloading', false);
-                    //_self.getImages([game]);
-                    //_self.filterObj();
                 }
             );
+        //console.log("key: ", key);
+        //getGameDetail(key).then((game) => {
+        //    //console.log("game: ", game);
+        //    _self.setState({ game: game },
+        //        () => {
+        //            DeviceEventEmitter.emit('reloading', false);
+        //            //_self.getImages([game]);
+        //            //_self.filterObj();
+        //        }
+        //    );
 
-        });
+        //});
     }
     itemAction() {
         var _self = this;
@@ -123,7 +126,7 @@ export default class GameItem extends React.Component {
                         <Text style={styles.labelTitle}>{this.state.game.name}</Text>
                     </View>
                     <View style={styles.thumbArea}>
-                        {this.renderThumb(this.state.game.file.image)}
+                        {this.renderThumb(this.state.game.image)}
                     </View>
                 </View>
             </TouchableHighlight>

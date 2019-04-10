@@ -24,7 +24,7 @@ import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 import NavigationService from '../../components/services/NavigationService';
 import Layout from '../../constants/Layout';
 import { getData, setData, insertData } from '../../components/services/baseService';
-import { getListByKey, getGames, deleteGamesFromList } from '../../components/services/Service';
+import { getListByKey, getGames, deleteGamesFromList, structureList } from '../../components/services/Service';
 import GameItem from '../../components/UI/GameItem';
 import AddGameItem from '../../components/UI/AddGameItem';
 import ListItem from '../../components/UI/ListItem';
@@ -98,27 +98,27 @@ export default class ListScreen extends React.Component {
     }
     loadData = (key) => {
         var _self = this;
+        var user = firebase.auth().currentUser;
+
         if (key == "") {
             key = this.state.key;
         }
-        getListByKey(key).then((list) => {
-            var obj = {
-                title: list.title,
-                games: (list.games == undefined ? [] : list.games),
-                key: key,
-                limit: list.limit,
-                type: list.type,
-                description: list.description
-            };
-            console.log("OBJ: ", obj);
-            _self.setState({ page: 0, list: obj, listend: false, loading: false, mounted: true, key: key },
-                () => {
-                    DeviceEventEmitter.emit('reloading', false);
-                    //_self.getImages(obj);
-                    //_self.filterObj();
+        firebase.database().ref('/userLists/' + user.uid + '/' + key).on('value', function (snapshot) {
+            var obj = {};
+            var list = null;
+            obj[snapshot.key] = snapshot.val();
+            structureList(obj).then(r => {
+                for (var item in r) {
+                    list = r[item];
                 }
-            );
-
+                //console.log("list: ", list);
+                _self.setState({ page: 0, list: list, listend: false, loading: false, mounted: true, key: key },
+                    () => {
+                        DeviceEventEmitter.emit('reloading', false);
+                    }
+                );
+                return true;
+            }).catch(err => console.log('There was an error:' + err));
         });
     }
     itemAction = () => {
@@ -295,10 +295,10 @@ export default class ListScreen extends React.Component {
     }
     renderGamesList() {
         let list = this.state.list.games;
-
+        //console.log("list: ", list);
         let items = [];
         for (let i = 0; i < list.length; i++) {
-            items.push(<GameItem key={i} consoles={list[i].consoles} callback={this.selectItem.bind(this)} id={list[i].key} />);
+            items.push(<GameItem key={i} obj={list[i]} callback={this.selectItem.bind(this)} />);
         }
         return items;
     }
@@ -371,16 +371,16 @@ export default class ListScreen extends React.Component {
                                 />
                             </View>
 
-                            <ScrollView keyboardShouldPersistTaps={true} style={styles.gamebox}>
-                                        {(this.state.games.length == 0) ? (
-                                            <Text style={styles.TextclearList}>Procure pelo nome o jogo que gostaria de adicionar</Text>
-                                        ) : (
-                                                <View>
-                                                    {this.renderGames()}
-                                                </View>
-                                            )
-                                        }
-                                    
+                            <ScrollView keyboardShouldPersistTaps="always" style={styles.gamebox}>
+                                {(this.state.games.length == 0) ? (
+                                    <Text style={styles.TextclearList}>Procure pelo nome o jogo que gostaria de adicionar</Text>
+                                ) : (
+                                        <View>
+                                            {this.renderGames()}
+                                        </View>
+                                    )
+                                }
+
                             </ScrollView>
                         </View>
                         <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.closeModal()}>

@@ -24,7 +24,7 @@ import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 import NavigationService from '../../components/services/NavigationService';
 import Layout from '../../constants/Layout';
 import { getData, setData, insertData, deleteData } from '../../components/services/baseService';
-import { getuserList, deleteItemsFromList, structureUserList } from '../../components/services/Service';
+import { getuserList, deleteItemsFromList, structureList } from '../../components/services/Service';
 import { MonoText } from '../../components/UI/StyledText';
 import ListItem from '../../components/UI/ListItem';
 import TabBarIcon from '../../components/UI/TabBarIcon';
@@ -95,82 +95,21 @@ export default class ListScreen extends React.Component {
         var user = firebase.auth().currentUser;
 
         firebase.database().ref('/userLists/' + user.uid).on('value', function (snapshot) {
-            console.log("content LOAD");
-            //console.log("snapshot.val(): ", snapshot.val());
 
 
-            structureUserList(snapshot.val()).then(r => {
-                //r = r.map(item => {
-                //    return {
-                //        title: item.title,
-                //        games: item.games,
-                //        limit: item.limit,
-                //        type: item.type,
-                //        key: item.key,
-                //        description: item.description
-                //    };
-                //});
+            structureList(snapshot.val()).then(r => {
                 for (var item in r) {
                     obj.push(r[item]);
                 }
-                console.log("obj:", obj);
-                //console.log('return: ', r);
                 _self.setState({ page: 0, lists: obj, listend: false, loading: false, mounted: true },
                     () => {
                         DeviceEventEmitter.emit('reloading', false);
-                        //_self.filterObj();
                     }
                 );
                 return true;
             }).catch(err => console.log('There was an error:' + err));
-
-            //console.log("obj: ", obj);
         });
-
-
-        //RefLists().on('value', function (snapshot) {
-
-        //    obj = Object.keys(snapshot.val()).map(item => {
-        //        var objitem = snapshot.val()[item];
-        //        return {
-        //            title: objitem.title,
-        //            games: objitem.games == undefined ? [] : objitem.games,
-        //            limit: objitem.limit,
-        //            type: objitem.type,
-        //            key: item,
-        //            description: objitem.description
-        //        };
-        //    });
-        //    //console.log("obj: ", obj);
-        //});
-
-        //RefLists2()
-        //    .then(r => {
-        //        console.log('return: ', r);
-        //        return true;
-        //    })
-        //    .catch(err => console.log('There was an error:' + err))
-
-        //getuserList(this.state.page).then((list) => {
-        //    console.log("list: ", list);
-        //    list = list.map(item => {
-        //        return {
-        //            title: item.title,
-        //            games: item.games,
-        //            limit: item.limit,
-        //            type: item.type,
-        //            key: item.key,
-        //            description: item.description
-        //        };
-        //    });
-        //    _self.setState({ page: 0, lists: list, listend: false, loading: false, mounted: true },
-        //        () => {
-        //            DeviceEventEmitter.emit('reloading', false);
-        //            //_self.filterObj();
-        //        }
-        //    );
-
-        //});
+        
     }
     itemAction = () => {
 
