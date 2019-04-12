@@ -17,7 +17,7 @@ import { LinearGradient } from 'expo';
 import NavigationService from '../../components/services/NavigationService';
 import Layout from '../../constants/Layout';
 import { setData } from '../../components/services/baseService';
-import { getGameDetail } from '../../components/services/Service';
+import { getGameDetail, structureGames } from '../../components/services/Service';
 import LoadingScreen from '../Loading/LoadingScreen';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 import AddGameButton from '../../components/UI/AddGameButton';
@@ -53,10 +53,26 @@ export default class GameDetailScreen extends React.Component {
 
         var _self = this;
 
-        getGameDetail(this.state.key).then((game) => {
-            _self.setState({ loaded: true, game: game, mounted: true });
 
+        firebase.database().ref('/Games/' + this.state.key).on('value', function (snapshot) {
+            var obj = {};
+            obj[snapshot.key] = snapshot.val();
+            structureGames(obj).then(r => {
+
+                var game = null;
+                for (var item in r) {
+                    var game = r[item];
+                }
+                _self.setState({ loaded: true, game: game, mounted: true });
+                return true;
+            }).catch(err => console.log('There was an error:' + err));
         });
+
+
+        //getGameDetail(this.state.key).then((game) => {
+        //    _self.setState({ loaded: true, game: game, mounted: true });
+
+        //});
 
     }
     componentWillUnmount() {
@@ -203,11 +219,12 @@ export default class GameDetailScreen extends React.Component {
         const listscount = 3;
         let loaded = this.state.loaded;
         let game = this.state.game;
-        if (loaded) {
+        if (loaded && game != null) {
+            console.log("game: ", game);
             return (
                 <View style={styles.container}>
                     <ScrollView>
-                        <Image source={{ uri: game.file.url }} resizeMode={'cover'} style={[styles.backgroundBanner]} />
+                        <Image source={{ uri: game.image.url }} resizeMode={'cover'} style={[styles.backgroundBanner]} />
                         <LinearGradient
                             colors={['rgba(0,0,0,0.2)', 'rgba(0,0,0,0.8)']}
                             useAngle

@@ -57,7 +57,7 @@ export default class AddGameItem extends React.Component {
     //}
     showButtons = () => {
         var _self = this;
-
+        console.log("SHOW CONSOLES");
         DeviceEventEmitter.emit('selectConsole', false);
         _self.setState({ showButtons: !this.state.showButtons },
             () => {
@@ -99,7 +99,7 @@ export default class AddGameItem extends React.Component {
     ActiveConsole(key, multiple) {
         var _self = this;
         var list = this.state.consolesActive;
-        let consoles = this.props.consoles;
+        let consoles = this.props.game.consoles;
         if (!multiple) {
             if (list.includes(key))
                 list = this.arrayRemove(list, [key]);
@@ -129,12 +129,12 @@ export default class AddGameItem extends React.Component {
         DeviceEventEmitter.emit('selectConsole', false);
         
         
-        addGamestoList(this.props.id, this.props.gamekey, this.state.consolesActive).then((resp) => {
+        addGamestoList(this.props.id, this.props.game.key, this.state.consolesActive).then((resp) => {
             _self.props.callback();
         });
     }
     renderThumb = (item) => {
-        //console.log("item: ", item);
+        
         if (item.key == "" || item.file == null)
             return (<Image source={require('../../assets/images/console-icon.png')} resizeMode={'cover'} style={styles.thumb} />);
         else {
@@ -143,7 +143,7 @@ export default class AddGameItem extends React.Component {
     }
     listPlatforms = () => {
         let obj = [];
-        let objarray = this.props.consoles;
+        let objarray = this.props.game.consoles;
         let filteractive = this.state.consolesActive;
 
 
@@ -200,9 +200,9 @@ export default class AddGameItem extends React.Component {
             <View>
                 <View style={[styles.listItem, boxstyle]}>
                     <View style={styles.itemInfo}>
-                        {this.renderThumb(this.props.img)}
+                        {this.renderThumb(this.props.game.image)}
                         <View>
-                            <Text style={styles.labelTitle}>{this.props.label}</Text>
+                            <Text style={styles.labelTitle}>{this.props.game.name}</Text>
                         </View>
                     </View>
                     <View style={styles.thumbArea}>

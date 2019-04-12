@@ -24,7 +24,7 @@ import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 import NavigationService from '../../components/services/NavigationService';
 import Layout from '../../constants/Layout';
 import { getData, setData, insertData } from '../../components/services/baseService';
-import { getListByKey, getGames, deleteGamesFromList, structureList } from '../../components/services/Service';
+import { getListByKey, getGames, deleteGamesFromList, structureList, structureGames } from '../../components/services/Service';
 import GameItem from '../../components/UI/GameItem';
 import AddGameItem from '../../components/UI/AddGameItem';
 import ListItem from '../../components/UI/ListItem';
@@ -111,7 +111,6 @@ export default class ListScreen extends React.Component {
                 for (var item in r) {
                     list = r[item];
                 }
-                //console.log("list: ", list);
                 _self.setState({ page: 0, list: list, listend: false, loading: false, mounted: true, key: key },
                     () => {
                         DeviceEventEmitter.emit('reloading', false);
@@ -146,7 +145,6 @@ export default class ListScreen extends React.Component {
                 () => {
                     DeviceEventEmitter.emit('confirmDelete', true);
                     DeviceEventEmitter.emit('selectMode', false);
-                    _self.loadData("");
                 }
             );
         });
@@ -198,7 +196,6 @@ export default class ListScreen extends React.Component {
     }
     addGame = () => {
         console.log("ADD GAME");
-        this.loadData("");
     }
     closeModal = () => {
         this.setState({ games: [], modalVisible: false, modalVisibleEdit: false });
@@ -228,7 +225,7 @@ export default class ListScreen extends React.Component {
     }
 
     _searchGame(search) {
-        console.log("Search: ", search);
+        //console.log("Search: ", search);
         var _self = this;
         if (search == "") {
             _self.setState({ games: [] },
@@ -237,29 +234,37 @@ export default class ListScreen extends React.Component {
                 }
             );
         } else {
+            if (this.state.searching)
+                return false;
 
+            setTimeout(function () {
+
+            }, 2000);
+            _self.setState({ searching: true },
+                () => {
+                }
+            );
             var re = new RegExp(search.toLowerCase(), 'g');
-            getGames(this.state.page).then((games) => {
-                games = games.filter(p => (p.name.toLowerCase().match(re) != null && search != "") || search == "").map(item => {
-                    return {
-                        image: item.file,
-                        name: item.name,
-                        key: item.key,
-                        consoles: item.consoles,
-                        genres: item.genres
-                    };
-                });
 
-                //games = obj.filter(p => (p.consoles.some(r => filterobj.consoles.includes(r.key)) || filterobj.consoles.length == 0) && (p.genres.some(r => filterobj.genres.includes(r.key)) || filterobj.genres.length == 0) && ((p.name.toLowerCase().match(re) != null && filterobj.search != "") || filterobj.search == ""));
-
-                _self.setState({ games: games },
-                    () => {
-                        //_self.getImages(games);
-                        //_self.filterObj();
+            firebase.database().ref('/Games/').on('value', function (snapshot) {
+                var obj = {};
+                for (var key in snapshot.val()) {
+                    let item = snapshot.val()[key];
+                    if ((item.name.toLowerCase().match(re) != null && search != "") || search == "") {
+                        obj[key] = item;
                     }
-                );
+                }
 
+
+                structureGames(obj).then(games => {
+                    _self.setState({ games: games, searching: false },
+                        () => {
+                        }
+                    );
+                    return true;
+                }).catch(err => console.log('There was an error:' + err));
             });
+            
 
         }
     }
@@ -274,28 +279,27 @@ export default class ListScreen extends React.Component {
     //}
 
 
-    getImages = async (obj) => {
-        for (let i = 0; i < obj.length; i++) {
-            await getData('thumbs/' + obj[i].image.key)
-                .then((img) => {
-                    obj[i].image.file = img.file;
-                    obj[i].image.url = img.url;
-                });
-        }
+    //getImages = async (obj) => {
+    //    for (let i = 0; i < obj.length; i++) {
+    //        await getData('thumbs/' + obj[i].image.key)
+    //            .then((img) => {
+    //                obj[i].image.file = img.file;
+    //                obj[i].image.url = img.url;
+    //            });
+    //    }
 
-        this.setState({ games: this.state.games });
-    }
+    //    this.setState({ games: this.state.games });
+    //}
     renderGames() {
         let list = this.state.games;
         let items = [];
         for (let i = 0; i < list.length; i++) {
-            items.push(<AddGameItem key={i} gamekey={list[i].key} label={list[i].name} img={list[i].image} consoles={list[i].consoles} callback={this.addGame.bind(this)} id={this.state.list.key} />);
+            items.push(<AddGameItem key={i} game={list[i]} callback={this.addGame.bind(this)} id={this.state.list.key} />);
         }
         return items;
     }
     renderGamesList() {
         let list = this.state.list.games;
-        //console.log("list: ", list);
         let items = [];
         for (let i = 0; i < list.length; i++) {
             items.push(<GameItem key={i} obj={list[i]} callback={this.selectItem.bind(this)} />);

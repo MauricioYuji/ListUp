@@ -132,7 +132,7 @@ export const structureGames = async (games) => {
                     objgames[key].image.file = imgs[objgames[key].image.key].file;
                 }
                 //console.log("-----------------------------------------------");
-                
+
 
             }
             resolve(objgames);
@@ -168,12 +168,13 @@ export const structureGames = async (games) => {
 };
 
 export const structureList = async (obj) => {
+    let objlist = require('../../files/consoles.json');
     return new Promise((resolve, reject) => {
         var keys = [];
         for (var list in obj) {
-            for (var games in obj[list].games) {
-                if (!keys.includes(games))
-                    keys.push(games);
+            for (let key in obj[list].games) {
+                if (!keys.includes(key))
+                    keys.push(key);
             }
         }
         getGame(keys).then((game) => {
@@ -185,8 +186,11 @@ export const structureList = async (obj) => {
                     if (!imgkeys.includes(item.image.key) && item.image.key != "") {
                         imgkeys.push(item.image.key);
                     }
-
-                    item.userConsoles = obj[list].games[key];
+                    var userconsoles = obj[list].games[key];
+                    for (var i = 0; i < userconsoles.length; i++) {
+                        userconsoles[i] = objlist.Consoles[userconsoles[i]];
+                    }
+                    item.userConsoles = userconsoles;
                     games.push(item);
                 }
                 obj[list].key = list;
@@ -206,7 +210,7 @@ export const structureList = async (obj) => {
 };
 
 getGame = async (keys) => {
-    
+
     let list = require('../../files/consoles.json');
 
     return new Promise((resolve, reject) => {
@@ -239,13 +243,13 @@ getGame = async (keys) => {
                     image: file,
                     genres: genres,
                     consoles: consoles,
-                    companies: companies,
+                    companies: companies
                 };
 
                 obj[snapshot.key] = game;
 
             });
-            
+
 
 
             resolve(obj);

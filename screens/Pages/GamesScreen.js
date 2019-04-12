@@ -70,27 +70,7 @@ export default class GameScreen extends React.Component {
             }).catch(err => console.log('There was an error:' + err));
         });
 
-
-
-        //getGames(this.state.page).then((games) => {
-        //    games = games.map(item => {
-        //        return {
-        //            image: item.file,
-        //            name: item.name,
-        //            key: item.key,
-        //            consoles: item.consoles,
-        //            genres: item.genres
-        //        };
-        //    });
-
-        //    console.log("games: ", games);
-        //    _self.setState({ page: 0, games: games },
-        //        () => {
-        //            _self.filterObj();
-        //        }
-        //    );
-
-        //});
+        
     }
 
 
@@ -142,17 +122,6 @@ export default class GameScreen extends React.Component {
         }
         return content;
     }
-    //getImages = async (obj) => {
-    //    for (let i = 0; i < obj.length; i++) {
-    //        await getData('thumbs/' + obj[i].image.key)
-    //            .then((img) => {
-    //                obj[i].image.file = img.file;
-    //                obj[i].image.url = img.url;
-    //            });
-    //    }
-
-    //    this.setState({ gamesfiltered: this.state.gamesfiltered });
-    //}
     checkLoading = async (event) => {
         DeviceEventEmitter.emit('hideFilter', true);
         var _self = this;

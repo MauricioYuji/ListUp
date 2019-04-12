@@ -91,13 +91,15 @@ export default class ListScreen extends React.Component {
     }
     loadData = () => {
         var _self = this;
-        var obj = [];
         var user = firebase.auth().currentUser;
 
         firebase.database().ref('/userLists/' + user.uid).on('value', function (snapshot) {
 
 
             structureList(snapshot.val()).then(r => {
+
+                var obj = [];
+                var ol = Object.keys(r);
                 for (var item in r) {
                     obj.push(r[item]);
                 }
@@ -109,7 +111,7 @@ export default class ListScreen extends React.Component {
                 return true;
             }).catch(err => console.log('There was an error:' + err));
         });
-        
+
     }
     itemAction = () => {
 
@@ -145,7 +147,7 @@ export default class ListScreen extends React.Component {
                 () => {
                     DeviceEventEmitter.emit('confirmDelete', true);
                     DeviceEventEmitter.emit('selectMode', false);
-                    this.loadData();
+                    //this.loadData();
                 }
             );
         });
@@ -174,7 +176,17 @@ export default class ListScreen extends React.Component {
             insertData('userLists/' + user.uid + '/', obj)
                 .then((resp) => {
                     _self.setModalVisible(false);
-                    _self.loadData();
+                    _self.setState({
+                        list: {
+                            title: "",
+                            games: [],
+                            key: "",
+                            description: "",
+                            type: "",
+                            limit: ""
+                        },
+                    })
+                    //_self.loadData();
                 });
         }
     }
