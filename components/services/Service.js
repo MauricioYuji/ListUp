@@ -1,5 +1,5 @@
 import * as firebase from 'firebase';
-import { getData, deleteData, setData } from './baseService';
+import { getData, deleteData, setData, insertData } from './baseService';
 
 export const getGames = async (page) => {
     let games = null;
@@ -419,7 +419,20 @@ export const deleteGamesFromList = async (keys, keylist) => {
 export const addGamestoList = async (keylist, keygame, obj) => {
     var user = firebase.auth().currentUser;
     let list = null;
-    setData('/userLists/' + user.uid + '/' + keylist + '/games/' + keygame, obj)
-        .then((res) => {
-        });
+    console.log("keylist: ", keylist);
+    console.log("keygame: ", keygame);
+    console.log("obj: ", obj);
+    getData('/userLists/' + user.uid + '/' + keylist + '/games/' + keygame).then((res) => {
+        if (obj.length > 0) {
+            console.log("EDIT");
+            setData('/userLists/' + user.uid + '/' + keylist + '/games/' + keygame, obj).then((res) => {
+            });
+        } else {
+            console.log("INSERT");
+            obj = {};
+            obj[keygame] = "";
+            setData('/userLists/' + user.uid + '/' + keylist + '/games/', obj).then((res) => {
+            });
+        }
+    });
 };

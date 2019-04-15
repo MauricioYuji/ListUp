@@ -116,7 +116,7 @@ export default class GameItem extends React.Component {
     }
     listPlatforms = () => {
         let obj = [];
-        let objarray = this.props.obj.consoles;
+        let objarray = this.props.obj.userConsoles;
 
 
         for (let j = 0; j < objarray.length; j++) {
@@ -153,7 +153,7 @@ export default class GameItem extends React.Component {
         if (this.state.selected) {
             itemStyle = styles.selected;
         }
-        console.log("this.props.obj: ", this.props.obj);
+        //console.log("this.props.obj: ", this.props.obj);
         return (
             <TouchableHighlight onLongPress={() => this.allowSelect()} onPress={() => this.itemAction()}>
                 <View style={[styles.listItem, itemStyle]}>
@@ -169,9 +169,7 @@ export default class GameItem extends React.Component {
                     <View style={styles.thumbArea}>
                         {this.renderThumb(this.props.obj.image)}
                         <LinearGradient
-                            colors={['rgba(0,0,0,0.2)', 'rgba(0,0,0,0.8)']}
-                            useAngle
-                            angle={180}
+                            colors={['rgba(34,34,34,0.2)', 'rgba(34,34,34,1)']} start={{ x: 1, y: 0 }} end={{ x: 0, y: 0 }} 
                             style={styles.backgroundOverlay}
                         />
                     </View>
@@ -183,7 +181,6 @@ export default class GameItem extends React.Component {
 const styles = StyleSheet.create({
     listItem: {
         marginTop: 10,
-        paddingVertical: 15,
         flexDirection: 'row',
         justifyContent: "center",
         alignItems: "center",
@@ -198,11 +195,9 @@ const styles = StyleSheet.create({
         zIndex: 0
     },
     backgroundBanner: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
+        minHeight: 120,
+        width: '100%',
+        height: '100%',
         zIndex: 0
     },
     selected: {
@@ -224,16 +219,16 @@ const styles = StyleSheet.create({
         justifyContent: 'space-evenly'
     },
     filterButtonImg: {
-        marginHorizontal: 5
+        marginRight: 5
     },
     menuContent: {
-        width: Dimensions.get('window').width - 20,
         alignItems: 'flex-start',
         flexDirection: "row",
         flexWrap: "wrap",
         paddingVertical: 10
     },
     itemInfo: {
+        paddingVertical: 15,
         width: Dimensions.get('window').width - (Dimensions.get('window').width / 3),
         paddingHorizontal: 20,
     },
@@ -248,10 +243,10 @@ const styles = StyleSheet.create({
         fontFamily: 'SourceSansPro-SemiBold'
     },
     thumbArea: {
-        width: (Dimensions.get('window').width / 3),
+        width: Dimensions.get('window').width / 3,
+        height: '100%',
         flexDirection: 'row-reverse',
         alignItems: 'flex-start',
-        flex: 1
     },
     thumb: {
         width: 60,

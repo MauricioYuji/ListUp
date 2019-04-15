@@ -183,7 +183,7 @@ export default class ListScreen extends React.Component {
             };
 
             console.log("EDIT LIST");
-            console.log("obj: ", obj);
+            //console.log("obj: ", obj);
             var user = firebase.auth().currentUser;
             setData('userLists/' + user.uid + '/' + list.key, obj)
                 .then((resp) => {
@@ -294,7 +294,12 @@ export default class ListScreen extends React.Component {
         let list = this.state.games;
         let items = [];
         for (let i = 0; i < list.length; i++) {
-            items.push(<AddGameItem key={i} game={list[i]} callback={this.addGame.bind(this)} id={this.state.list.key} />);
+            var game = this.state.list.games.filter(p => p.key == list[i].key)[0];
+            var userconsoles = null;
+            if (game != undefined) {
+                userconsoles = game.userConsoles;
+            }
+            items.push(<AddGameItem key={i} game={list[i]} userConsoles={userconsoles} callback={this.addGame.bind(this)} id={this.state.list.key} />);
         }
         return items;
     }
@@ -317,6 +322,7 @@ export default class ListScreen extends React.Component {
                     <View style={styles.titleBox}>
                         <Text style={styles.labelTitle}>{this.state.list.title}</Text>
                         <Text style={styles.labelDetail}>{this.state.list.games.length} jogos - Lista {this.state.list.type}</Text>
+                        <Text style={styles.labelDescription}>{this.state.list.description}</Text>
                     </View>
 
                     {this.renderGamesList()}
@@ -444,7 +450,7 @@ export default class ListScreen extends React.Component {
                                 placeholder={"Descrição"}
                                 multiline={true}
                                 numberOfLines={4}
-                                value={this.state.list.description}
+                                value={this.state.list.description.toString()}
                                 style={[styles.inputsearch, styles.inputMulti, styles.inputText]}
                                 onChangeText={(text) => this._setText(text)}
                                 ref={input => { this.textInput = input }} />
@@ -531,6 +537,12 @@ const styles = {
         fontSize: 14,
         color: '#FFF',
         fontFamily: 'SourceSansPro-SemiBold'
+    },
+    labelDescription: {
+        fontSize: 16,
+        marginTop: 10,
+        color: '#FFF',
+        fontFamily: 'SourceSansPro-Regular'
     },
     thumbArea: {
         flexDirection: 'row-reverse',

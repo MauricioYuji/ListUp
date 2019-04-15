@@ -9,7 +9,8 @@ import {
     ScrollView,
     Image,
     TouchableWithoutFeedback,
-    DeviceEventEmitter
+    DeviceEventEmitter,
+    Keyboard
 } from 'react-native';
 import * as firebase from 'firebase';
 import TabBarIcon from '../UI/TabBarIcon';
@@ -28,11 +29,21 @@ export default class AddGameItem extends React.Component {
         selected: false,
         selectMode: false,
         showButtons: false,
+        addFeedback: false,
         consolesActive: []
     };
 
     componentDidMount() {
         var _self = this;
+        var item = this.props.userConsoles;
+        var array = [];
+        if (item != null) {
+            for (var i = 0; i < item.length; i++) {
+                array.push(item[i].key);
+            }
+            _self.setState({ consolesActive: array });
+        }
+
         DeviceEventEmitter.addListener('selectConsole', (data) => {
             if (data) {
                 _self.setState({ showButtons: true });
@@ -57,7 +68,7 @@ export default class AddGameItem extends React.Component {
     //}
     showButtons = () => {
         var _self = this;
-        console.log("SHOW CONSOLES");
+        Keyboard.dismiss();
         DeviceEventEmitter.emit('selectConsole', false);
         _self.setState({ showButtons: !this.state.showButtons },
             () => {
@@ -99,6 +110,7 @@ export default class AddGameItem extends React.Component {
     ActiveConsole(key, multiple) {
         var _self = this;
         var list = this.state.consolesActive;
+        console.log("list: ", list);
         let consoles = this.props.game.consoles;
         if (!multiple) {
             if (list.includes(key))
@@ -126,15 +138,19 @@ export default class AddGameItem extends React.Component {
     }
     sendGame = () => {
         var _self = this;
-        DeviceEventEmitter.emit('selectConsole', false);
-        
-        
-        addGamestoList(this.props.id, this.props.game.key, this.state.consolesActive).then((resp) => {
-            _self.props.callback();
+        _self.setState({ addFeedback: true }, () => {
+            setTimeout(function () {
+                _self.setState({ addFeedback: false }, () => {
+                    DeviceEventEmitter.emit('selectConsole', false);
+                    addGamestoList(_self.props.id, _self.props.game.key, _self.state.consolesActive).then((resp) => {
+                        _self.props.callback();
+                    });
+                });
+            }, 1000);
         });
     }
     renderThumb = (item) => {
-        
+
         if (item.key == "" || item.file == null)
             return (<Image source={require('../../assets/images/console-icon.png')} resizeMode={'cover'} style={styles.thumb} />);
         else {
@@ -145,7 +161,7 @@ export default class AddGameItem extends React.Component {
         let obj = [];
         let objarray = this.props.game.consoles;
         let filteractive = this.state.consolesActive;
-
+        console.log("filteractive: ", filteractive);
 
         for (let j = 0; j < objarray.length; j++) {
             if (objarray[j].keycompany === undefined) {
@@ -175,6 +191,19 @@ export default class AddGameItem extends React.Component {
         }
         return obj;
     }
+    renderAddButton = () => {
+        if (this.state.addFeedback) {
+            return (
+                <Text style={styles.buttonTextFeedback}>Adicionado com sucesso</Text>
+            );
+        } else {
+            return (
+                <TouchableHighlight onPress={() => this.sendGame()} style={styles.button}>
+                    <Text style={styles.buttonText}>Adicionar</Text>
+                </TouchableHighlight>
+            );
+        }
+    }
     renderConsoleBox = () => {
         if (this.state.showButtons) {
             return (
@@ -182,9 +211,7 @@ export default class AddGameItem extends React.Component {
                     <View style={styles.selectConsoles}>
                         {this.listPlatforms()}
                     </View>
-                    <TouchableHighlight onPress={() => this.sendGame()} style={styles.button}>
-                        <Text style={styles.buttonText}>Adicionar</Text>
-                    </TouchableHighlight>
+                    {this.renderAddButton()}
                 </View>
             );
         } else {
@@ -245,6 +272,17 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: 20,
         color: '#FFF',
+        fontFamily: 'SourceSansPro-Bold',
+    },
+    buttonTextFeedback: {
+        fontSize: 20,
+        color: '#FFF',
+        flex: 1,
+        marginVertical: 15,
+        flexDirection: 'row',
+        justifyContent: "center",
+        alignItems: "center",
+        textAlign: 'center',
         fontFamily: 'SourceSansPro-Bold',
     },
     selectConsoles: {
