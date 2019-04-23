@@ -55,7 +55,7 @@ export default class ListScreen extends React.Component {
             list: {
                 title: "",
                 games: [],
-                key: "",
+                status: "",
                 description: "",
                 type: "",
                 limit: ""
@@ -72,6 +72,9 @@ export default class ListScreen extends React.Component {
         var _self = this;
 
 
+        DeviceEventEmitter.addListener('selectMode', (data) => {
+            this.setState({ selectMode: data });
+        });
         //DeviceEventEmitter.addListener('refresh', (data) => {
         //    if (data) {
         //        _self.loadData();
@@ -165,7 +168,7 @@ export default class ListScreen extends React.Component {
     addList = () => {
         //console.log("ADD ITEM");
         var obj = this.state.list;
-        if (this.state.list.title == "" || this.state.list.type == "" || this.state.list.text == "" || this.state.list.limit == "") {
+        if (obj.title == "" || obj.type == "" || obj.status == "" || obj.description == "" || obj.limit == "") {
             this.setState({ modelInvalid: true });
         } else {
             DeviceEventEmitter.emit('reloading', true);
@@ -180,7 +183,7 @@ export default class ListScreen extends React.Component {
                         list: {
                             title: "",
                             games: [],
-                            key: "",
+                            status: "",
                             description: "",
                             type: "",
                             limit: ""
@@ -196,7 +199,7 @@ export default class ListScreen extends React.Component {
             list: {
                 title: "",
                 games: [],
-                key: "",
+                status: "",
                 description: "",
                 type: "",
                 limit: ""
@@ -223,6 +226,11 @@ export default class ListScreen extends React.Component {
         obj.type = value;
         this.setState({ list: obj });
     }
+    _setStatus(value) {
+        var obj = this.state.list;
+        obj.status = value;
+        this.setState({ list: obj });
+    }
     _setText(value) {
         var obj = this.state.list;
         obj.text = value;
@@ -236,13 +244,36 @@ export default class ListScreen extends React.Component {
         }
         return items;
     }
+    _headerItens() {
+        if (this.state.selectMode) {
+            return (<TouchableHighlight underlayColor="transparent" onPress={() => this.deleteItens()} style={styles.sideIcon}>
+                <TabBarIcon
+                    name={'trash-can-outline'}
+                    type={'MaterialCommunityIcons'}
+                    style={styles.backButton}
+                />
+            </TouchableHighlight>);
+        } else {
+            return (
+                <TouchableHighlight underlayColor="transparent" onPress={() => this.addItens()} style={styles.sideIcon}>
+                    <TabBarIcon
+                        name={'playlist-plus'}
+                        type={'MaterialCommunityIcons'}
+                        style={styles.backButton}
+                    />
+                </TouchableHighlight>
+            );
+        }
+    }
     render() {
         let pickerState = null;
+        let pickerStateStatus = null;
         if (this.state.list.type == "") {
             pickerState = styles.unselected;
         }
-        //console.log("pickerState: ", pickerState);
-
+        if (this.state.list.status == "") {
+            pickerStateStatus = styles.unselected;
+        }
         return (
             <View style={styles.container}>
                 <ScrollView>
@@ -251,7 +282,7 @@ export default class ListScreen extends React.Component {
                     </View>
                 </ScrollView>
 
-                <Header style={styles.header} type={"info-lists"} back={true} callbackDelete={this.deleteItens.bind(this)} callbackAdd={this.addItens.bind(this)} label={"Minhas Listas"} detail={this.state.lists.length + " listas"} />
+                <Header style={styles.header} type={"info-lists"} back={true} label={"Minhas Listas"} detail={this.state.lists.length + " listas"} itens={this._headerItens()} />
 
                 <Modal
                     animationType="slide"
@@ -305,18 +336,33 @@ export default class ListScreen extends React.Component {
                                 onChangeText={(text) => this._setTitle(text)}
                                 ref={input => { this.titleInput = input }}
                             />
-                            <View style={styles.inputSelect}>
-                                <Picker
-                                    selectedValue={this.state.list.type}
-                                    style={[styles.pickerStyle, pickerState]}
-                                    itemStyle={[styles.itempickerStyle]}
-                                    onValueChange={(itemValue, itemIndex) =>
-                                        this._setSelect(itemValue)
-                                    }>
-                                    <Picker.Item label="Selecione um tipo" value="" />
-                                    <Picker.Item label="Lista Padrão" value="padrao" />
-                                    <Picker.Item label="Ranking" value="ranking" />
-                                </Picker>
+                            <View style={styles.rowInput}>
+                                <View style={[styles.inputSelect, styles.SelectLeft]}>
+                                    <Picker
+                                        selectedValue={this.state.list.type}
+                                        style={[styles.pickerStyle, pickerState]}
+                                        itemStyle={[styles.itempickerStyle]}
+                                        onValueChange={(itemValue, itemIndex) =>
+                                            this._setSelect(itemValue)
+                                        }>
+                                        <Picker.Item label="Selecione um tipo" value="" />
+                                        <Picker.Item label="Lista Padrão" value="padrao" />
+                                        <Picker.Item label="Ranking" value="ranking" />
+                                    </Picker>
+                                </View>
+                                <View style={[styles.inputSelect, styles.SelectRight]}>
+                                    <Picker
+                                        selectedValue={this.state.list.status}
+                                        style={[styles.pickerStyle, pickerStateStatus]}
+                                        itemStyle={[styles.itempickerStyle]}
+                                        onValueChange={(itemValue, itemIndex) =>
+                                            this._setStatus(itemValue)
+                                        }>
+                                        <Picker.Item label="Selecione um status" value="" />
+                                        <Picker.Item label="Público" value="publico" />
+                                        <Picker.Item label="Privado" value="privado" />
+                                    </Picker>
+                                </View>
                             </View>
                             <TextInput
                                 placeholder={"Limite de jogos"}
@@ -360,6 +406,17 @@ const styles = {
     },
     menuList: {
         flex: 1,
+    },
+    sideIcon: {
+        padding: 5
+    },
+    backButton: {
+        fontSize: 40
+    },
+    rowInput: {
+        flexDirection: 'row',
+        justifyContent: "center",
+        alignItems: "center",
     },
     contentModal: {
         flex: 1,
@@ -457,7 +514,7 @@ const styles = {
     closeBox: {
         position: 'absolute',
         top: 10,
-        right: 10,
+        left: 10,
     },
     closeBoxIcon: {
         color: '#FFF',
@@ -489,13 +546,20 @@ const styles = {
     dangerButton: {
         backgroundColor: '#F00'
     },
+    SelectLeft: {
+        marginRight: 10
+    },
+    SelectRight: {
+        marginLeft: 10
+    },
     inputSelect: {
+        flex: 1,
         backgroundColor: '#444',
-        margin: 10,
+        marginVertical: 10,
+        paddingLeft: 15,
         padding: 0,
         borderRadius: 10,
-        minHeight: 50,
-        width: '100%'
+        maxHeight: 50,
     },
     inputsearch: {
         backgroundColor: '#444',
@@ -518,9 +582,9 @@ const styles = {
         color: '#FFF',
         width: '100%'
     },
+
     pickerStyle: {
-        backgroundColor: '#444',
-        margin: 10,
+        //backgroundColor: '#FFF',
         borderRadius: 10,
         color: '#FFF'
     },

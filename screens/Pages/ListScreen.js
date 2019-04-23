@@ -24,7 +24,7 @@ import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 import NavigationService from '../../components/services/NavigationService';
 import Layout from '../../constants/Layout';
 import { getData, setData, insertData } from '../../components/services/baseService';
-import { getListByKey, getGames, deleteGamesFromList, structureList, structureGames } from '../../components/services/Service';
+import { getListByKey, getGames, deleteGamesFromList, structureList, structureGames, deleteItemsFromList } from '../../components/services/Service';
 import GameItem from '../../components/UI/GameItem';
 import AddGameItem from '../../components/UI/AddGameItem';
 import ListItem from '../../components/UI/ListItem';
@@ -55,7 +55,15 @@ export default class ListScreen extends React.Component {
             list: {
                 title: "",
                 games: [],
-                key: "",
+                status: "",
+                description: "",
+                type: "",
+                limit: ""
+            },
+            listedit: {
+                title: "",
+                games: [],
+                status: "",
                 description: "",
                 type: "",
                 limit: ""
@@ -64,20 +72,25 @@ export default class ListScreen extends React.Component {
             selectedItens: [],
             modalVisible: false,
             modalVisibleEdit: false,
+            menu: false,
             mounted: false,
             inputTitle: "",
             inputSelect: "",
             inputText: "",
             inputLimit: "",
             modelInvalid: false,
-            key: ""
+            key: "",
+            modalActive: null,
+            selectMode: false
         };
     }
     componentDidMount() {
         var _self = this;
 
         DeviceEventEmitter.emit('reloading', true);
-
+        DeviceEventEmitter.addListener('selectMode', (data) => {
+            this.setState({ selectMode: data });
+        });
 
         const { navigation } = this.props;
         const key = navigation.getParam('key', 'NO-ID');
@@ -89,13 +102,23 @@ export default class ListScreen extends React.Component {
         this.setState({ mounted: false });
     }
 
-
-    setModalVisible(visible) {
-        this.setState({ modalVisible: visible });
+    setVisible(content) {
+        let _self = this;
+        _self.setState({ modalVisible: false },
+            () => {
+                _self.setState({ modalActive: content },
+                    () => {
+                        _self.setState({ modalVisible: true },
+                            () => {
+                            }
+                        );
+                    }
+                );
+            }
+        );
+        //this.setState({ modal: visible });
     }
-    setModalVisibleEdit(visible) {
-        this.setState({ modalVisibleEdit: visible });
-    }
+    
     loadData = (key) => {
         var _self = this;
         var user = firebase.auth().currentUser;
@@ -129,9 +152,9 @@ export default class ListScreen extends React.Component {
         if (!arrayobj.includes(id)) {
             arrayobj.push(id);
         }
-        this.setState({ selectedItens: arrayobj },
+        this.setState({ selectedItens: arrayobj, selectMode: true },
             () => {
-                DeviceEventEmitter.emit('selectMode', true);
+                //DeviceEventEmitter.emit('selectMode', true);
             }
         );
     }
@@ -141,34 +164,65 @@ export default class ListScreen extends React.Component {
         var list = this.state.list;
         DeviceEventEmitter.emit('reloading', true);
         deleteGamesFromList(this.state.selectedItens, list.key).then(() => {
-            _self.setState({ selectedItens: [], confirmDelete: false },
+            this.closeModal();
+            _self.setState({ selectedItens: [], selectMode: false },
                 () => {
-                    DeviceEventEmitter.emit('confirmDelete', true);
+                    //DeviceEventEmitter.emit('confirmDelete', true);
                     DeviceEventEmitter.emit('selectMode', false);
                 }
             );
         });
     }
-    deleteItens = () => {
+    confirmdeleteList = () => {
+
         var _self = this;
-        _self.setState({ confirmDelete: true },
-            () => {
-            }
-        );
+
+        DeviceEventEmitter.emit('reloading', true);
+        deleteItemsFromList([this.state.list.key]).then(() => {
+            _self.setState({  modalVisible: false },
+                () => {
+                    NavigationService.navigate("Lists");
+                    //DeviceEventEmitter.emit('confirmDelete', true);
+                    //DeviceEventEmitter.emit('selectMode', false);
+                    //this.loadData();
+                }
+            );
+        });
+    }
+    deleteItens = () => {
+        this.setVisible(this._modalDeleteGame());
+    }
+    showDropdown = () => {
+        this.setVisible(this._modalMenu());
     }
     addItens = () => {
-        console.log("ADD");
-        this.setModalVisible(!this.state.modalVisible);
+        let _self = this;
+        this.setVisible(this._modalAdd());
+
+    }
+    editGames = () => {
+        let _self = this;
+        this.setVisible(this._modalEditGames());
+
+    }
+    deleteList = () => {
+        let _self = this;
+        this.setVisible(this._modalDeleteList());
+
     }
     editItens = () => {
-        console.log("EDIT");
-        this.setModalVisibleEdit(!this.state.modalVisibleEdit);
+        let _self = this;
+        this.setState({ listedit: this.state.list },
+            () => {
+                _self.setVisible(this._modalEditList());
+            }
+        );
 
     }
     editList = () => {
         console.log("SEND EDIT");
-        var list = this.state.list;
-        if (this.state.list.title == "" || this.state.list.type == "" || this.state.list.text == "" || this.state.list.limit == "") {
+        var list = this.state.listedit;
+        if (list.title == "" || list.type == "" || list.status == "" || list.description == "" || list.limit == "") {
             this.setState({ modelInvalid: true });
         } else {
             this.setState({ modelInvalid: false });
@@ -179,6 +233,7 @@ export default class ListScreen extends React.Component {
                 title: list.title,
                 description: list.description,
                 type: list.type,
+                status: list.status,
                 limit: list.limit
             };
 
@@ -198,10 +253,7 @@ export default class ListScreen extends React.Component {
         console.log("ADD GAME");
     }
     closeModal = () => {
-        this.setState({ games: [], modalVisible: false, modalVisibleEdit: false });
-    }
-    closeConfirm = () => {
-        this.setState({ confirmDelete: false });
+        this.setState({ games: [], modalVisible: false });
     }
     _setTitle(value) {
         var obj = this.state.list;
@@ -218,6 +270,11 @@ export default class ListScreen extends React.Component {
         obj.type = value;
         this.setState({ list: obj });
     }
+    _setStatus(value) {
+        var obj = this.state.list;
+        obj.status = value;
+        this.setState({ list: obj });
+    }
     _setText(value) {
         var obj = this.state.list;
         obj.description = value;
@@ -225,7 +282,7 @@ export default class ListScreen extends React.Component {
     }
 
     _searchGame(search) {
-        //console.log("Search: ", search);
+        console.log("Search: ", search);
         var _self = this;
         if (search == "") {
             _self.setState({ games: [] },
@@ -255,42 +312,24 @@ export default class ListScreen extends React.Component {
                     }
                 }
 
-
                 structureGames(obj).then(games => {
                     _self.setState({ games: games, searching: false },
                         () => {
+                            _self.setState({ modalActive: _self._modalAdd() },
+                                () => {
+                                }
+                            );
                         }
                     );
                     return true;
                 }).catch(err => console.log('There was an error:' + err));
             });
-            
+
 
         }
     }
-    //renderLists() {
-    //    let lists = this.state.list.games;
-    //    let items = [];
-    //    for (let i = 0; i < lists.length; i++) {
-    //        //items.push(<ListItem key={i} label={"GAME"} games={lists[i].games} callback={this.selectItem.bind(this)} id={lists[i].key} />);
-    //    }
-    //    return items;
-
-    //}
-
-
-    //getImages = async (obj) => {
-    //    for (let i = 0; i < obj.length; i++) {
-    //        await getData('thumbs/' + obj[i].image.key)
-    //            .then((img) => {
-    //                obj[i].image.file = img.file;
-    //                obj[i].image.url = img.url;
-    //            });
-    //    }
-
-    //    this.setState({ games: this.state.games });
-    //}
     renderGames() {
+        console.log("RENDER GAMES");
         let list = this.state.games;
         let items = [];
         for (let i = 0; i < list.length; i++) {
@@ -307,60 +346,206 @@ export default class ListScreen extends React.Component {
         let list = this.state.list.games;
         let items = [];
         for (let i = 0; i < list.length; i++) {
-            items.push(<GameItem key={i} obj={list[i]} callback={this.selectItem.bind(this)} />);
+            items.push(<GameItem key={i} pos={i + 1} ranking={this.state.list.type == "ranking"} obj={list[i]} callback={this.selectItem.bind(this)} />);
         }
         return items;
     }
-    render() {
+    _headerItens() {
+        if (this.state.selectMode) {
+            return (<TouchableHighlight underlayColor="transparent" onPress={() => this.deleteItens()} style={styles.sideIcon}>
+                <TabBarIcon
+                    name={'trash-can-outline'}
+                    type={'MaterialCommunityIcons'}
+                    style={styles.backButton}
+                />
+            </TouchableHighlight>);
+        } else {
+            return (
+                <TouchableHighlight underlayColor="transparent" onPress={() => this.showDropdown()} style={styles.sideIcon}>
+                    <TabBarIcon
+                        name={'more-vert'}
+                        type={'MaterialIcons'}
+                        style={styles.backButton}
+                    />
+                </TouchableHighlight>
+            );
+        }
+    }
+    _modalAdd() {
+        return (
+            <View style={styles.menuList}>
+                <View style={styles.scrollBox}>
+                    <Text style={styles.menuTitle}>-ADICIONAR JOGO-</Text>
+                    <TextInput
+                        placeholder={"Nome"}
+                        style={[styles.inputsearch, styles.inputText]}
+                        onChangeText={(text) => this._searchGame(text)}
+                        ref={input => { this.titleInput = input }}
+                    />
+                </View>
+
+                <ScrollView keyboardShouldPersistTaps="always" style={styles.gamebox}>
+                    {(this.state.games.length == 0) ? (
+                        <Text style={styles.TextclearList}>Procure pelo nome o jogo que gostaria de adicionar</Text>
+                    ) : (
+                            <View>
+                                {this.renderGames()}
+                            </View>
+                        )
+                    }
+
+                </ScrollView>
+            </View>
+        );
+    }
+    _modalEditList() {
         let pickerState = null;
+        let pickerStateStatus = null;
         if (this.state.list.type == "") {
             pickerState = styles.unselected;
         }
+        if (this.state.list.status == "") {
+            pickerStateStatus = styles.unselected;
+        }
         return (
+            <View style={styles.listBox}>
+                <Text style={styles.menuTitle}>-CRIAR LISTA-</Text>
+                {this.state.modelInvalid &&
+                    <Text style={styles.erroText}>Preencha todos os campos.</Text>
+                }
+                <TextInput
+                    placeholder={"Nome"}
+                    value={this.state.list.title}
+                    style={[styles.inputsearch, styles.inputText]}
+                    onChangeText={(text) => this._setTitle(text)}
+                    ref={input => { this.titleInput = input }}
+                />
+                <View style={styles.rowInput}>
+                    <View style={[styles.inputSelect, styles.SelectLeft]}>
+                        <Picker
+                            selectedValue={this.state.list.type}
+                            style={[styles.pickerStyle, pickerState]}
+                            itemStyle={[styles.itempickerStyle]}
+                            onValueChange={(itemValue, itemIndex) =>
+                                this._setSelect(itemValue)
+                            }>
+                            <Picker.Item label="Selecione um tipo" value="" />
+                            <Picker.Item label="Lista Padrão" value="padrao" />
+                            <Picker.Item label="Ranking" value="ranking" />
+                        </Picker>
+                    </View>
+                    <View style={[styles.inputSelect, styles.SelectRight]}>
+                        <Picker
+                            selectedValue={this.state.list.status}
+                            style={[styles.pickerStyle, pickerStateStatus]}
+                            itemStyle={[styles.itempickerStyle]}
+                            onValueChange={(itemValue, itemIndex) =>
+                                this._setStatus(itemValue)
+                            }>
+                            <Picker.Item label="Selecione um status" value="" />
+                            <Picker.Item label="Público" value="publico" />
+                            <Picker.Item label="Privado" value="privado" />
+                        </Picker>
+                    </View>
+                </View>
+                <TextInput
+                    placeholder={"Limite de jogos"}
+                    keyboardType='numeric'
+                    maxLength={10}
+                    value={this.state.list.limit}
+                    style={[styles.inputsearch, styles.inputText]}
+                    onChangeText={(text) => this._setLimit(text)}
+                    ref={input => { this.limitInput = input }}
+                />
+                <TextInput
+                    placeholder={"Descrição"}
+                    multiline={true}
+                    numberOfLines={4}
+                    value={this.state.list.description.toString()}
+                    style={[styles.inputsearch, styles.inputMulti, styles.inputText]}
+                    onChangeText={(text) => this._setText(text)}
+                    ref={input => { this.textInput = input }} />
+                <View style={styles.buttonBox}>
+                    <TouchableHighlight style={styles.addItem} underlayColor="transparent" onPress={() => this.editList()}>
+                        <Text style={styles.addItemText}>Criar Lista</Text>
+                    </TouchableHighlight>
+                </View>
+            </View>
+        );
+    }
+    _modalDeleteGame() {
+        return (
+            <View>
+                <Text style={styles.addItemText}>DESEJA EXCLUIR?</Text>
+                <View style={styles.buttonBox}>
+                    <TouchableHighlight underlayColor="transparent" onPress={() => this.confirmdeleteItens()}>
+                        <View style={[styles.addItem, styles.dangerButton]}>
+                            <Text style={[styles.addItemText]}>Deletar</Text>
+                        </View>
+                    </TouchableHighlight>
+                    <TouchableHighlight underlayColor="transparent" onPress={() => this.closeModal()}>
+                        <View style={styles.addItem}>
+                            <Text style={styles.addItemText}>Cancelar</Text>
+                        </View>
+                    </TouchableHighlight>
+                </View>
+            </View>
+        );
+    }
+    _modalDeleteList() {
+        return (
+            <View>
+                <Text style={styles.addItemText}>DESEJA EXCLUIR A LISTA?</Text>
+                <View style={styles.buttonBox}>
+                    <TouchableHighlight underlayColor="transparent" onPress={() => this.confirmdeleteList()}>
+                        <View style={[styles.addItem, styles.dangerButton]}>
+                            <Text style={[styles.addItemText]}>Deletar</Text>
+                        </View>
+                    </TouchableHighlight>
+                    <TouchableHighlight underlayColor="transparent" onPress={() => this.closeModal()}>
+                        <View style={styles.addItem}>
+                            <Text style={styles.addItemText}>Cancelar</Text>
+                        </View>
+                    </TouchableHighlight>
+                </View>
+            </View>
+        );
+    }
+    _modalEditGames() {
+        return null;
+    }
+    _modalMenu() {
+        return (
+            <View style={styles.dropdownMenu}>
+                <TouchableHighlight underlayColor="transparent" onPress={() => this.addItens()}>
+                    <Text style={styles.menuText}>Adicionar jogo</Text>
+                </TouchableHighlight>
+                <TouchableHighlight underlayColor="transparent" onPress={() => this.editItens()}>
+                    <Text style={styles.menuText}>Editar lista</Text>
+                </TouchableHighlight>
+                <TouchableHighlight underlayColor="transparent" onPress={() => this.editGames()}>
+                    <Text style={styles.menuText}>Editar games</Text>
+                </TouchableHighlight>
+                <TouchableHighlight underlayColor="transparent" onPress={() => this.deleteList()}>
+                    <Text style={styles.menuText}>Excluir lista</Text>
+                </TouchableHighlight>
+            </View>
+        );
+    }
+    render() {
+        return (
+
             <View style={styles.container}>
                 <ScrollView style={styles.scrollArea}>
                     <View style={styles.titleBox}>
                         <Text style={styles.labelTitle}>{this.state.list.title}</Text>
-                        <Text style={styles.labelDetail}>{this.state.list.games.length} jogos - Lista {this.state.list.type}</Text>
                         <Text style={styles.labelDescription}>{this.state.list.description}</Text>
                     </View>
 
                     {this.renderGamesList()}
                 </ScrollView>
 
-                <Header style={styles.header} type={"info-list"} back={true} callbackDelete={this.deleteItens.bind(this)} callbackAdd={this.addItens.bind(this)} callbackEdit={this.editItens.bind(this)} label={"Lista"} detail={""} />
-
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={this.state.mounted && this.state.confirmDelete}
-                    onRequestClose={() => {
-                        this.setState({ confirmDelete: false });
-                    }}>
-
-                    <View style={styles.backgroundModal}>
-                        <Text style={styles.addItemText}>DESEJA EXCLUIR?</Text>
-                        <View style={styles.buttonBox}>
-                            <TouchableHighlight underlayColor="transparent" onPress={() => this.confirmdeleteItens()}>
-                                <View style={[styles.addItem, styles.dangerButton]}>
-                                    <Text style={[styles.addItemText]}>Deletar</Text>
-                                </View>
-                            </TouchableHighlight>
-                            <TouchableHighlight underlayColor="transparent" onPress={() => this.closeConfirm()}>
-                                <View style={styles.addItem}>
-                                    <Text style={styles.addItemText}>Cancelar</Text>
-                                </View>
-                            </TouchableHighlight>
-                        </View>
-                        <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.closeConfirm()}>
-                            <TabBarIcon
-                                name={'close'}
-                                type={'MaterialIcons'}
-                                style={styles.closeBoxIcon}
-                            />
-                        </TouchableHighlight>
-                    </View>
-                </Modal>
+                <Header style={styles.header} type={"info-list"} back={true} label={"Lista"} detail={this.state.list.games.length + " jogos"} itens={this._headerItens()} />
 
                 <Modal
                     animationType="slide"
@@ -370,29 +555,8 @@ export default class ListScreen extends React.Component {
                         this.setState({ modalVisible: false });
                     }}>
                     <View style={styles.backgroundModal}>
-                        <View style={styles.menuList}>
-                            <View style={styles.scrollBox}>
-                                <Text style={styles.menuTitle}>-ADICIONAR JOGO-</Text>
-                                <TextInput
-                                    placeholder={"Nome"}
-                                    style={[styles.inputsearch, styles.inputText]}
-                                    onChangeText={(text) => this._searchGame(text)}
-                                    ref={input => { this.titleInput = input }}
-                                />
-                            </View>
+                        {this.state.modalActive}
 
-                            <ScrollView keyboardShouldPersistTaps="always" style={styles.gamebox}>
-                                {(this.state.games.length == 0) ? (
-                                    <Text style={styles.TextclearList}>Procure pelo nome o jogo que gostaria de adicionar</Text>
-                                ) : (
-                                        <View>
-                                            {this.renderGames()}
-                                        </View>
-                                    )
-                                }
-
-                            </ScrollView>
-                        </View>
                         <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.closeModal()}>
                             <TabBarIcon
                                 name={'close'}
@@ -403,77 +567,30 @@ export default class ListScreen extends React.Component {
                     </View>
                 </Modal>
 
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={this.state.mounted && this.state.modalVisibleEdit}
-                    onRequestClose={() => {
-                        this.setState({ modalVisibleEdit: false });
-                    }}>
-                    <View style={styles.backgroundModal}>
 
-                        <View style={styles.listBox}>
-                            <Text style={styles.menuTitle}>-CRIAR LISTA-</Text>
-                            {this.state.modelInvalid &&
-                                <Text style={styles.erroText}>Preencha todos os campos.</Text>
-                            }
-                            <TextInput
-                                placeholder={"Nome"}
-                                value={this.state.list.title}
-                                style={[styles.inputsearch, styles.inputText]}
-                                onChangeText={(text) => this._setTitle(text)}
-                                ref={input => { this.titleInput = input }}
-                            />
-                            <View style={styles.inputSelect}>
-                                <Picker
-                                    selectedValue={this.state.list.type}
-                                    style={[styles.pickerStyle, pickerState]}
-                                    itemStyle={[styles.itempickerStyle]}
-                                    onValueChange={(itemValue, itemIndex) =>
-                                        this._setSelect(itemValue)
-                                    }>
-                                    <Picker.Item label="Selecione um tipo" value="" />
-                                    <Picker.Item label="Lista Padrão" value="padrao" />
-                                    <Picker.Item label="Ranking" value="ranking" />
-                                </Picker>
-                            </View>
-                            <TextInput
-                                placeholder={"Limite de jogos"}
-                                keyboardType='numeric'
-                                maxLength={10}
-                                value={this.state.list.limit}
-                                style={[styles.inputsearch, styles.inputText]}
-                                onChangeText={(text) => this._setLimit(text)}
-                                ref={input => { this.limitInput = input }}
-                            />
-                            <TextInput
-                                placeholder={"Descrição"}
-                                multiline={true}
-                                numberOfLines={4}
-                                value={this.state.list.description.toString()}
-                                style={[styles.inputsearch, styles.inputMulti, styles.inputText]}
-                                onChangeText={(text) => this._setText(text)}
-                                ref={input => { this.textInput = input }} />
-                            <View style={styles.buttonBox}>
-                                <TouchableHighlight style={styles.addItem} underlayColor="transparent" onPress={() => this.editList()}>
-                                    <Text style={styles.addItemText}>Criar Lista</Text>
-                                </TouchableHighlight>
-                            </View>
-                        </View>
-                        <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.closeModal()}>
-                            <TabBarIcon
-                                name={'close'}
-                                type={'MaterialIcons'}
-                                style={styles.closeBoxIcon}
-                            />
-                        </TouchableHighlight>
-                    </View>
-                </Modal>
             </View>
         );
     }
 }
 const styles = {
+    dropdownMenu: {
+        backgroundColor: "#FFF",
+        borderRadius: 10,
+        alignSelf: 'center',
+        textAlign: 'center',
+        width: Dimensions.get('window').width / 2,
+        //height: Dimensions.get('window').height / 3,
+        padding: 15,
+        marginTop: 20
+    },
+    menuText: {
+        color: '#333',
+        fontSize: 20,
+        textAlign: 'center',
+        flexWrap: "nowrap",
+        marginVertical: 5,
+        fontFamily: 'SourceSansPro-Regular'
+    },
     container: {
         flex: 1,
         paddingBottom: 50,
@@ -483,6 +600,17 @@ const styles = {
         color: "#F00",
         fontSize: 24,
         fontFamily: 'SourceSansPro-SemiBold'
+    },
+    sideIcon: {
+        padding: 5
+    },
+    backButton: {
+        fontSize: 40
+    },
+    rowInput: {
+        flexDirection: 'row',
+        justifyContent: "center",
+        alignItems: "center",
     },
     backgroundModal: {
         backgroundColor: 'rgba(0, 0, 0, 0.9)',
@@ -524,22 +652,31 @@ const styles = {
         flex: 1,
         padding: 15,
         marginBottom: 15,
-        backgroundColor: "#333",
-        borderTopColor: "#006CD8",
-        borderTopWidth: 4
+        backgroundColor: "#006CD8",
+        //borderTopColor: "#006CD8",
+        //borderTopWidth: 4
     },
     labelTitle: {
-        fontSize: 24,
+        fontSize: 34,
         color: '#FFF',
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
         fontFamily: 'SourceSansPro-SemiBold'
     },
     labelDetail: {
         fontSize: 14,
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
         color: '#FFF',
         fontFamily: 'SourceSansPro-SemiBold'
     },
     labelDescription: {
         fontSize: 16,
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
         marginTop: 10,
         color: '#FFF',
         fontFamily: 'SourceSansPro-Regular'
@@ -593,7 +730,7 @@ const styles = {
     closeBox: {
         position: 'absolute',
         top: 10,
-        right: 10,
+        left: 10,
     },
     closeBoxIcon: {
         color: '#FFF',
@@ -625,13 +762,20 @@ const styles = {
     dangerButton: {
         backgroundColor: '#F00'
     },
+    SelectLeft: {
+        marginRight: 10
+    },
+    SelectRight: {
+        marginLeft: 10
+    },
     inputSelect: {
+        flex: 1,
         backgroundColor: '#444',
-        margin: 10,
+        marginVertical: 10,
+        paddingLeft: 15,
         padding: 0,
         borderRadius: 10,
-        minHeight: 50,
-        width: '100%'
+        maxHeight: 50,
     },
     gamebox: {
         padding: 0,
@@ -661,8 +805,7 @@ const styles = {
         width: '100%'
     },
     pickerStyle: {
-        backgroundColor: '#444',
-        margin: 10,
+        //backgroundColor: '#444',
         borderRadius: 10,
         color: '#FFF'
     },

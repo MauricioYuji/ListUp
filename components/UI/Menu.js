@@ -148,7 +148,7 @@ class Menu extends Component {
                             <View style={styles.menuContent}>
 
                                 <ScrollView style={styles.menuGrid} horizontal={true} showsHorizontalScrollIndicator={false}>
-                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Lists')}>
+                                    <TouchableHighlight style={styles.menuItem} underlayColor="transparent" onPress={() => this.changePage('Test')}>
                                         <View>
                                             <TabBarIcon
                                                 size={26}

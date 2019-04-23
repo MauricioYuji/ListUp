@@ -13,6 +13,7 @@ import GameDetailScreen from '../screens/Pages/GameDetailScreen';
 import ListScreen from '../screens/Pages/ListScreen';
 import ListsScreen from '../screens/Pages/ListsScreen';
 import ProfileScreen from '../screens/Pages/ProfileScreen';
+import TestScreen from '../screens/Pages/TestScreen';
 const transitionConfig = () => {
     return {
         transitionSpec: {
@@ -60,7 +61,8 @@ const GamesStack = createStackNavigator({
     Games: GamesScreen,
     GameDetail: GameDetailScreen,
     Lists: ListsScreen,
-    List: ListScreen
+    List: ListScreen,
+    Test: TestScreen
 },
     {
         headerMode: 'none',

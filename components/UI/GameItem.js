@@ -40,11 +40,7 @@ export default class GameItem extends React.Component {
         DeviceEventEmitter.emit('reloading', true);
         //this.loadData(this.props.id);
         DeviceEventEmitter.addListener('selectMode', (data) => {
-            if (data) {
-                _self.setState({ selectMode: true });
-            } else {
-                _self.setState({ selected: false, selectMode: false });
-            }
+            _self.setState({ selected: data, selectMode: data });
         });
     }
     //loadData = (key) => {
@@ -148,15 +144,26 @@ export default class GameItem extends React.Component {
 
     //    this.setState({ games: this.props.obj });
     //}
+    _renderRanking() {
+        if (this.props.ranking) {
+            return (
+                <View style={styles.itemRanking}>
+                    <Text style={styles.itemRankingText}>{this.props.pos}</Text>
+                </View>
+            );
+        } else {
+            return null;
+        }
+    }
     render() {
         let itemStyle = null;
         if (this.state.selected) {
             itemStyle = styles.selected;
         }
-        //console.log("this.props.obj: ", this.props.obj);
         return (
             <TouchableHighlight onLongPress={() => this.allowSelect()} onPress={() => this.itemAction()}>
                 <View style={[styles.listItem, itemStyle]}>
+                    {this._renderRanking()}
                     <View style={styles.itemInfo}>
                         <Text style={styles.labelTitle}>{this.props.obj.name}</Text>
                         <View style={styles.menuContent} horizontal={true}>
@@ -169,7 +176,7 @@ export default class GameItem extends React.Component {
                     <View style={styles.thumbArea}>
                         {this.renderThumb(this.props.obj.image)}
                         <LinearGradient
-                            colors={['rgba(34,34,34,0.2)', 'rgba(34,34,34,1)']} start={{ x: 1, y: 0 }} end={{ x: 0, y: 0 }} 
+                            colors={['rgba(34,34,34,0.2)', 'rgba(34,34,34,1)']} start={{ x: 1, y: 0 }} end={{ x: 0, y: 0 }}
                             style={styles.backgroundOverlay}
                         />
                     </View>
@@ -227,10 +234,26 @@ const styles = StyleSheet.create({
         flexWrap: "wrap",
         paddingVertical: 10
     },
+    itemRanking: {
+        width: 40,
+        alignSelf: 'flex-start',
+        alignItems: 'center',
+        justifyContent: 'space-evenly',
+        borderBottomRightRadius: 5,
+        borderTopRightRadius: 5,
+        marginTop: 20,
+        backgroundColor: '#006CD8'
+    },
+    itemRankingText: {
+        color: '#FFF',
+        fontSize: 20,
+        textAlign: 'center',
+        fontFamily: 'SourceSansPro-Black'
+    },
     itemInfo: {
         paddingVertical: 15,
-        width: Dimensions.get('window').width - (Dimensions.get('window').width / 3),
-        paddingHorizontal: 20,
+        width: Dimensions.get('window').width - (Dimensions.get('window').width / 3) - 40,
+        paddingHorizontal: 10,
     },
     labelTitle: {
         fontSize: 24,

@@ -421,7 +421,7 @@ export default class Header extends React.Component {
                     </View>
                 </Animated.View>
             );
-        } else if (this.props.type == "info-lists") {
+        } else{
             return (
                 <View style={[styles.searchbar]}>
                     <View style={[styles.flexGroupMax, styles.flexLeft]}>
@@ -449,87 +449,11 @@ export default class Header extends React.Component {
                     </View>
                     <View style={[styles.flexGroupMax, styles.flexRight]}>
 
-                        {this.state.selectMode ?
-                            (<TouchableHighlight underlayColor="transparent" onPress={() => this.deleteElements()} style={styles.sideIcon}>
-                                <TabBarIcon
-                                    name={'trash-can-outline'}
-                                    type={'MaterialCommunityIcons'}
-                                    style={styles.backButton}
-                                />
-                            </TouchableHighlight>) :
-                            (<TouchableHighlight underlayColor="transparent" onPress={() => this.addElements()} style={styles.sideIcon}>
-                                <TabBarIcon
-                                    name={'playlist-plus'}
-                                    type={'MaterialCommunityIcons'}
-                                    style={styles.backButton}
-                                />
-                            </TouchableHighlight>)
-                        }
+                        {this.props.itens}
 
                     </View>
                 </View>
             );
-        } else if (this.props.type == "info-list") {
-            return (
-                <View style={[styles.searchbar]}>
-                    <View style={[styles.flexGroupMax, styles.flexLeft]}>
-                        {this.props.back && !this.state.selectMode ?
-                            (<TouchableHighlight underlayColor="transparent" onPress={() => NavigationService.goback()} style={styles.sideIcon}>
-                                <TabBarIcon
-                                    name={'ios-arrow-back'}
-                                    type={'Ionicons'}
-                                    style={styles.backButton}
-                                />
-                            </TouchableHighlight>) :
-                            (<TouchableHighlight underlayColor="transparent" onPress={() => this.cancelDelete()} style={styles.sideIcon}>
-                                <TabBarIcon
-                                    name={'close'}
-                                    type={'MaterialCommunityIcons'}
-                                    style={styles.backButton}
-                                />
-                            </TouchableHighlight>
-                            )
-                        }
-                    </View>
-                    <View style={[styles.flexGroupMax, styles.labelArea]}>
-                        <Text style={styles.labelTitle}>{this.props.label}</Text>
-                        <Text style={styles.labelDetail}>{this.props.detail}</Text>
-                    </View>
-
-                    {this.state.selectMode ?
-                        (
-                            <View style={[styles.flexGroupMax, styles.flexRight]}>
-                                <TouchableHighlight underlayColor="transparent" onPress={() => this.deleteElements()} style={styles.sideIcon}>
-                                    <TabBarIcon
-                                        name={'trash-can-outline'}
-                                        type={'MaterialCommunityIcons'}
-                                        style={styles.backButton}
-                                    />
-                                </TouchableHighlight>
-                            </View>
-                        ) : (
-                            <View style={[styles.flexGroupMax, styles.flexRight]}>
-                                <TouchableHighlight underlayColor="transparent" onPress={() => this.editElements()} style={styles.sideIcon}>
-                                    <TabBarIcon
-                                        name={'edit'}
-                                        type={'MaterialIcons'}
-                                        style={styles.backButton}
-                                    />
-                                </TouchableHighlight>
-                                <TouchableHighlight underlayColor="transparent" onPress={() => this.addElements()} style={styles.sideIcon}>
-                                    <TabBarIcon
-                                        name={'library-plus'}
-                                        type={'MaterialCommunityIcons'}
-                                        style={styles.backButton}
-                                    />
-                                </TouchableHighlight>
-                            </View>
-                        )
-                    }
-                </View>
-            );
-        } else {
-            return null;
         }
     }
 
@@ -586,7 +510,7 @@ const styles = StyleSheet.create({
         right: 0,
         width: '100%',
         height: 60,
-        overflow: 'hidden',
+        //overflow: 'hidden',
         //backgroundColor: 'rgba(255, 255, 255, 0.0)',
         backgroundColor: '#333',
         flexDirection: 'row',

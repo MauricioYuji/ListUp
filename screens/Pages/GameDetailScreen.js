@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     closeBox: {
         position: 'absolute',
         top: 10,
-        right: 10,
+        left: 10,
     },
     closeBoxIcon: {
         color: '#FFF',
