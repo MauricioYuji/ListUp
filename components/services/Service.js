@@ -173,20 +173,24 @@ export const structureList = async (obj) => {
         var keys = [];
         for (var list in obj) {
             for (let key in obj[list].games) {
-                if (!keys.includes(key))
-                    keys.push(key);
+                var objkey = Object.keys(obj[list].games[key])[0];
+                if (!keys.includes(objkey))
+                    keys.push(objkey);
             }
         }
         getGame(keys).then((game) => {
             var imgkeys = [];
             for (var list in obj) {
                 var games = [];
-                for (var key in obj[list].games) {
+                for (var index in obj[list].games) {
+                    let key = Object.keys(obj[list].games[index])[0];
+                    console.log("key: ", key);
                     var item = game[key];
+                    console.log("item: ", item);
                     if (!imgkeys.includes(item.image.key) && item.image.key != "") {
                         imgkeys.push(item.image.key);
                     }
-                    var userconsoles = obj[list].games[key];
+                    var userconsoles = obj[list].games[index];
                     for (var i = 0; i < userconsoles.length; i++) {
                         userconsoles[i] = objlist.Consoles[userconsoles[i]];
                     }
@@ -422,17 +426,21 @@ export const addGamestoList = async (keylist, keygame, obj) => {
     console.log("keylist: ", keylist);
     console.log("keygame: ", keygame);
     console.log("obj: ", obj);
-    getData('/userLists/' + user.uid + '/' + keylist + '/games/' + keygame).then((res) => {
-        if (obj.length > 0) {
-            console.log("EDIT");
-            setData('/userLists/' + user.uid + '/' + keylist + '/games/' + keygame, obj).then((res) => {
-            });
-        } else {
-            console.log("INSERT");
-            obj = {};
-            obj[keygame] = "";
-            setData('/userLists/' + user.uid + '/' + keylist + '/games/', obj).then((res) => {
-            });
-        }
-    });
+
+    //insertData('/userLists/' + user.uid + '/' + keylist + '/games/' + keygame, obj).then((res) => {
+    //});
+   
+    //getData('/userLists/' + user.uid + '/' + keylist + '/games/' + keygame).then((res) => {
+    //    if (obj.length > 0) {
+    //        console.log("EDIT");
+    //        setData('/userLists/' + user.uid + '/' + keylist + '/games/' + keygame, obj).then((res) => {
+    //        });
+    //    } else {
+    //        console.log("INSERT");
+    //        obj = {};
+    //        obj[keygame] = "";
+    //        setData('/userLists/' + user.uid + '/' + keylist + '/games/', obj).then((res) => {
+    //        });
+    //    }
+    //});
 };

@@ -110,7 +110,7 @@ export default class AddGameItem extends React.Component {
     ActiveConsole(key, multiple) {
         var _self = this;
         var list = this.state.consolesActive;
-        console.log("list: ", list);
+        //console.log("list: ", list);
         let consoles = this.props.game.consoles;
         if (!multiple) {
             if (list.includes(key))
@@ -161,7 +161,7 @@ export default class AddGameItem extends React.Component {
         let obj = [];
         let objarray = this.props.game.consoles;
         let filteractive = this.state.consolesActive;
-        console.log("filteractive: ", filteractive);
+        //console.log("filteractive: ", filteractive);
 
         for (let j = 0; j < objarray.length; j++) {
             if (objarray[j].keycompany === undefined) {

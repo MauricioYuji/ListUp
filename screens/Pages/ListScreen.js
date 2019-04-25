@@ -219,7 +219,7 @@ export default class ListScreen extends React.Component {
     }
     editItens = () => {
         let _self = this;
-        this.setState({ listedit: this.state.list },
+        this.setState({ listedit: Object.assign({}, this.state.list) },
             () => {
                 _self.setVisible(_self._modalEditList());
             }
@@ -249,7 +249,7 @@ export default class ListScreen extends React.Component {
             var user = firebase.auth().currentUser;
             setData('userLists/' + user.uid + '/' + list.key, obj)
                 .then((resp) => {
-                    _self.setModalVisibleEdit(false);
+                    _self.setState({ modalVisible: false });
                     _self.loadData("");
                     console.log("resp: ", resp);
                     console.log("=============================");
@@ -265,27 +265,27 @@ export default class ListScreen extends React.Component {
     _setTitle(value) {
         var obj = this.state.listedit;
         obj.title = value;
-        this.setState({ listedit: obj });
+        this.setState({ listedit: obj, modalActive: this._modalEditList() });
     }
     _setLimit(value) {
         var obj = this.state.listedit;
         obj.limit = value;
-        this.setState({ listedit: obj });
+        this.setState({ listedit: obj, modalActive: this._modalEditList() });
     }
     _setSelect(value) {
         var obj = this.state.listedit;
         obj.type = value;
-        this.setState({ listedit: obj });
+        this.setState({ listedit: obj, modalActive: this._modalEditList() });
     }
     _setStatus(value) {
         var obj = this.state.listedit;
         obj.status = value;
-        this.setState({ listedit: obj });
+        this.setState({ listedit: obj, modalActive: this._modalEditList() });
     }
     _setText(value) {
         var obj = this.state.listedit;
         obj.description = value;
-        this.setState({ listedit: obj });
+        this.setState({ listedit: obj, modalActive: this._modalEditList() });
     }
 
     _searchGame(search) {
@@ -336,18 +336,40 @@ export default class ListScreen extends React.Component {
         }
     }
     saveGameEdit() {
-        var obj = this.state.list;
-        obj.games = this.state.listgames;
-        this.setState({ list: obj },
+        var list = this.state.list;
+        list.games = this.state.listgames;
+        //for (let i = 0; i < this.state.list.games.length; i++) {
+        //    console.log("name: ", this.state.list.games[i].name);
+        //}
+        this.setState({ list: list },
             () => {
                 var _self = this;
 
 
-                var obj = {
-                    games: this.state.listgames
+                //var obj = {
+                //    games: this.state.listgames
+                //};
+                let obj = {
+                    games: []
                 };
-                
+                //var games = [];
+                for (let i = 0; i < this.state.listgames.length; i++) {
+                    //var obj = {};
+                    var consoles = [];
+                    for (let j = 0; j < this.state.listgames[i].userConsoles.length; j++) {
+                        consoles.push(this.state.listgames[i].userConsoles[j].key);
+                    }
+                    //console.log(this.state.listgames[i].key + ": ", this.state.listgames[i].name);
+                    //obj[this.state.listgames[i].key] = consoles;
+                    //games.push(obj);
+                    //games.set(this.state.listgames[i].key, consoles);
+                    var item = {};
+                    item[this.state.listgames[i].key] = consoles;
+                    
+                    obj.games.push(item);
+                }
                 var user = firebase.auth().currentUser;
+                
                 setData('userLists/' + user.uid + '/' + list.key, obj)
                     .then((resp) => {
                         _self.setState({ modalVisible: false },
@@ -362,13 +384,11 @@ export default class ListScreen extends React.Component {
         );
     }
     onchangePos(pos) {
-        var list = this.state.listgames;
+        var list = Object.assign([], this.state.list.games);
         var newlist = [];
         for (let i = 0; i < pos.length; i++) {
             newlist.push(list[pos[i]]);
-            console.log("name: ", list[pos[i]].name);
         }
-        console.log("=======================");
         this.setState({ listgames: newlist },
             () => {
             }
@@ -486,7 +506,7 @@ export default class ListScreen extends React.Component {
                 }
                 <TextInput
                     placeholder={"Nome"}
-                    value={this.state.list.title}
+                    value={this.state.listedit.title}
                     style={[styles.inputsearch, styles.inputText]}
                     onChangeText={(text) => this._setTitle(text)}
                     ref={input => { this.titleInput = input }}
@@ -494,7 +514,7 @@ export default class ListScreen extends React.Component {
                 <View style={styles.rowInput}>
                     <View style={[styles.inputSelect, styles.SelectLeft]}>
                         <Picker
-                            selectedValue={this.state.list.type}
+                            selectedValue={this.state.listedit.type}
                             style={[styles.pickerStyle, pickerState]}
                             itemStyle={[styles.itempickerStyle]}
                             onValueChange={(itemValue, itemIndex) =>
@@ -507,7 +527,7 @@ export default class ListScreen extends React.Component {
                     </View>
                     <View style={[styles.inputSelect, styles.SelectRight]}>
                         <Picker
-                            selectedValue={this.state.list.status}
+                            selectedValue={this.state.listedit.status}
                             style={[styles.pickerStyle, pickerStateStatus]}
                             itemStyle={[styles.itempickerStyle]}
                             onValueChange={(itemValue, itemIndex) =>
@@ -523,7 +543,7 @@ export default class ListScreen extends React.Component {
                     placeholder={"Limite de jogos"}
                     keyboardType='numeric'
                     maxLength={10}
-                    value={this.state.list.limit}
+                    value={this.state.listedit.limit}
                     style={[styles.inputsearch, styles.inputText]}
                     onChangeText={(text) => this._setLimit(text)}
                     ref={input => { this.limitInput = input }}
@@ -532,15 +552,17 @@ export default class ListScreen extends React.Component {
                     placeholder={"Descrição"}
                     multiline={true}
                     numberOfLines={4}
-                    value={this.state.list.description.toString()}
+                    value={this.state.listedit.description.toString()}
                     style={[styles.inputsearch, styles.inputMulti, styles.inputText]}
                     onChangeText={(text) => this._setText(text)}
                     ref={input => { this.textInput = input }} />
-                <View style={styles.buttonBox}>
-                    <TouchableHighlight style={styles.addItem} underlayColor="transparent" onPress={() => this.editList()}>
-                        <Text style={styles.addItemText}>Criar Lista</Text>
-                    </TouchableHighlight>
-                </View>
+                <TouchableHighlight underlayColor="transparent" style={styles.saveButton} onPress={() => this.editList()}>
+                    <TabBarIcon
+                        name={'save'}
+                        type={'MaterialIcons'}
+                        style={styles.saveBoxIcon}
+                    />
+                </TouchableHighlight>
             </View>
         );
     }
@@ -584,12 +606,22 @@ export default class ListScreen extends React.Component {
     }
     _modalEditGames() {
         return (
-            <SortableList
-                style={styles.list}
-                contentContainerStyle={styles.contentContainer}
-                onChangeOrder={this.onchangePos.bind(this)}
-                data={this.state.listgames}
-                renderRow={this._renderRow} />
+            <View>
+                <SortableList
+                    style={styles.list}
+                    contentContainerStyle={styles.contentContainer}
+                    onChangeOrder={this.onchangePos.bind(this)}
+                    data={this.state.listgames}
+                    renderRow={this._renderRow} />
+
+                <TouchableHighlight underlayColor="transparent" style={styles.saveButton} onPress={() => this.saveGameEdit()}>
+                    <TabBarIcon
+                        name={'save'}
+                        type={'MaterialIcons'}
+                        style={styles.saveBoxIcon}
+                    />
+                </TouchableHighlight>
+            </View>
         );
     }
     _modalMenu() {
@@ -845,6 +877,15 @@ const styles = {
         fontSize: 30,
         paddingHorizontal: 50,
         marginTop: 50,
+    },
+    saveButton: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+    },
+    saveBoxIcon: {
+        color: '#FFF',
+        fontSize: 50
     },
     closeBox: {
         position: 'absolute',
