@@ -20,6 +20,7 @@ import {
     Picker
 } from 'react-native';
 import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
+import SortableList from 'react-native-sortable-list';
 
 import NavigationService from '../../components/services/NavigationService';
 import Layout from '../../constants/Layout';
@@ -32,6 +33,7 @@ import TabBarIcon from '../../components/UI/TabBarIcon';
 import { GetImage } from '../../components/UI/GetImage';
 import Header from '../../screens/Shared/Header';
 import LoadingScreen from '../Loading/LoadingScreen';
+import DragGame from '../../components/UI/DragGame';
 
 const { width } = Dimensions.get("window");
 const columnWidth = (width - 10) / 2 - 10;
@@ -50,6 +52,7 @@ export default class ListScreen extends React.Component {
             loading: true,
             listend: false,
             games: [],
+            listgames: [],
             page: 0,
             confirmDelete: false,
             list: {
@@ -118,7 +121,7 @@ export default class ListScreen extends React.Component {
         );
         //this.setState({ modal: visible });
     }
-    
+
     loadData = (key) => {
         var _self = this;
         var user = firebase.auth().currentUser;
@@ -179,7 +182,7 @@ export default class ListScreen extends React.Component {
 
         DeviceEventEmitter.emit('reloading', true);
         deleteItemsFromList([this.state.list.key]).then(() => {
-            _self.setState({  modalVisible: false },
+            _self.setState({ modalVisible: false },
                 () => {
                     NavigationService.navigate("Lists");
                     //DeviceEventEmitter.emit('confirmDelete', true);
@@ -202,7 +205,11 @@ export default class ListScreen extends React.Component {
     }
     editGames = () => {
         let _self = this;
-        this.setVisible(this._modalEditGames());
+        this.setState({ listgames: this.state.list.games },
+            () => {
+                _self.setVisible(_self._modalEditGames());
+            }
+        );
 
     }
     deleteList = () => {
@@ -214,7 +221,7 @@ export default class ListScreen extends React.Component {
         let _self = this;
         this.setState({ listedit: this.state.list },
             () => {
-                _self.setVisible(this._modalEditList());
+                _self.setVisible(_self._modalEditList());
             }
         );
 
@@ -256,29 +263,29 @@ export default class ListScreen extends React.Component {
         this.setState({ games: [], modalVisible: false });
     }
     _setTitle(value) {
-        var obj = this.state.list;
+        var obj = this.state.listedit;
         obj.title = value;
-        this.setState({ list: obj });
+        this.setState({ listedit: obj });
     }
     _setLimit(value) {
-        var obj = this.state.list;
+        var obj = this.state.listedit;
         obj.limit = value;
-        this.setState({ list: obj });
+        this.setState({ listedit: obj });
     }
     _setSelect(value) {
-        var obj = this.state.list;
+        var obj = this.state.listedit;
         obj.type = value;
-        this.setState({ list: obj });
+        this.setState({ listedit: obj });
     }
     _setStatus(value) {
-        var obj = this.state.list;
+        var obj = this.state.listedit;
         obj.status = value;
-        this.setState({ list: obj });
+        this.setState({ listedit: obj });
     }
     _setText(value) {
-        var obj = this.state.list;
+        var obj = this.state.listedit;
         obj.description = value;
-        this.setState({ list: obj });
+        this.setState({ listedit: obj });
     }
 
     _searchGame(search) {
@@ -328,8 +335,72 @@ export default class ListScreen extends React.Component {
 
         }
     }
+    saveGameEdit() {
+        var obj = this.state.list;
+        obj.games = this.state.listgames;
+        this.setState({ list: obj },
+            () => {
+                var _self = this;
+
+
+                var obj = {
+                    games: this.state.listgames
+                };
+                
+                var user = firebase.auth().currentUser;
+                setData('userLists/' + user.uid + '/' + list.key, obj)
+                    .then((resp) => {
+                        _self.setState({ modalVisible: false },
+                            () => {
+                                _self.loadData("");
+                                console.log("resp: ", resp);
+                                console.log("=============================");
+                            }
+                        );
+                    });
+            }
+        );
+    }
+    onchangePos(pos) {
+        var list = this.state.listgames;
+        var newlist = [];
+        for (let i = 0; i < pos.length; i++) {
+            newlist.push(list[pos[i]]);
+            console.log("name: ", list[pos[i]].name);
+        }
+        console.log("=======================");
+        this.setState({ listgames: newlist },
+            () => {
+            }
+        );
+    }
+    deleteItemFromList = (id) => {
+        console.log("id: ", id);
+        var list = this.state.listgames;
+        var index = list.findIndex(p => p.key == id);
+        //var index = list.findIndex(function (p) {
+        //    return p.key == id;
+        //});
+        list.splice(index, 1);
+
+        var _self = this;
+
+        this.setState({ listgames: list },
+            () => {
+                _self.setState({ modalActive: _self._modalEditGames() },
+                    () => {
+                    }
+                );
+            }
+        );
+        //var obj = this.state.list;
+        //obj.games = list;
+        //this.setState({ list: obj },
+        //    () => {
+        //    }
+        //);
+    }
     renderGames() {
-        console.log("RENDER GAMES");
         let list = this.state.games;
         let items = [];
         for (let i = 0; i < list.length; i++) {
@@ -512,7 +583,14 @@ export default class ListScreen extends React.Component {
         );
     }
     _modalEditGames() {
-        return null;
+        return (
+            <SortableList
+                style={styles.list}
+                contentContainerStyle={styles.contentContainer}
+                onChangeOrder={this.onchangePos.bind(this)}
+                data={this.state.listgames}
+                renderRow={this._renderRow} />
+        );
     }
     _modalMenu() {
         return (
@@ -531,6 +609,9 @@ export default class ListScreen extends React.Component {
                 </TouchableHighlight>
             </View>
         );
+    }
+    _renderRow = ({ key, index, data, active }) => {
+        return <DragGame data={data} pos={index} active={active} callback={this.deleteItemFromList.bind(this)} />;
     }
     render() {
         return (
@@ -573,6 +654,44 @@ export default class ListScreen extends React.Component {
     }
 }
 const styles = {
+    containersort: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#eee',
+
+        ...Platform.select({
+            ios: {
+                paddingTop: 20,
+            },
+        }),
+    },
+
+    title: {
+        fontSize: 20,
+        paddingVertical: 20,
+        color: '#999999',
+    },
+
+    list: {
+        marginTop: 80,
+        flex: 1,
+    },
+
+    contentContainer: {
+        width: Dimensions.get('window').width,
+
+        ...Platform.select({
+            ios: {
+                paddingHorizontal: 30,
+            },
+
+            android: {
+                paddingHorizontal: 0,
+            }
+        })
+    },
+
     dropdownMenu: {
         backgroundColor: "#FFF",
         borderRadius: 10,

@@ -40,7 +40,11 @@ export default class GameItem extends React.Component {
         DeviceEventEmitter.emit('reloading', true);
         //this.loadData(this.props.id);
         DeviceEventEmitter.addListener('selectMode', (data) => {
-            _self.setState({ selected: data, selectMode: data });
+            if (data) {
+                _self.setState({ selectMode: true });
+            } else {
+                _self.setState({ selected: false, selectMode: false });
+            }
         });
     }
     //loadData = (key) => {

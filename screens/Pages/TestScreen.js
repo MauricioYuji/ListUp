@@ -16,6 +16,7 @@ import {
     Platform,
 } from 'react-native';
 import SortableList from 'react-native-sortable-list';
+import DragGame from '../../components/UI/DragGame';
 
 const window = Dimensions.get('window');
 
@@ -67,7 +68,6 @@ export default class TestScreen extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text style={styles.title}>React Native Sortable List</Text>
                 <SortableList
                     style={styles.list}
                     contentContainerStyle={styles.contentContainer}
@@ -78,72 +78,10 @@ export default class TestScreen extends Component {
     }
 
     _renderRow = ({ data, active }) => {
-        return <Row data={data} active={active} />
+        return <DragGame data={data} active={active} />
     }
 }
 
-class Row extends Component {
-
-    constructor(props) {
-        super(props);
-
-        this._active = new Animated.Value(0);
-
-        this._style = {
-            ...Platform.select({
-                ios: {
-                    transform: [{
-                        scale: this._active.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [1, 1.1],
-                        }),
-                    }],
-                    shadowRadius: this._active.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [2, 10],
-                    }),
-                },
-
-                android: {
-                    transform: [{
-                        scale: this._active.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [1, 1.07],
-                        }),
-                    }],
-                    elevation: this._active.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [2, 6],
-                    }),
-                },
-            })
-        };
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (this.props.active !== nextProps.active) {
-            Animated.timing(this._active, {
-                duration: 300,
-                easing: Easing.bounce,
-                toValue: Number(nextProps.active),
-            }).start();
-        }
-    }
-
-    render() {
-        const { data, active } = this.props;
-
-        return (
-            <Animated.View style={[
-                styles.row,
-                this._style,
-            ]}>
-                <Image source={{ uri: data.image }} style={styles.image} />
-                <Text style={styles.text}>{data.text}</Text>
-            </Animated.View>
-        );
-    }
-}
 
 const styles = StyleSheet.create({
     container: {
