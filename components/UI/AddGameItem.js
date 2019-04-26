@@ -36,7 +36,7 @@ export default class AddGameItem extends React.Component {
     componentDidMount() {
         var _self = this;
         var item = this.props.userConsoles;
-        console.log("item: ", item);
+        //console.log("item: ", item);
         var array = [];
         if (item != null) {
             for (var i = 0; i < item.length; i++) {

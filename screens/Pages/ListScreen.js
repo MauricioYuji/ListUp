@@ -338,6 +338,9 @@ export default class ListScreen extends React.Component {
     saveGameEdit() {
         var list = this.state.list;
         list.games = this.state.listgames;
+        //for (let i = 0; i < list.games.length; i++) {
+        //    console.log("list.games: ", list.games[i].name);
+        //}
         //for (let i = 0; i < this.state.list.games.length; i++) {
         //    console.log("name: ", this.state.list.games[i].name);
         //}
@@ -353,24 +356,25 @@ export default class ListScreen extends React.Component {
                     games: []
                 };
                 //var games = [];
-                for (let i = 0; i < this.state.listgames.length; i++) {
+                for (let i = 0; i < list.games.length; i++) {
                     //var obj = {};
                     var consoles = [];
-                    for (let j = 0; j < this.state.listgames[i].userConsoles.length; j++) {
-                        consoles.push(this.state.listgames[i].userConsoles[j].key);
+                    for (let j = 0; j < list.games[i].userConsoles.length; j++) {
+                        consoles.push(list.games[i].userConsoles[j].key);
                     }
                     //console.log(this.state.listgames[i].key + ": ", this.state.listgames[i].name);
                     //obj[this.state.listgames[i].key] = consoles;
                     //games.push(obj);
                     //games.set(this.state.listgames[i].key, consoles);
                     var item = {};
-                    item[this.state.listgames[i].key] = consoles;
+                    item[list.games[i].key] = consoles;
+
 
                     obj.games.push(item);
                 }
                 var user = firebase.auth().currentUser;
                 console.log("obj: ", obj);
-                setData('userLists/' + user.uid + '/' + list.key + '/games', obj.games)
+                setData('userLists/' + user.uid + '/' + list.key, obj)
                     .then((resp) => {
                         _self.setState({ modalVisible: false },
                             () => {
@@ -397,29 +401,31 @@ export default class ListScreen extends React.Component {
     deleteItemFromList = (id) => {
         console.log("id: ", id);
         var list = Object.assign([], this.state.listgames);
-
-
-        var r = list.filter(p => Object.keys(p) == id);
+        var r = list.filter(p => p.key == id);
+        //console.log("r: ", r);
         var index = list.indexOf(r[0]);
 
         //var index = list.findIndex(p => p.key == id);
         //var index = list.findIndex(function (p) {
         //    return p.key == id;
         //});
-        list.splice(index-1, 1);
-        console.log("list: ", list);
+        //console.log("index: ", index);
+        list.splice(index, 1);
+        //for (let i = 0; i < list.length; i++) {
+        //    console.log("list: ", list[i].name);
+        //}
 
         this.setState({ modalActive: this._modalEditGames() });
         var _self = this;
 
-        //this.setState({ listgames: list },
-        //    () => {
-        //        _self.setState({ modalActive: _self._modalEditGames() },
-        //            () => {
-        //            }
-        //        );
-        //    }
-        //);
+        this.setState({ listgames: list },
+            () => {
+                _self.setState({ modalActive: _self._modalEditGames() },
+                    () => {
+                    }
+                );
+            }
+        );
         //var obj = this.state.list;
         //obj.games = list;
         //this.setState({ list: obj },
@@ -749,7 +755,7 @@ const styles = {
         fontSize: 20,
         textAlign: 'center',
         flexWrap: "nowrap",
-        marginVertical: 5,
+        marginVertical: 10,
         fontFamily: 'SourceSansPro-Regular'
     },
     container: {

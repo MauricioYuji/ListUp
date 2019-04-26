@@ -65,7 +65,8 @@ export default class ListScreen extends React.Component {
             modalVisible: false,
             mounted: false,
             modelInvalid: false,
-            confirmDelete: false
+            confirmDelete: false,
+            modalActive: null
         };
     }
     componentDidMount() {
@@ -86,6 +87,23 @@ export default class ListScreen extends React.Component {
     }
     componentWillUnmount() {
         this.setState({ mounted: false });
+    }
+
+    setVisible(content) {
+        let _self = this;
+        _self.setState({ modalVisible: false },
+            () => {
+                _self.setState({ modalActive: content },
+                    () => {
+                        _self.setState({ modalVisible: true },
+                            () => {
+                            }
+                        );
+                    }
+                );
+            }
+        );
+        //this.setState({ modal: visible });
     }
 
 
@@ -146,27 +164,33 @@ export default class ListScreen extends React.Component {
 
         DeviceEventEmitter.emit('reloading', true);
         deleteItemsFromList(this.state.selectedItens).then(() => {
-            _self.setState({ selectedItens: [], confirmDelete: false },
+
+            this.closeModal();
+            _self.setState({ selectedItens: [], selectMode: false },
                 () => {
-                    DeviceEventEmitter.emit('confirmDelete', true);
+                    //DeviceEventEmitter.emit('confirmDelete', true);
                     DeviceEventEmitter.emit('selectMode', false);
-                    //this.loadData();
                 }
             );
+
+            //_self.setState({ selectedItens: [], confirmDelete: false },
+            //    () => {
+            //        DeviceEventEmitter.emit('confirmDelete', true);
+            //        DeviceEventEmitter.emit('selectMode', false);
+            //        //this.loadData();
+            //    }
+            //);
         });
     }
     deleteItens = () => {
-        var _self = this;
-        _self.setState({ confirmDelete: true },
-            () => {
-            }
-        );
+        let _self = this;
+        this.setVisible(this._modalDeleteList());
     }
     addItens = () => {
-        this.setModalVisible(!this.state.modalVisible);
+        let _self = this;
+        this.setVisible(this._modalAdd());
     }
     addList = () => {
-        //console.log("ADD ITEM");
         var obj = this.state.list;
         if (obj.title == "" || obj.type == "" || obj.status == "" || obj.description == "" || obj.limit == "") {
             this.setState({ modelInvalid: true });
@@ -179,16 +203,7 @@ export default class ListScreen extends React.Component {
             insertData('userLists/' + user.uid + '/', obj)
                 .then((resp) => {
                     _self.setModalVisible(false);
-                    _self.setState({
-                        list: {
-                            title: "",
-                            games: [],
-                            status: "",
-                            description: "",
-                            type: "",
-                            limit: ""
-                        },
-                    })
+                    _self.closeModal();
                     //_self.loadData();
                 });
         }
@@ -210,31 +225,30 @@ export default class ListScreen extends React.Component {
     closeConfirm = () => {
         this.setState({ confirmDelete: false });
     }
-
     _setTitle(value) {
         var obj = this.state.list;
         obj.title = value;
-        this.setState({ list: obj });
+        this.setState({ list: obj, modalActive: this._modalAdd() });
     }
     _setLimit(value) {
         var obj = this.state.list;
         obj.limit = value;
-        this.setState({ list: obj });
+        this.setState({ list: obj, modalActive: this._modalAdd() });
     }
     _setSelect(value) {
         var obj = this.state.list;
         obj.type = value;
-        this.setState({ list: obj });
+        this.setState({ list: obj, modalActive: this._modalAdd() });
     }
     _setStatus(value) {
         var obj = this.state.list;
         obj.status = value;
-        this.setState({ list: obj });
+        this.setState({ list: obj, modalActive: this._modalAdd() });
     }
     _setText(value) {
         var obj = this.state.list;
-        obj.text = value;
-        this.setState({ list: obj });
+        obj.description = value;
+        this.setState({ list: obj, modalActive: this._modalAdd() });
     }
     renderLists() {
         let lists = this.state.lists;
@@ -265,7 +279,8 @@ export default class ListScreen extends React.Component {
             );
         }
     }
-    render() {
+
+    _modalAdd() {
         let pickerState = null;
         let pickerStateStatus = null;
         if (this.state.list.type == "") {
@@ -274,6 +289,91 @@ export default class ListScreen extends React.Component {
         if (this.state.list.status == "") {
             pickerStateStatus = styles.unselected;
         }
+        return (
+                <View style={styles.listBox}>
+                    <Text style={styles.menuTitle}>-CRIAR LISTA-</Text>
+                    {this.state.modelInvalid &&
+                        <Text style={styles.erroText}>Preencha todos os campos.</Text>
+                    }
+                    <TextInput
+                        placeholder={"Nome"}
+                        style={[styles.inputsearch, styles.inputText]}
+                        onChangeText={(text) => this._setTitle(text)}
+                        ref={input => { this.titleInput = input }}
+                    />
+                    <View style={styles.rowInput}>
+                        <View style={[styles.inputSelect, styles.SelectLeft]}>
+                            <Picker
+                                selectedValue={this.state.list.type}
+                                style={[styles.pickerStyle, pickerState]}
+                                itemStyle={[styles.itempickerStyle]}
+                                onValueChange={(itemValue, itemIndex) =>
+                                    this._setSelect(itemValue)
+                                }>
+                                <Picker.Item label="Selecione um tipo" value="" />
+                                <Picker.Item label="Lista Padrão" value="padrao" />
+                                <Picker.Item label="Ranking" value="ranking" />
+                            </Picker>
+                        </View>
+                        <View style={[styles.inputSelect, styles.SelectRight]}>
+                            <Picker
+                                selectedValue={this.state.list.status}
+                                style={[styles.pickerStyle, pickerStateStatus]}
+                                itemStyle={[styles.itempickerStyle]}
+                                onValueChange={(itemValue, itemIndex) =>
+                                    this._setStatus(itemValue)
+                                }>
+                                <Picker.Item label="Selecione um status" value="" />
+                                <Picker.Item label="Público" value="publico" />
+                                <Picker.Item label="Privado" value="privado" />
+                            </Picker>
+                        </View>
+                    </View>
+                    <TextInput
+                        placeholder={"Limite de jogos"}
+                        keyboardType='numeric'
+                        maxLength={10}
+                        style={[styles.inputsearch, styles.inputText]}
+                        onChangeText={(text) => this._setLimit(text)}
+                        ref={input => { this.limitInput = input }}
+                    />
+                    <TextInput
+                        placeholder={"Descrição"}
+                        multiline={true}
+                        numberOfLines={4}
+                        style={[styles.inputsearch, styles.inputMulti, styles.inputText]}
+                        onChangeText={(text) => this._setText(text)}
+                        ref={input => { this.textInput = input }} />
+                    <TouchableHighlight underlayColor="transparent" style={styles.saveButton} onPress={() => this.addList()}>
+                        <TabBarIcon
+                            name={'save'}
+                            type={'MaterialIcons'}
+                            style={styles.saveBoxIcon}
+                        />
+                    </TouchableHighlight>
+                </View>
+        );
+    }
+    _modalDeleteList() {
+        return (
+            <View>
+                <Text style={styles.addItemText}>DESEJA EXCLUIR?</Text>
+                <View style={styles.buttonBox}>
+                    <TouchableHighlight underlayColor="transparent" onPress={() => this.confirmdeleteItens()}>
+                        <View style={[styles.addItem, styles.dangerButton]}>
+                            <Text style={[styles.addItemText]}>Deletar</Text>
+                        </View>
+                    </TouchableHighlight>
+                    <TouchableHighlight underlayColor="transparent" onPress={() => this.closeModal()}>
+                        <View style={styles.addItem}>
+                            <Text style={styles.addItemText}>Cancelar</Text>
+                        </View>
+                    </TouchableHighlight>
+                </View>
+            </View>
+        );
+    }
+    render() {
         return (
             <View style={styles.container}>
                 <ScrollView>
@@ -284,37 +384,9 @@ export default class ListScreen extends React.Component {
 
                 <Header style={styles.header} type={"info-lists"} back={true} label={"Minhas Listas"} detail={this.state.lists.length + " listas"} itens={this._headerItens()} />
 
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={this.state.mounted && this.state.confirmDelete}
-                    onRequestClose={() => {
-                        this.setState({ confirmDelete: false });
-                    }}>
+            
 
-                    <View style={styles.backgroundModal}>
-                        <Text style={styles.addItemText}>DESEJA EXCLUIR?</Text>
-                        <View style={styles.buttonBox}>
-                            <TouchableHighlight underlayColor="transparent" onPress={() => this.confirmdeleteItens()}>
-                                <View style={[styles.addItem, styles.dangerButton]}>
-                                    <Text style={[styles.addItemText]}>Deletar</Text>
-                                </View>
-                            </TouchableHighlight>
-                            <TouchableHighlight underlayColor="transparent" onPress={() => this.closeConfirm()}>
-                                <View style={styles.addItem}>
-                                    <Text style={styles.addItemText}>Cancelar</Text>
-                                </View>
-                            </TouchableHighlight>
-                        </View>
-                        <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.closeConfirm()}>
-                            <TabBarIcon
-                                name={'close'}
-                                type={'MaterialIcons'}
-                                style={styles.closeBoxIcon}
-                            />
-                        </TouchableHighlight>
-                    </View>
-                </Modal>
+
 
                 <Modal
                     animationType="slide"
@@ -324,67 +396,8 @@ export default class ListScreen extends React.Component {
                         this.setState({ modalVisible: false });
                     }}>
                     <View style={styles.backgroundModal}>
+                        {this.state.modalActive}
 
-                        <View style={styles.listBox}>
-                            <Text style={styles.menuTitle}>-CRIAR LISTA-</Text>
-                            {this.state.modelInvalid &&
-                                <Text style={styles.erroText}>Preencha todos os campos.</Text>
-                            }
-                            <TextInput
-                                placeholder={"Nome"}
-                                style={[styles.inputsearch, styles.inputText]}
-                                onChangeText={(text) => this._setTitle(text)}
-                                ref={input => { this.titleInput = input }}
-                            />
-                            <View style={styles.rowInput}>
-                                <View style={[styles.inputSelect, styles.SelectLeft]}>
-                                    <Picker
-                                        selectedValue={this.state.list.type}
-                                        style={[styles.pickerStyle, pickerState]}
-                                        itemStyle={[styles.itempickerStyle]}
-                                        onValueChange={(itemValue, itemIndex) =>
-                                            this._setSelect(itemValue)
-                                        }>
-                                        <Picker.Item label="Selecione um tipo" value="" />
-                                        <Picker.Item label="Lista Padrão" value="padrao" />
-                                        <Picker.Item label="Ranking" value="ranking" />
-                                    </Picker>
-                                </View>
-                                <View style={[styles.inputSelect, styles.SelectRight]}>
-                                    <Picker
-                                        selectedValue={this.state.list.status}
-                                        style={[styles.pickerStyle, pickerStateStatus]}
-                                        itemStyle={[styles.itempickerStyle]}
-                                        onValueChange={(itemValue, itemIndex) =>
-                                            this._setStatus(itemValue)
-                                        }>
-                                        <Picker.Item label="Selecione um status" value="" />
-                                        <Picker.Item label="Público" value="publico" />
-                                        <Picker.Item label="Privado" value="privado" />
-                                    </Picker>
-                                </View>
-                            </View>
-                            <TextInput
-                                placeholder={"Limite de jogos"}
-                                keyboardType='numeric'
-                                maxLength={10}
-                                style={[styles.inputsearch, styles.inputText]}
-                                onChangeText={(text) => this._setLimit(text)}
-                                ref={input => { this.limitInput = input }}
-                            />
-                            <TextInput
-                                placeholder={"Descrição"}
-                                multiline={true}
-                                numberOfLines={4}
-                                style={[styles.inputsearch, styles.inputMulti, styles.inputText]}
-                                onChangeText={(text) => this._setText(text)}
-                                ref={input => { this.textInput = input }} />
-                            <View style={styles.buttonBox}>
-                                <TouchableHighlight underlayColor="transparent" style={styles.addItem} onPress={() => this.addList()}>
-                                    <Text style={styles.addItemText}>Criar Lista</Text>
-                                </TouchableHighlight>
-                            </View>
-                        </View>
                         <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.closeModal()}>
                             <TabBarIcon
                                 name={'close'}
@@ -510,6 +523,15 @@ const styles = {
         fontSize: 30,
         paddingHorizontal: 50,
         marginTop: 50,
+    },
+    saveButton: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+    },
+    saveBoxIcon: {
+        color: '#FFF',
+        fontSize: 50
     },
     closeBox: {
         position: 'absolute',
