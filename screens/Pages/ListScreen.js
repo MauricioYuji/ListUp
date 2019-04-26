@@ -365,12 +365,12 @@ export default class ListScreen extends React.Component {
                     //games.set(this.state.listgames[i].key, consoles);
                     var item = {};
                     item[this.state.listgames[i].key] = consoles;
-                    
+
                     obj.games.push(item);
                 }
                 var user = firebase.auth().currentUser;
-                
-                setData('userLists/' + user.uid + '/' + list.key, obj)
+                console.log("obj: ", obj);
+                setData('userLists/' + user.uid + '/' + list.key + '/games', obj.games)
                     .then((resp) => {
                         _self.setState({ modalVisible: false },
                             () => {
@@ -396,23 +396,30 @@ export default class ListScreen extends React.Component {
     }
     deleteItemFromList = (id) => {
         console.log("id: ", id);
-        var list = this.state.listgames;
-        var index = list.findIndex(p => p.key == id);
+        var list = Object.assign([], this.state.listgames);
+
+
+        var r = list.filter(p => Object.keys(p) == id);
+        var index = list.indexOf(r[0]);
+
+        //var index = list.findIndex(p => p.key == id);
         //var index = list.findIndex(function (p) {
         //    return p.key == id;
         //});
-        list.splice(index, 1);
+        list.splice(index-1, 1);
+        console.log("list: ", list);
 
+        this.setState({ modalActive: this._modalEditGames() });
         var _self = this;
 
-        this.setState({ listgames: list },
-            () => {
-                _self.setState({ modalActive: _self._modalEditGames() },
-                    () => {
-                    }
-                );
-            }
-        );
+        //this.setState({ listgames: list },
+        //    () => {
+        //        _self.setState({ modalActive: _self._modalEditGames() },
+        //            () => {
+        //            }
+        //        );
+        //    }
+        //);
         //var obj = this.state.list;
         //obj.games = list;
         //this.setState({ list: obj },
@@ -422,6 +429,7 @@ export default class ListScreen extends React.Component {
     }
     renderGames() {
         let list = this.state.games;
+        console.log("list: ", list);
         let items = [];
         for (let i = 0; i < list.length; i++) {
             var game = this.state.list.games.filter(p => p.key == list[i].key)[0];
@@ -429,6 +437,8 @@ export default class ListScreen extends React.Component {
             if (game != undefined) {
                 userconsoles = game.userConsoles;
             }
+            console.log("game: ", game);
+            console.log("userconsoles: ", userconsoles);
             items.push(<AddGameItem key={i} game={list[i]} userConsoles={userconsoles} callback={this.addGame.bind(this)} id={this.state.list.key} />);
         }
         return items;

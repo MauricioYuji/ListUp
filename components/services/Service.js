@@ -184,13 +184,14 @@ export const structureList = async (obj) => {
                 var games = [];
                 for (var index in obj[list].games) {
                     let key = Object.keys(obj[list].games[index])[0];
-                    console.log("key: ", key);
+                    //console.log("key: ", key);
                     var item = game[key];
-                    console.log("item: ", item);
+                    //console.log("item: ", item);
                     if (!imgkeys.includes(item.image.key) && item.image.key != "") {
                         imgkeys.push(item.image.key);
                     }
-                    var userconsoles = obj[list].games[index];
+                    var userconsoles = obj[list].games[index][key];
+                    //console.log("userconsoles: ", userconsoles);
                     for (var i = 0; i < userconsoles.length; i++) {
                         userconsoles[i] = objlist.Consoles[userconsoles[i]];
                     }
@@ -200,6 +201,7 @@ export const structureList = async (obj) => {
                 obj[list].key = list;
                 obj[list].games = games;
             }
+            //console.log("=================");
             getImages(imgkeys).then((imgs) => {
                 for (var list in obj) {
                     for (var key in obj[list].games) {
@@ -411,7 +413,13 @@ export const deleteGamesFromList = async (keys, keylist) => {
         //console.log("snapshot: ", snapshot.val());
         lists = snapshot.val();
         for (var i = 0; i < keys.length; i++) {
-            lists[keys[i]] = null;
+
+            var r = lists.filter(p => Object.keys(p) == keys[i]);
+            var index = lists.indexOf(r[0]);
+
+            lists[index] = null;
+
+
         }
         setData('/userLists/' + user.uid + '/' + keylist + '/games/', lists)
             .then((img) => {
@@ -427,9 +435,23 @@ export const addGamestoList = async (keylist, keygame, obj) => {
     console.log("keygame: ", keygame);
     console.log("obj: ", obj);
 
-    //insertData('/userLists/' + user.uid + '/' + keylist + '/games/' + keygame, obj).then((res) => {
-    //});
-   
+    var itemobj = {};
+    itemobj[keygame] = obj.length <= 0 ? "" : obj;
+    getData('/userLists/' + user.uid + '/' + keylist + '/games/').then((res) => {
+        res = (res == null) ? [] : res;
+        var r = res.filter(p => Object.keys(p) == keygame);
+        var index = res.indexOf(r[0]);
+        console.log("r:> ", r);
+        console.log("res: ", res);
+        if (res.length == 0 || index == -1) {
+            res.push(itemobj);
+        } else {
+            res[index] = itemobj;
+        }
+        setData('/userLists/' + user.uid + '/' + keylist + '/games/', res).then((res) => {
+        });
+    });
+
     //getData('/userLists/' + user.uid + '/' + keylist + '/games/' + keygame).then((res) => {
     //    if (obj.length > 0) {
     //        console.log("EDIT");

@@ -36,11 +36,13 @@ export default class AddGameItem extends React.Component {
     componentDidMount() {
         var _self = this;
         var item = this.props.userConsoles;
+        console.log("item: ", item);
         var array = [];
         if (item != null) {
             for (var i = 0; i < item.length; i++) {
                 array.push(item[i].key);
             }
+            console.log("array: ", array);
             _self.setState({ consolesActive: array });
         }
 
@@ -158,10 +160,18 @@ export default class AddGameItem extends React.Component {
         }
     }
     listPlatforms = () => {
+        var item = this.props.userConsoles;
+        var array = [];
+        if (item != null) {
+            for (var i = 0; i < item.length; i++) {
+                array.push(item[i].key);
+            }
+        }
+
+
         let obj = [];
         let objarray = this.props.game.consoles;
-        let filteractive = this.state.consolesActive;
-        //console.log("filteractive: ", filteractive);
+        let filteractive = array;
 
         for (let j = 0; j < objarray.length; j++) {
             if (objarray[j].keycompany === undefined) {
