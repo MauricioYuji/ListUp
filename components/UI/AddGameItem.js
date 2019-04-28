@@ -42,17 +42,17 @@ export default class AddGameItem extends React.Component {
             for (var i = 0; i < item.length; i++) {
                 array.push(item[i].key);
             }
-            console.log("array: ", array);
+            //console.log("array: ", array);
             _self.setState({ consolesActive: array });
         }
 
-        DeviceEventEmitter.addListener('selectConsole', (data) => {
-            if (data) {
-                _self.setState({ showButtons: true });
-            } else {
-                _self.setState({ showButtons: false });
-            }
-        });
+        //DeviceEventEmitter.addListener('selectConsole', (data) => {
+        //    if (data) {
+        //        _self.setState({ showButtons: true });
+        //    } else {
+        //        _self.setState({ showButtons: false });
+        //    }
+        //});
     }
 
     //itemAction() {
@@ -71,7 +71,7 @@ export default class AddGameItem extends React.Component {
     showButtons = () => {
         var _self = this;
         Keyboard.dismiss();
-        DeviceEventEmitter.emit('selectConsole', false);
+        //DeviceEventEmitter.emit('selectConsole', false);
         _self.setState({ showButtons: !this.state.showButtons },
             () => {
                 //_self.props.callback(_self.props.id);
@@ -112,7 +112,6 @@ export default class AddGameItem extends React.Component {
     ActiveConsole(key, multiple) {
         var _self = this;
         var list = this.state.consolesActive;
-        //console.log("list: ", list);
         let consoles = this.props.game.consoles;
         if (!multiple) {
             if (list.includes(key))
@@ -129,13 +128,11 @@ export default class AddGameItem extends React.Component {
             else
                 list = this.arrayUnique(list.concat(result));
         }
-
-
         _self.setState({ consolesActive: list },
             () => {
-                //_self._submitFilter();
             }
         );
+
 
     }
     sendGame = () => {
@@ -160,11 +157,13 @@ export default class AddGameItem extends React.Component {
         }
     }
     listPlatforms = () => {
-        var item = this.props.userConsoles;
+        console.log("RENDER CONSOLES");
+        var item = this.state.consolesActive;
+        //console.log("this.state.consolesActive: ", this.state.consolesActive);
         var array = [];
         if (item != null) {
             for (var i = 0; i < item.length; i++) {
-                array.push(item[i].key);
+                array.push(item[i]);
             }
         }
 
@@ -172,33 +171,41 @@ export default class AddGameItem extends React.Component {
         let obj = [];
         let objarray = this.props.game.consoles;
         let filteractive = array;
+        //console.log("objarray: ", objarray);
+        //console.log("filteractive: ", filteractive);
 
         for (let j = 0; j < objarray.length; j++) {
-            if (objarray[j].keycompany === undefined) {
-                obj.push(
-                    <TouchableHighlight underlayColor="transparent" onPress={(a) => this.ActiveConsole(objarray[j].key, true)} key={objarray[j].name} style={styles.filterButtonTab}>
-                        <View>
-                            <Image source={{ uri: objarray[j].img }} resizeMode={'contain'} style={[styles.filterButtonTabImg, { width: objarray[j].width / 3, height: objarray[j].height / 3 }]} />
-                        </View>
-                    </TouchableHighlight>);
+            //if (objarray[j].keycompany === undefined) {
+            //    obj.push(
+            //        <TouchableHighlight underlayColor="transparent" onPress={(a) => this.ActiveConsole(objarray[j].key, true)} key={objarray[j].name} style={styles.filterButtonTab}>
+            //            <View>
+            //                <Image source={{ uri: objarray[j].img }} resizeMode={'contain'} style={[styles.filterButtonTabImg, { width: objarray[j].width / 3, height: objarray[j].height / 3 }]} />
+            //            </View>
+            //        </TouchableHighlight>);
+            //} else {
+            var styleclass = null;
+            var imgcolor = '';
+            //console.log("filteractive: ", filteractive);
+            //console.log(filteractive[0] + ": ", typeof (filteractive[0]));
+            //console.log(objarray[j].key + ": ", typeof (objarray[j].key));
+            if (filteractive.includes(objarray[j].key.toString())) {
+                styleclass = styles.filterButtonActive;
+                imgcolor = '#FFFFFF';
             } else {
-                var styleclass = null;
-                var imgcolor = '';
-                if (filteractive.includes(objarray[j].key)) {
-                    styleclass = styles.filterButtonActive;
-                    imgcolor = '#FFFFFF';
-                } else {
-                    styleclass = styles.filterButton;
-                    imgcolor = '#BBBBBB';
-                }
-                obj.push(
-                    <TouchableHighlight underlayColor="transparent" onPress={(a) => this.ActiveConsole(objarray[j].key, false)} key={objarray[j].name} style={[styleclass]}>
-                        <View>
-                            <Image source={{ uri: objarray[j].img }} resizeMode={'contain'} style={[styles.filterButtonImg, { width: objarray[j].width / 5, height: objarray[j].height / 5, tintColor: imgcolor }]} />
-                        </View>
-                    </TouchableHighlight>);
+                styleclass = styles.filterButton;
+                imgcolor = '#BBBBBB';
             }
+            console.log("color: ", imgcolor);
+            obj.push(
+                <TouchableHighlight underlayColor="transparent" onPress={(a) => this.ActiveConsole(objarray[j].key, false)} key={objarray[j].name} style={[styleclass]}>
+                    <View>
+                        <Image source={{ uri: objarray[j].img }} resizeMode={'contain'} style={[styles.filterButtonImg, { width: objarray[j].width / 5, height: objarray[j].height / 5, tintColor: imgcolor }]} />
+                    </View>
+                </TouchableHighlight>);
+            //}
+            console.log("-------------------------");
         }
+        console.log("=======================");
         return obj;
     }
     renderAddButton = () => {

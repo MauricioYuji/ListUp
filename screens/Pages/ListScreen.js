@@ -289,7 +289,7 @@ export default class ListScreen extends React.Component {
     }
 
     _searchGame(search) {
-        console.log("Search: ", search);
+        //console.log("Search: ", search);
         var _self = this;
         if (search == "") {
             _self.setState({ games: [] },
@@ -435,7 +435,7 @@ export default class ListScreen extends React.Component {
     }
     renderGames() {
         let list = this.state.games;
-        console.log("list: ", list);
+        //console.log("list: ", list);
         let items = [];
         for (let i = 0; i < list.length; i++) {
             var game = this.state.list.games.filter(p => p.key == list[i].key)[0];
@@ -443,8 +443,8 @@ export default class ListScreen extends React.Component {
             if (game != undefined) {
                 userconsoles = game.userConsoles;
             }
-            console.log("game: ", game);
-            console.log("userconsoles: ", userconsoles);
+            //console.log("game: ", game);
+            //console.log("userconsoles: ", userconsoles);
             items.push(<AddGameItem key={i} game={list[i]} userConsoles={userconsoles} callback={this.addGame.bind(this)} id={this.state.list.key} />);
         }
         return items;
