@@ -258,6 +258,11 @@ export default class ListScreen extends React.Component {
     }
     addGame = () => {
         console.log("ADD GAME");
+        _self.setState({ modalActive: _self._modalAdd() },
+            () => {
+                //_self.filterObj();
+            }
+        );
     }
     closeModal = () => {
         this.setState({ games: [], modalVisible: false });
@@ -294,43 +299,48 @@ export default class ListScreen extends React.Component {
         if (search == "") {
             _self.setState({ games: [] },
                 () => {
-                    //_self.filterObj();
+                    _self.setState({ modalActive: _self._modalAdd() },
+                        () => {
+                            //_self.filterObj();
+                        }
+                    );
                 }
             );
         } else {
             if (this.state.searching)
                 return false;
 
-            setTimeout(function () {
+            //setTimeout(function () {
 
-            }, 2000);
+            //}, 2000);
             _self.setState({ searching: true },
                 () => {
-                }
-            );
-            var re = new RegExp(search.toLowerCase(), 'g');
+                    var re = new RegExp(search.toLowerCase(), 'g');
 
-            firebase.database().ref('/Games/').on('value', function (snapshot) {
-                var obj = {};
-                for (var key in snapshot.val()) {
-                    let item = snapshot.val()[key];
-                    if ((item.name.toLowerCase().match(re) != null && search != "") || search == "") {
-                        obj[key] = item;
-                    }
-                }
+                    firebase.database().ref('/Games/').on('value', function (snapshot) {
+                        var obj = {};
+                        for (var key in snapshot.val()) {
+                            let item = snapshot.val()[key];
+                            if ((item.name.toLowerCase().match(re) != null && search != "") || search == "") {
+                                obj[key] = item;
+                            }
+                        }
 
-                structureGames(obj).then(games => {
-                    _self.setState({ games: games, searching: false },
-                        () => {
-                            _self.setState({ modalActive: _self._modalAdd() },
+                        structureGames(obj).then(games => {
+                            _self.setState({ games: games, searching: false },
                                 () => {
+                                    _self.setState({ modalActive: _self._modalAdd() },
+                                        () => {
+                                        }
+                                    );
                                 }
                             );
-                        }
-                    );
-                    return true;
-                }).catch(err => console.log('There was an error:' + err));
-            });
+                            return true;
+                        }).catch(err => console.log('There was an error:' + err));
+                    });
+
+                }
+            );
 
 
         }
@@ -443,7 +453,7 @@ export default class ListScreen extends React.Component {
             if (game != undefined) {
                 userconsoles = game.userConsoles;
             }
-            //console.log("game: ", game);
+            console.log("game: ", game);
             //console.log("userconsoles: ", userconsoles);
             items.push(<AddGameItem key={i} game={list[i]} userConsoles={userconsoles} callback={this.addGame.bind(this)} id={this.state.list.key} />);
         }
@@ -479,6 +489,7 @@ export default class ListScreen extends React.Component {
         }
     }
     _modalAdd() {
+        console.log("RENDER GAMES");
         return (
             <View style={styles.menuList}>
                 <View style={styles.scrollBox}>

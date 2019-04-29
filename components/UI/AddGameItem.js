@@ -139,8 +139,8 @@ export default class AddGameItem extends React.Component {
         var _self = this;
         _self.setState({ addFeedback: true }, () => {
             setTimeout(function () {
-                _self.setState({ addFeedback: false }, () => {
-                    DeviceEventEmitter.emit('selectConsole', false);
+                _self.setState({ addFeedback: false, showButtons: false }, () => {
+                    //DeviceEventEmitter.emit('selectConsole', false);
                     addGamestoList(_self.props.id, _self.props.game.key, _self.state.consolesActive).then((resp) => {
                         _self.props.callback();
                     });
@@ -157,7 +157,7 @@ export default class AddGameItem extends React.Component {
         }
     }
     listPlatforms = () => {
-        console.log("RENDER CONSOLES");
+        //console.log("RENDER CONSOLES");
         var item = this.state.consolesActive;
         //console.log("this.state.consolesActive: ", this.state.consolesActive);
         var array = [];
@@ -174,6 +174,8 @@ export default class AddGameItem extends React.Component {
         //console.log("objarray: ", objarray);
         //console.log("filteractive: ", filteractive);
 
+        //console.log("this.props.game.name: ", this.props.game.name);
+        //console.log("filteractive: ", filteractive);
         for (let j = 0; j < objarray.length; j++) {
             //if (objarray[j].keycompany === undefined) {
             //    obj.push(
@@ -185,7 +187,6 @@ export default class AddGameItem extends React.Component {
             //} else {
             var styleclass = null;
             var imgcolor = '';
-            //console.log("filteractive: ", filteractive);
             //console.log(filteractive[0] + ": ", typeof (filteractive[0]));
             //console.log(objarray[j].key + ": ", typeof (objarray[j].key));
             if (filteractive.includes(objarray[j].key.toString())) {
@@ -195,7 +196,7 @@ export default class AddGameItem extends React.Component {
                 styleclass = styles.filterButton;
                 imgcolor = '#BBBBBB';
             }
-            console.log("color: ", imgcolor);
+            //console.log("color: ", imgcolor);
             obj.push(
                 <TouchableHighlight underlayColor="transparent" onPress={(a) => this.ActiveConsole(objarray[j].key, false)} key={objarray[j].name} style={[styleclass]}>
                     <View>
