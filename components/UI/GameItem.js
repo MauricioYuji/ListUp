@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon, LinearGradient } from 'expo';
+import { LinearGradient } from 'expo';
 import {
     Text,
     View,
@@ -7,14 +7,8 @@ import {
     StyleSheet,
     Dimensions,
     Image,
-    TouchableWithoutFeedback,
     DeviceEventEmitter
 } from 'react-native';
-import * as firebase from 'firebase';
-import TabBarIcon from '../UI/TabBarIcon';
-import Layout from '../../constants/Layout';
-import { getData, setData, insertData } from '../services/baseService';
-import { getGameDetail } from '../services/Service';
 import NavigationService from '../services/NavigationService';
 
 
@@ -27,10 +21,6 @@ export default class GameItem extends React.Component {
 
     state = {
         key: "",
-        game: {
-            name: "",
-            img: null
-        },
         selected: false,
         selectMode: false,
     };
@@ -38,7 +28,6 @@ export default class GameItem extends React.Component {
     componentDidMount() {
         var _self = this;
         DeviceEventEmitter.emit('reloading', true);
-        //this.loadData(this.props.id);
         DeviceEventEmitter.addListener('selectMode', (data) => {
             if (data) {
                 _self.setState({ selectMode: true });
@@ -47,29 +36,6 @@ export default class GameItem extends React.Component {
             }
         });
     }
-    //loadData = (key) => {
-    //    var _self = this;
-    //    if (key == "") {
-    //        key = this.state.key;
-    //    }
-    //         _self.setState({ game: this.props.obj },
-    //            () => {
-    //                DeviceEventEmitter.emit('reloading', false);
-    //            }
-    //        );
-    //    //console.log("key: ", key);
-    //    //getGameDetail(key).then((game) => {
-    //    //    //console.log("game: ", game);
-    //    //    _self.setState({ game: game },
-    //    //        () => {
-    //    //            DeviceEventEmitter.emit('reloading', false);
-    //    //            //_self.getImages([game]);
-    //    //            //_self.filterObj();
-    //    //        }
-    //    //    );
-
-    //    //});
-    //}
     itemAction() {
         var _self = this;
         if (this.state.selectMode) {
@@ -79,7 +45,6 @@ export default class GameItem extends React.Component {
                 }
             );
         } else {
-            console.log("GO TO PAGE: ", this.props.id);
             NavigationService.navigate("List", { key: this.props.id });
         }
     }
@@ -130,24 +95,12 @@ export default class GameItem extends React.Component {
         return obj;
     }
     renderThumb = (item) => {
-        //console.log("item: ", item);
         if (item == "" || item == null)
             return (<Image source={require('../../assets/images/console-icon.png')} resizeMode={'cover'} style={styles.backgroundBanner} />);
         else {
             return (<Image source={{ uri: this.props.obj.image.url }} resizeMode={'cover'} style={[styles.backgroundBanner]} />);
         }
     }
-    //getImages = async (obj) => {
-    //    for (let i = 0; i < obj.length; i++) {
-    //        await getData('thumbs/' + obj[i].image.key)
-    //            .then((img) => {
-    //                obj[i].image.file = img.file;
-    //                obj[i].image.url = img.url;
-    //            });
-    //    }
-
-    //    this.setState({ games: this.props.obj });
-    //}
     _renderRanking() {
         if (this.props.ranking) {
             return (
@@ -264,20 +217,10 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontFamily: 'SourceSansPro-SemiBold'
     },
-    labelDetail: {
-        fontSize: 14,
-        color: '#FFF',
-        fontFamily: 'SourceSansPro-SemiBold'
-    },
     thumbArea: {
         width: Dimensions.get('window').width / 3,
         height: '100%',
         flexDirection: 'row-reverse',
         alignItems: 'flex-start',
-    },
-    thumb: {
-        width: 60,
-        height: 90,
-        marginLeft: 2
     },
 });

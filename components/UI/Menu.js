@@ -45,8 +45,6 @@ class Menu extends Component {
 
     }
     logoff() {
-        //NavigationService.navigate('Profile', { Id: '1' });
-        //DeviceEventEmitter.emit('showMenu', { show: this.state.showMenu });
         firebase.auth().signOut().then(function () {
             // Sign-out successful.
 
@@ -132,7 +130,6 @@ class Menu extends Component {
                     borderRadius: radius,
                     bottom: menuPos,
                     backgroundColor: '#006CD8',
-                    //opacity,
                     overflow: 'hidden',
                     zIndex: 100
                 }}>

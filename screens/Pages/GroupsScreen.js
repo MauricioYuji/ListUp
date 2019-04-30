@@ -17,10 +17,7 @@ import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 import Layout from '../../constants/Layout';
 import { getData, setData } from '../../components/services/baseService';
 import { getUserGames } from '../../components/services/Service';
-import { MonoText } from '../../components/UI/StyledText';
-import { GetImage } from '../../components/UI/GetImage';
 import LoadingScreen from '../Loading/LoadingScreen';
-import { parse } from 'qs';
 
 export default class GroupScreen extends React.Component {
 

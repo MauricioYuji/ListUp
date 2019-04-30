@@ -33,14 +33,6 @@ export class Fade extends React.Component {
                 inputRange: [0, 1],
                 outputRange: [0, 1],
             }),
-            //transform: [
-            //    {
-            //        rotate: this._visibility.interpolate({
-            //            inputRange: [0, 1],
-            //            outputRange: ["450deg", "0deg"],
-            //        }),
-            //    },
-            //],
         };
 
         const combinedStyle = [containerStyle, style];

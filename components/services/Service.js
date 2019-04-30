@@ -1,5 +1,5 @@
 import * as firebase from 'firebase';
-import { getData, deleteData, setData, insertData } from './baseService';
+import { getData, setData, deleteData, insertData } from './baseService';
 
 export const getGames = async (page) => {
     let games = null;
@@ -7,7 +7,6 @@ export const getGames = async (page) => {
     let list = require('../../files/consoles.json');
 
     await firebase.database().ref('/Games').once('value').then(function (snapshot) {
-        //console.log("snapshot: ", snapshot.val());
         games = snapshot.val();
     });
 
@@ -122,47 +121,16 @@ export const structureGames = async (games) => {
         }
         getImages(imgkeys).then((imgs) => {
             for (let key in objgames) {
-                //console.log("objgames[key].file.url: ", objgames[key].file.url);
-                //console.log("imgs[objgames[key].file.key].url: ", imgs[objgames[key].file.key].url);
-                //console.log("objgames[key].file.file: ", objgames[key].file.file);
-                //console.log("imgs[objgames[key].file.key].file: ", imgs[objgames[key].file.key].file);
-                //console.log("objgames[key].file: ", objgames[key].file.key);
                 if (objgames[key].image.key != "") {
                     objgames[key].image.url = imgs[objgames[key].image.key].url;
                     objgames[key].image.file = imgs[objgames[key].image.key].file;
                 }
-                //console.log("-----------------------------------------------");
 
 
             }
             resolve(objgames);
         });
 
-        //getGame(keys).then((game) => {
-        //    var imgkeys = [];
-        //    for (var list in obj) {
-        //        var games = [];
-        //        for (var key in obj[list].games) {
-        //            var item = game[key];
-        //            if (!imgkeys.includes(item.img) && item.img != "") {
-        //                imgkeys.push(item.img);
-        //            }
-
-        //            item.userConsoles = obj[list].games[key];
-        //            games.push(item);
-        //        }
-        //        obj[list].key = list;
-        //        obj[list].games = games;
-        //    }
-        //    getImages(imgkeys).then((imgs) => {
-        //        for (var list in obj) {
-        //            for (var key in obj[list].games) {
-        //                obj[list].games[key].img = imgs[obj[list].games[key].img];
-        //            }
-        //        }
-        //        resolve(obj);
-        //    });
-        //});
 
     });
 };
@@ -184,14 +152,11 @@ export const structureList = async (obj) => {
                 var games = [];
                 for (var index in obj[list].games) {
                     let key = Object.keys(obj[list].games[index])[0];
-                    //console.log("key: ", key);
                     var item = game[key];
-                    //console.log("item: ", item);
                     if (!imgkeys.includes(item.image.key) && item.image.key != "") {
                         imgkeys.push(item.image.key);
                     }
                     var userconsoles = obj[list].games[index][key];
-                    //console.log("userconsoles: ", userconsoles);
                     for (var i = 0; i < userconsoles.length; i++) {
                         userconsoles[i] = objlist.Consoles[userconsoles[i]];
                     }
@@ -201,7 +166,6 @@ export const structureList = async (obj) => {
                 obj[list].key = list;
                 obj[list].games = games;
             }
-            //console.log("=================");
             getImages(imgkeys).then((imgs) => {
                 for (var list in obj) {
                     for (var key in obj[list].games) {
@@ -278,49 +242,12 @@ getImages = async (keys) => {
         });
     });
 };
-//export const RefLists = () => {
-//    var user = firebase.auth().currentUser;
-//    let lists = null;
-//    var objgames = [];
-//    return firebase.database().ref('/userLists/' + user.uid);
-//};
-//export function RefLists2() {
-//    // Get the current 'global' time from an API using Promise
-//    return new Promise((resolve, reject) => {
-//        //setTimeout(function () {
-//        //    resolve(new Date());
-//        //    console.log("CHANGE");
-//        //}, 2000);
-//        var user = firebase.auth().currentUser;
-//        let lists = null;
-//        var objgames = [];
-//        firebase.database().ref('/userLists/' + user.uid).on('value', function (snapshot) {
-//            console.log("content LOAD");
-//            //console.log("snapshot.val(): ", snapshot.val());
-//            obj = Object.keys(snapshot.val()).map(item => {
-//                var objitem = snapshot.val()[item];
-//                return {
-//                    title: objitem.title,
-//                    games: objitem.games == undefined ? [] : objitem.games,
-//                    limit: objitem.limit,
-//                    type: objitem.type,
-//                    key: item,
-//                    description: objitem.description
-//                };
-//            });
-
-//            //console.log("obj: ", obj);
-//            resolve(obj);
-//        });
-//    });
-//}
 
 export const getuserList = async (page) => {
     var user = firebase.auth().currentUser;
     let lists = null;
     var objgames = [];
     await firebase.database().ref('/userLists/' + user.uid).once('value').then(function (snapshot) {
-        //console.log("snapshot: ", snapshot.val());
         lists = snapshot.val();
     });
 
@@ -357,7 +284,6 @@ export const getListByKey = async (key) => {
     var user = firebase.auth().currentUser;
     let list = null;
     await firebase.database().ref('/userLists/' + user.uid + '/' + key).once('value').then(function (snapshot) {
-        //console.log("snapshot: ", snapshot.val());
         list = snapshot.val();
     });
 
@@ -381,7 +307,6 @@ export const getListByKey = async (key) => {
 };
 
 
-
 export const deleteItemsFromList = async (keys) => {
 
     var user = firebase.auth().currentUser;
@@ -390,7 +315,6 @@ export const deleteItemsFromList = async (keys) => {
     let lists = null;
     var objgames = [];
     await firebase.database().ref('/userLists/' + user.uid).once('value').then(function (snapshot) {
-        //console.log("snapshot: ", snapshot.val());
         lists = snapshot.val();
         for (var i = 0; i < keys.length; i++) {
             lists[keys[i]] = null;
@@ -410,7 +334,6 @@ export const deleteGamesFromList = async (keys, keylist) => {
     let lists = null;
     var objgames = [];
     await firebase.database().ref('/userLists/' + user.uid + '/' + keylist + '/games/').once('value').then(function (snapshot) {
-        //console.log("snapshot: ", snapshot.val());
         lists = snapshot.val();
         for (var i = 0; i < keys.length; i++) {
 
@@ -431,9 +354,6 @@ export const deleteGamesFromList = async (keys, keylist) => {
 export const addGamestoList = async (keylist, keygame, obj) => {
     var user = firebase.auth().currentUser;
     let list = null;
-    console.log("keylist: ", keylist);
-    console.log("keygame: ", keygame);
-    console.log("obj: ", obj);
 
     var itemobj = {};
     itemobj[keygame] = obj.length <= 0 ? "" : obj;
@@ -441,8 +361,6 @@ export const addGamestoList = async (keylist, keygame, obj) => {
         res = (res == null) ? [] : res;
         var r = res.filter(p => Object.keys(p) == keygame);
         var index = res.indexOf(r[0]);
-        console.log("r:> ", r);
-        console.log("res: ", res);
         if (res.length == 0 || index == -1) {
             res.push(itemobj);
         } else {
@@ -451,18 +369,4 @@ export const addGamestoList = async (keylist, keygame, obj) => {
         setData('/userLists/' + user.uid + '/' + keylist + '/games/', res).then((res) => {
         });
     });
-
-    //getData('/userLists/' + user.uid + '/' + keylist + '/games/' + keygame).then((res) => {
-    //    if (obj.length > 0) {
-    //        console.log("EDIT");
-    //        setData('/userLists/' + user.uid + '/' + keylist + '/games/' + keygame, obj).then((res) => {
-    //        });
-    //    } else {
-    //        console.log("INSERT");
-    //        obj = {};
-    //        obj[keygame] = "";
-    //        setData('/userLists/' + user.uid + '/' + keylist + '/games/', obj).then((res) => {
-    //        });
-    //    }
-    //});
 };

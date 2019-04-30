@@ -20,7 +20,6 @@ import { WebBrowser, Icon, Constants } from 'expo';
 import * as firebase from 'firebase';
 import { Grow } from '../../components/animations/Grow';
 import { FadeSpin } from '../../components/animations/FadeSpin';
-import { MonoText } from '../../components/UI/StyledText';
 import NavigationService from '../../components/services/NavigationService';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 import { setData } from '../../components/services/baseService';

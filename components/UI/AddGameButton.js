@@ -1,5 +1,4 @@
 import React from 'react';
-import { Icon } from 'expo';
 import {
     Text,
     View,
@@ -10,7 +9,7 @@ import {
 } from 'react-native';
 import * as firebase from 'firebase';
 import TabBarIcon from '../UI/TabBarIcon';
-import { getData, setData, insertData } from '../services/baseService';
+import { setData } from '../services/baseService';
 
 
 
@@ -37,7 +36,6 @@ export default class AddGameButton extends React.Component {
 
         _self.setState({ consolesActive: list },
             () => {
-                //_self._submitFilter();
             }
         );
 
@@ -60,10 +58,6 @@ export default class AddGameButton extends React.Component {
         } else {
             _self.setState({ process: 1 },
                 () => {
-                    //setTimeout(function () {
-                    //    _self.setState({ process: false });
-                    //    _self.props.callback(_self.props.list + " list add");
-                    //}, 2000);
                 }
             );
         }
@@ -216,16 +210,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-evenly',
         height: 30
     },
-    filterButtonText: {
-        color: '#BBBBBB',
-    },
     filterButtonImg: {
         marginHorizontal: 5
     },
 
-    filterButtonTextActive: {
-        color: '#FFFFFF',
-    },
     filterButtonActive: {
         backgroundColor: '#006CD8',
         borderRadius: 4,

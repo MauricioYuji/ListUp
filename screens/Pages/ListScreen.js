@@ -30,7 +30,6 @@ import GameItem from '../../components/UI/GameItem';
 import AddGameItem from '../../components/UI/AddGameItem';
 import ListItem from '../../components/UI/ListItem';
 import TabBarIcon from '../../components/UI/TabBarIcon';
-import { GetImage } from '../../components/UI/GetImage';
 import Header from '../../screens/Shared/Header';
 import LoadingScreen from '../Loading/LoadingScreen';
 import DragGame from '../../components/UI/DragGame';

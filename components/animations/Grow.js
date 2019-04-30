@@ -29,18 +29,6 @@ export class Grow extends React.Component {
         const { visible, style, children, ...rest } = this.props;
 
         const containerStyle = {
-            //width: this._visibility.interpolate({
-            //    inputRange: [0, 1],
-            //    outputRange: [40, Dimensions.get('window').width],
-            //}),
-            //height: this._visibility.interpolate({
-            //    inputRange: [0, 1],
-            //    outputRange: [40, Dimensions.get('window').width / 2],
-            //}),
-            //borderRadius: this._visibility.interpolate({
-            //    inputRange: [0, 1],
-            //    outputRange: [40, 0],
-            //}),
             opacity: this._visibility.interpolate({
                 inputRange: [0, 0.1, 1],
                 outputRange: [0, 1, 1],
@@ -58,12 +46,6 @@ export class Grow extends React.Component {
                         outputRange: [0, 1],
                     })
                 },
-                //{
-                //    translateX: this._visibility.interpolate({
-                //        inputRange: [0, 1],
-                //        outputRange: [Dimensions.get('window').height, 0],
-                //    })
-                //},
             ],
         };
 

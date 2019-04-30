@@ -5,18 +5,10 @@ import {
     View,
     TouchableHighlight,
     StyleSheet,
-    Dimensions,
-    ScrollView,
     Image,
-    TouchableWithoutFeedback,
-    DeviceEventEmitter,
     Keyboard
 } from 'react-native';
-import * as firebase from 'firebase';
-import TabBarIcon from '../UI/TabBarIcon';
-import { getData, setData, insertData } from '../services/baseService';
 import { addGamestoList } from '../services/Service';
-import NavigationService from '../services/NavigationService';
 
 
 export default class AddGameItem extends React.Component {
@@ -26,8 +18,6 @@ export default class AddGameItem extends React.Component {
     }
 
     state = {
-        selected: false,
-        selectMode: false,
         showButtons: false,
         addFeedback: false,
         consolesActive: []
@@ -36,67 +26,28 @@ export default class AddGameItem extends React.Component {
     componentDidMount() {
         var _self = this;
         var item = this.props.userConsoles;
-        //console.log("item: ", item);
         var array = [];
         if (item != null) {
             for (var i = 0; i < item.length; i++) {
                 array.push(item[i].key);
             }
-            //console.log("array: ", array);
             _self.setState({ consolesActive: array });
         }
 
-        //DeviceEventEmitter.addListener('selectConsole', (data) => {
-        //    if (data) {
-        //        _self.setState({ showButtons: true });
-        //    } else {
-        //        _self.setState({ showButtons: false });
-        //    }
-        //});
     }
-
-    //itemAction() {
-    //    var _self = this;
-    //    if (this.state.selectMode) {
-    //        _self.setState({ selected: !this.state.selected },
-    //            () => {
-    //                _self.props.callback(_self.props.id);
-    //            }
-    //        );
-    //    } else {
-    //        console.log("GO TO PAGE: ", this.props.id);
-    //        NavigationService.navigate("List", { key: this.props.id });
-    //    }
-    //}
     showButtons = () => {
         var _self = this;
         Keyboard.dismiss();
-        //DeviceEventEmitter.emit('selectConsole', false);
         _self.setState({ showButtons: !this.state.showButtons },
             () => {
-                //_self.props.callback(_self.props.id);
             }
         );
     }
-    //allowSelect() {
-    //    var _self = this;
-    //    _self.setState({ selected: !this.state.selected },
-    //        () => {
-    //            _self.props.callback(_self.props.id);
-    //            DeviceEventEmitter.emit('selectMode', true);
-    //        }
-    //    );
-
-    //}
 
     arrayRemove(arr, value) {
         return arr.filter(function (el) {
             return !value.includes(el);
         });
-        //return arr.filter(function (ele) {
-        //    return ele != value;
-        //});
-
     }
     arrayUnique(array) {
         var a = array.concat();
@@ -140,7 +91,6 @@ export default class AddGameItem extends React.Component {
         _self.setState({ addFeedback: true }, () => {
             setTimeout(function () {
                 _self.setState({ addFeedback: false, showButtons: false }, () => {
-                    //DeviceEventEmitter.emit('selectConsole', false);
                     addGamestoList(_self.props.id, _self.props.game.key, _self.state.consolesActive).then((resp) => {
                         _self.props.callback();
                     });
@@ -157,9 +107,7 @@ export default class AddGameItem extends React.Component {
         }
     }
     listPlatforms = () => {
-        //console.log("RENDER CONSOLES");
         var item = this.state.consolesActive;
-        //console.log("this.state.consolesActive: ", this.state.consolesActive);
         var array = [];
         if (item != null) {
             for (var i = 0; i < item.length; i++) {
@@ -171,24 +119,9 @@ export default class AddGameItem extends React.Component {
         let obj = [];
         let objarray = this.props.game.consoles;
         let filteractive = array;
-        //console.log("objarray: ", objarray);
-        //console.log("filteractive: ", filteractive);
-
-        //console.log("this.props.game.name: ", this.props.game.name);
-        //console.log("filteractive: ", filteractive);
         for (let j = 0; j < objarray.length; j++) {
-            //if (objarray[j].keycompany === undefined) {
-            //    obj.push(
-            //        <TouchableHighlight underlayColor="transparent" onPress={(a) => this.ActiveConsole(objarray[j].key, true)} key={objarray[j].name} style={styles.filterButtonTab}>
-            //            <View>
-            //                <Image source={{ uri: objarray[j].img }} resizeMode={'contain'} style={[styles.filterButtonTabImg, { width: objarray[j].width / 3, height: objarray[j].height / 3 }]} />
-            //            </View>
-            //        </TouchableHighlight>);
-            //} else {
             var styleclass = null;
             var imgcolor = '';
-            //console.log(filteractive[0] + ": ", typeof (filteractive[0]));
-            //console.log(objarray[j].key + ": ", typeof (objarray[j].key));
             if (filteractive.includes(objarray[j].key.toString())) {
                 styleclass = styles.filterButtonActive;
                 imgcolor = '#FFFFFF';
@@ -196,17 +129,13 @@ export default class AddGameItem extends React.Component {
                 styleclass = styles.filterButton;
                 imgcolor = '#BBBBBB';
             }
-            //console.log("color: ", imgcolor);
             obj.push(
                 <TouchableHighlight underlayColor="transparent" onPress={(a) => this.ActiveConsole(objarray[j].key, false)} key={objarray[j].name} style={[styleclass]}>
                     <View>
                         <Image source={{ uri: objarray[j].img }} resizeMode={'contain'} style={[styles.filterButtonImg, { width: objarray[j].width / 5, height: objarray[j].height / 5, tintColor: imgcolor }]} />
                     </View>
                 </TouchableHighlight>);
-            //}
-            console.log("-------------------------");
         }
-        console.log("=======================");
         return obj;
     }
     renderAddButton = () => {
@@ -316,9 +245,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         flex: 1
     },
-    selected: {
-        backgroundColor: '#006CD8',
-    },
     itemInfo: {
         flex: 2,
         flexDirection: 'row',
@@ -328,11 +254,6 @@ const styles = StyleSheet.create({
     },
     labelTitle: {
         fontSize: 24,
-        color: '#FFF',
-        fontFamily: 'SourceSansPro-SemiBold'
-    },
-    labelDetail: {
-        fontSize: 14,
         color: '#FFF',
         fontFamily: 'SourceSansPro-SemiBold'
     },
@@ -360,12 +281,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         height: 30
     },
-    filterButtonText: {
-        color: '#BBBBBB',
-    },
-    filterButtonTextActive: {
-        color: '#FFFFFF',
-    },
     filterButtonActive: {
         backgroundColor: '#006CD8',
         borderRadius: 4,
@@ -375,9 +290,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         height: 30
-    },
-    filterButtonTabImg: {
-        marginHorizontal: 10,
     },
     filterButtonImg: {
         margin: 5

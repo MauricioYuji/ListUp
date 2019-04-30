@@ -1,18 +1,12 @@
 import React from 'react';
-import { Icon } from 'expo';
 import {
     Text,
     View,
     TouchableHighlight,
     StyleSheet,
-    Dimensions,
     Image,
-    TouchableWithoutFeedback,
     DeviceEventEmitter
 } from 'react-native';
-import * as firebase from 'firebase';
-import TabBarIcon from '../UI/TabBarIcon';
-import { getData, setData, insertData } from '../services/baseService';
 import NavigationService from '../services/NavigationService';
 
 
@@ -50,7 +44,6 @@ export default class ListItem extends React.Component {
                 }
             );
         } else {
-            //console.log("GO TO PAGE: ", this.props.id);
             NavigationService.navigate("List", { key: this.props.id });
         }
     }
@@ -88,7 +81,6 @@ export default class ListItem extends React.Component {
         return (<Text style={styles.nameList}>{items}</Text>);
     }
     render() {
-        //console.log("OBJ: ", this.props.obj);
         let itemStyle = null;
         if (this.state.selected) {
             itemStyle = styles.selected;

@@ -13,7 +13,7 @@ import {
 import SortableList from 'react-native-sortable-list';
 import TabBarIcon from './TabBarIcon';
 
-const window = Dimensions.get('window');;
+const window = Dimensions.get('window');
 
 
 
@@ -99,42 +99,6 @@ export default class DragGame extends React.Component {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#eee',
-
-        ...Platform.select({
-            ios: {
-                paddingTop: 20,
-            },
-        }),
-    },
-
-    title: {
-        fontSize: 20,
-        paddingVertical: 20,
-        color: '#999999',
-    },
-
-    list: {
-        flex: 1,
-    },
-
-    contentContainer: {
-        width: window.width,
-
-        ...Platform.select({
-            ios: {
-                paddingHorizontal: 30,
-            },
-
-            android: {
-                paddingHorizontal: 0,
-            }
-        })
-    },
 
     row: {
         flexDirection: 'row',
