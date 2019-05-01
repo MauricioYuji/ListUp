@@ -13,7 +13,7 @@ import {
 
 import NavigationService from '../../components/services/NavigationService';
 import { getData } from '../../components/services/baseService';
-import { getGames, structureGames } from '../../components/services/Service';
+import { structureGames } from '../../components/services/Service';
 import Header from '../../screens/Shared/Header';
 import MasonryList from '@appandflow/masonry-list';
 
@@ -89,7 +89,6 @@ export default class GameScreen extends React.Component {
         const registerPerPage = 10;
         var resultsliced = result.slice(_self.state.page * registerPerPage, _self.state.page * registerPerPage + registerPerPage);
 
-        //_self.getImages(resultsliced);
         var returnarray = _self.state.gamesfiltered.concat(resultsliced);
         if (resultsliced.length > 0) {
             DeviceEventEmitter.emit('reloading', false);
@@ -185,7 +184,7 @@ export default class GameScreen extends React.Component {
         </View>
     }
 }
-const styles = {
+const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingBottom: 50,
@@ -223,4 +222,4 @@ const styles = {
         color: "#FFF",
         fontSize: 20
     }
-}
+});

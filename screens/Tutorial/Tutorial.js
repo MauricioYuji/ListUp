@@ -8,7 +8,7 @@ import {
     DeviceEventEmitter
 } from 'react-native';
 import * as firebase from 'firebase';
-import { Font, Icon } from 'expo';
+import { Icon } from 'expo';
 import Swiper from 'react-native-swiper';
 
 export default class Tutorial extends React.Component {

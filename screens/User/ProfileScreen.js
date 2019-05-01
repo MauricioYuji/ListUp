@@ -15,7 +15,6 @@ export default class ProfileScreen extends React.Component {
     componentWillMount() {
         const { navigation } = this.props;
         const Id = navigation.getParam('Id', 0);
-        console.log("Id: ", Id);
         this.setState({ Id: Id });
     }
     test() {

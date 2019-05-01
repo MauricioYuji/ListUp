@@ -8,7 +8,6 @@ import {
     View,
     TouchableHighlight,
     Dimensions,
-    DeviceEventEmitter,
     Modal,
     TouchableWithoutFeedback
 } from 'react-native';
@@ -17,7 +16,7 @@ import { LinearGradient } from 'expo';
 import NavigationService from '../../components/services/NavigationService';
 import Layout from '../../constants/Layout';
 import { setData } from '../../components/services/baseService';
-import { getGameDetail, structureGames } from '../../components/services/Service';
+import { structureGames } from '../../components/services/Service';
 import LoadingScreen from '../Loading/LoadingScreen';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 import AddGameButton from '../../components/UI/AddGameButton';
@@ -67,13 +66,6 @@ export default class GameDetailScreen extends React.Component {
                 return true;
             }).catch(err => console.log('There was an error:' + err));
         });
-
-
-        //getGameDetail(this.state.key).then((game) => {
-        //    _self.setState({ loaded: true, game: game, mounted: true });
-
-        //});
-
     }
     componentWillUnmount() {
         this.setState({ mounted: false });
@@ -152,7 +144,6 @@ export default class GameDetailScreen extends React.Component {
         this.setState({ modalVisible: false, modalVisibleAddGame: true });
     }
     addToList = (list) => {
-        //console.log("list: ", list);
 
         this.setState({ modalVisible: false });
     }
@@ -220,7 +211,6 @@ export default class GameDetailScreen extends React.Component {
         let loaded = this.state.loaded;
         let game = this.state.game;
         if (loaded && game != null) {
-            console.log("game: ", game);
             return (
                 <View style={styles.container}>
                     <ScrollView>

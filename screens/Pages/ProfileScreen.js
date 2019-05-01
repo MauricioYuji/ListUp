@@ -1,24 +1,11 @@
 import React from 'react';
-import * as firebase from 'firebase';
 import {
-    Image,
-    Platform,
     ScrollView,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View,
-    Button,
-    TouchableHighlight,
     DeviceEventEmitter
 } from 'react-native';
-import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
-
-import Layout from '../../constants/Layout';
-import { getData, setData } from '../../components/services/baseService';
-import { getUserGames } from '../../components/services/Service';
-import LoadingScreen from '../Loading/LoadingScreen';
-import { parse } from 'qs';
 
 export default class ProfileScreen extends React.Component {
 
@@ -30,8 +17,7 @@ export default class ProfileScreen extends React.Component {
     }
 
     state = {
-        key: null,
-        loaded: false
+        key: null
     };
     componentWillMount() {
 
@@ -39,44 +25,18 @@ export default class ProfileScreen extends React.Component {
         const key = navigation.getParam('key', 'NO-ID');
         this.setState({ key: key });
 
-
+        DeviceEventEmitter.emit('reloading', true);
     }
     componentDidMount() {
-
-        this.setState({ loaded: true });
-        
-        //getData('Companies')
-        //    .then((companies) => {
-        //        companies = companies === undefined ? null : companies;
-        //        //console.log("companies: ", companies);
-        //        this.setState({ companies: companies });
-        //        getUserGames(user.uid).then((usergames) => {
-        //            var game = null;
-        //            if (usergames.length > 0) {
-        //                game = usergames[Math.floor(Math.random() * usergames.length)];
-        //            }
-        //            this.setState({ usergames: usergames, randomGame: game, loaded: true });
-        //        });
-        //    });
-
-
+        DeviceEventEmitter.emit('reloading', false);
     }
     componentWillUnmount() {
-        this.setState({
-        });
     }
     render() {
-        let loaded = this.state.loaded;
         let key = this.state.key;
-        if (loaded) {
-            return (
-                <View style={styles.container}>
-                    <Text style={styles.text}>Profile - {key}</Text>
-                </View>
-            );
-        } else {
-            return (<LoadingScreen />);
-        }
+        <View style={styles.container}>
+            <Text style={styles.text}>Profile - {key}</Text>
+        </View>
     }
 
 

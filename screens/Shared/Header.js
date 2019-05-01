@@ -1,28 +1,17 @@
 import React from 'react';
-//import * as firebase from 'firebase';
 import {
     Image,
-    Platform,
     ScrollView,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View,
     TextInput,
     TouchableHighlight,
     DeviceEventEmitter,
-    AsyncStorage,
     Animated,
-    PixelRatio,
     Dimensions
 } from 'react-native';
-import { WebBrowser, Icon, Constants } from 'expo';
-import * as firebase from 'firebase';
-import { Grow } from '../../components/animations/Grow';
-import { FadeSpin } from '../../components/animations/FadeSpin';
-import NavigationService from '../../components/services/NavigationService';
 import TabBarIcon from '../../components/UI/TabBarIcon';
-import { setData } from '../../components/services/baseService';
 
 export default class Header extends React.Component {
 
@@ -38,8 +27,6 @@ export default class Header extends React.Component {
         genres: [],
         genresActive: [],
         searchText: "",
-        loading: false,
-        showMenu: false,
         rotateAnim: new Animated.Value(0),  // Initial value for opacity: 0
         visible: false,
         selectMode: false
@@ -77,7 +64,6 @@ export default class Header extends React.Component {
                 duration: 300
             })
         ]).start(() => {
-            // callback
         });
 
     };
@@ -134,9 +120,6 @@ export default class Header extends React.Component {
         return arr.filter(function (el) {
             return !value.includes(el);
         });
-        //return arr.filter(function (ele) {
-        //    return ele != value;
-        //});
 
     }
     arrayUnique(array) {
@@ -509,8 +492,6 @@ const styles = StyleSheet.create({
         right: 0,
         width: '100%',
         height: 60,
-        //overflow: 'hidden',
-        //backgroundColor: 'rgba(255, 255, 255, 0.0)',
         backgroundColor: '#333',
         flexDirection: 'row',
         alignSelf: 'flex-start',
@@ -691,11 +672,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#006CD8',
         zIndex: 100,
         borderRadius: Dimensions.get('window').width * 2,
-        //transform: [{ translateY: -Dimensions.get('window').height / 2 }, { translateX: Dimensions.get('window').height / 4 }]
-        //top: 0,
-        //right: 0,
-        //width: Dimensions.get('window').width,
-        //height: Dimensions.get('window').width,
     },
     menuArea: {
         position: 'absolute',
@@ -704,7 +680,6 @@ const styles = StyleSheet.create({
     },
     contentMenu: {
         position: 'absolute',
-        //right: Dimensions.get('window').width / 4,
         left: Dimensions.get('window').width / 2,
         top: Dimensions.get('window').width,
         width: Dimensions.get('window').width,
@@ -720,9 +695,6 @@ const styles = StyleSheet.create({
     menuContent: {
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').width / 3 - 40,
-        //position: 'absolute',
-        //top: 50,
-        //left: 0,
         zIndex: 10000000000,
     },
     menuItem: {

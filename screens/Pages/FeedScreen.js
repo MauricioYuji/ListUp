@@ -1,28 +1,11 @@
 ﻿import React from 'react';
-import * as firebase from 'firebase';
 import {
-    Image,
-    Platform,
-    ScrollView,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View,
-    Button,
-    TouchableHighlight,
-    Dimensions,
-    RefreshControl,
     DeviceEventEmitter
 } from 'react-native';
-import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 
-import Layout from '../../constants/Layout';
-import { getData, setData } from '../../components/services/baseService';
-import { getGames } from '../../components/services/Service';
-import LoadingScreen from '../Loading/LoadingScreen';
-import Masonry from 'react-native-masonry-layout';
-const { width } = Dimensions.get("window");
-const columnWidth = (width - 10) / 2 - 10;
 
 export default class FeedScreen extends React.Component {
 
@@ -31,17 +14,35 @@ export default class FeedScreen extends React.Component {
     };
     constructor(props) {
         super(props);
-        this.state = {
-        };
     }
 
+    state = {
+    };
+    componentWillMount() {
+        DeviceEventEmitter.emit('reloading', true);
+    }
     componentDidMount() {
+        DeviceEventEmitter.emit('reloading', false);
     }
-    
-
+    componentWillUnmount() {
+    }
     render() {
-        return <View style={{ flex: 1 }}>
-            <Text>Feed</Text>
-        </View>
+        return (
+            <View style={styles.container}>
+                <Text style={styles.text}>Feed</Text>
+            </View>
+        );
     }
+
+
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    text: {
+        fontSize: 30,
+        color: '#FFF'
+    },
+});

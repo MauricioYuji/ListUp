@@ -1,23 +1,11 @@
 import React from 'react';
-import * as firebase from 'firebase';
 import {
-    Image,
-    Platform,
-    ScrollView,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View,
-    Button,
-    TouchableHighlight,
     DeviceEventEmitter
 } from 'react-native';
-import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 
-import Layout from '../../constants/Layout';
-import { getData, setData } from '../../components/services/baseService';
-import { getUserGames } from '../../components/services/Service';
-import LoadingScreen from '../Loading/LoadingScreen';
 
 export default class GroupScreen extends React.Component {
 
@@ -29,53 +17,21 @@ export default class GroupScreen extends React.Component {
     }
 
     state = {
-        user: null,
-        usergames: [],
-        companies: null,
-        randomGame: null,
-        loaded: false
     };
     componentWillMount() {
+        DeviceEventEmitter.emit('reloading', true);
     }
     componentDidMount() {
-
-        this.setState({ loaded: true });
-
-
-        //getData('Companies')
-        //    .then((companies) => {
-        //        companies = companies === undefined ? null : companies;
-        //        //console.log("companies: ", companies);
-        //        this.setState({ companies: companies });
-        //        getUserGames(user.uid).then((usergames) => {
-        //            var game = null;
-        //            if (usergames.length > 0) {
-        //                game = usergames[Math.floor(Math.random() * usergames.length)];
-        //            }
-        //            this.setState({ usergames: usergames, randomGame: game, loaded: true });
-        //        });
-        //    });
-
-
+        DeviceEventEmitter.emit('reloading', false);
     }
     componentWillUnmount() {
-        this.setState({
-            user: null,
-            usergames: [],
-            companies: null
-        });
     }
     render() {
-        let loaded = this.state.loaded;
-        if (loaded) {
-            return (
-                <View style={styles.container}>
-                    <Text style={styles.text}>Groups</Text>
-                </View>
-            );
-        } else {
-            return (<LoadingScreen />);
-        }
+        return (
+            <View style={styles.container}>
+                <Text style={styles.text}>Groups</Text>
+            </View>
+        );
     }
 
 

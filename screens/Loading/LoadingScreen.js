@@ -1,6 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View, TextInput, Image, ActivityIndicator, Keyboard } from 'react-native';
-import { ExpoConfigView } from '@expo/samples';
+import { StyleSheet, View, ActivityIndicator } from 'react-native';
 
 export default class LoadingScreen extends React.Component {
     static navigationOptions = {

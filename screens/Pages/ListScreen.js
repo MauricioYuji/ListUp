@@ -1,42 +1,29 @@
 ﻿import React from 'react';
 import * as firebase from 'firebase';
 import {
-    Image,
     Platform,
     ScrollView,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View,
-    Button,
     TouchableHighlight,
     Dimensions,
-    RefreshControl,
-    ActivityIndicator,
     DeviceEventEmitter,
     Modal,
-    TouchableWithoutFeedback,
     TextInput,
     Picker
 } from 'react-native';
-import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 import SortableList from 'react-native-sortable-list';
 
 import NavigationService from '../../components/services/NavigationService';
-import Layout from '../../constants/Layout';
-import { getData, setData, insertData } from '../../components/services/baseService';
-import { getListByKey, getGames, deleteGamesFromList, structureList, structureGames, deleteItemsFromList } from '../../components/services/Service';
+import { setData } from '../../components/services/baseService';
+import { deleteGamesFromList, structureList, structureGames, deleteItemsFromList } from '../../components/services/Service';
 import GameItem from '../../components/UI/GameItem';
 import AddGameItem from '../../components/UI/AddGameItem';
-import ListItem from '../../components/UI/ListItem';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 import Header from '../../screens/Shared/Header';
-import LoadingScreen from '../Loading/LoadingScreen';
 import DragGame from '../../components/UI/DragGame';
 
-const { width } = Dimensions.get("window");
-const columnWidth = (width - 10) / 2 - 10;
-var process = false;
 
 
 
@@ -118,7 +105,6 @@ export default class ListScreen extends React.Component {
                 );
             }
         );
-        //this.setState({ modal: visible });
     }
 
     loadData = (key) => {
@@ -149,14 +135,12 @@ export default class ListScreen extends React.Component {
 
     }
     selectItem = (id) => {
-        console.log("id: ", id);
         var arrayobj = this.state.selectedItens;
         if (!arrayobj.includes(id)) {
             arrayobj.push(id);
         }
         this.setState({ selectedItens: arrayobj, selectMode: true },
             () => {
-                //DeviceEventEmitter.emit('selectMode', true);
             }
         );
     }
@@ -169,7 +153,6 @@ export default class ListScreen extends React.Component {
             this.closeModal();
             _self.setState({ selectedItens: [], selectMode: false },
                 () => {
-                    //DeviceEventEmitter.emit('confirmDelete', true);
                     DeviceEventEmitter.emit('selectMode', false);
                 }
             );
@@ -184,9 +167,6 @@ export default class ListScreen extends React.Component {
             _self.setState({ modalVisible: false },
                 () => {
                     NavigationService.navigate("Lists");
-                    //DeviceEventEmitter.emit('confirmDelete', true);
-                    //DeviceEventEmitter.emit('selectMode', false);
-                    //this.loadData();
                 }
             );
         });
@@ -226,7 +206,6 @@ export default class ListScreen extends React.Component {
 
     }
     editList = () => {
-        console.log("SEND EDIT");
         var list = this.state.listedit;
         if (list.title == "" || list.type == "" || list.status == "" || list.description == "" || list.limit == "") {
             this.setState({ modelInvalid: true });
@@ -242,24 +221,17 @@ export default class ListScreen extends React.Component {
                 status: list.status,
                 limit: list.limit
             };
-
-            console.log("EDIT LIST");
-            //console.log("obj: ", obj);
             var user = firebase.auth().currentUser;
             setData('userLists/' + user.uid + '/' + list.key, obj)
                 .then((resp) => {
                     _self.setState({ modalVisible: false });
                     _self.loadData("");
-                    console.log("resp: ", resp);
-                    console.log("=============================");
                 });
         }
     }
     addGame = () => {
-        console.log("ADD GAME");
         _self.setState({ modalActive: _self._modalAdd() },
             () => {
-                //_self.filterObj();
             }
         );
     }
@@ -293,14 +265,12 @@ export default class ListScreen extends React.Component {
     }
 
     _searchGame(search) {
-        //console.log("Search: ", search);
         var _self = this;
         if (search == "") {
             _self.setState({ games: [] },
                 () => {
                     _self.setState({ modalActive: _self._modalAdd() },
                         () => {
-                            //_self.filterObj();
                         }
                     );
                 }
@@ -308,10 +278,6 @@ export default class ListScreen extends React.Component {
         } else {
             if (this.state.searching)
                 return false;
-
-            //setTimeout(function () {
-
-            //}, 2000);
             _self.setState({ searching: true },
                 () => {
                     var re = new RegExp(search.toLowerCase(), 'g');
@@ -347,34 +313,19 @@ export default class ListScreen extends React.Component {
     saveGameEdit() {
         var list = this.state.list;
         list.games = this.state.listgames;
-        //for (let i = 0; i < list.games.length; i++) {
-        //    console.log("list.games: ", list.games[i].name);
-        //}
-        //for (let i = 0; i < this.state.list.games.length; i++) {
-        //    console.log("name: ", this.state.list.games[i].name);
-        //}
         this.setState({ list: list },
             () => {
                 var _self = this;
 
 
-                //var obj = {
-                //    games: this.state.listgames
-                //};
                 let obj = {
                     games: []
                 };
-                //var games = [];
                 for (let i = 0; i < list.games.length; i++) {
-                    //var obj = {};
                     var consoles = [];
                     for (let j = 0; j < list.games[i].userConsoles.length; j++) {
                         consoles.push(list.games[i].userConsoles[j].key);
                     }
-                    //console.log(this.state.listgames[i].key + ": ", this.state.listgames[i].name);
-                    //obj[this.state.listgames[i].key] = consoles;
-                    //games.push(obj);
-                    //games.set(this.state.listgames[i].key, consoles);
                     var item = {};
                     item[list.games[i].key] = consoles;
 
@@ -382,14 +333,11 @@ export default class ListScreen extends React.Component {
                     obj.games.push(item);
                 }
                 var user = firebase.auth().currentUser;
-                console.log("obj: ", obj);
                 setData('userLists/' + user.uid + '/' + list.key, obj)
                     .then((resp) => {
                         _self.setState({ modalVisible: false },
                             () => {
                                 _self.loadData("");
-                                console.log("resp: ", resp);
-                                console.log("=============================");
                             }
                         );
                     });
@@ -408,21 +356,11 @@ export default class ListScreen extends React.Component {
         );
     }
     deleteItemFromList = (id) => {
-        console.log("id: ", id);
         var list = Object.assign([], this.state.listgames);
         var r = list.filter(p => p.key == id);
-        //console.log("r: ", r);
         var index = list.indexOf(r[0]);
 
-        //var index = list.findIndex(p => p.key == id);
-        //var index = list.findIndex(function (p) {
-        //    return p.key == id;
-        //});
-        //console.log("index: ", index);
         list.splice(index, 1);
-        //for (let i = 0; i < list.length; i++) {
-        //    console.log("list: ", list[i].name);
-        //}
 
         this.setState({ modalActive: this._modalEditGames() });
         var _self = this;
@@ -435,16 +373,9 @@ export default class ListScreen extends React.Component {
                 );
             }
         );
-        //var obj = this.state.list;
-        //obj.games = list;
-        //this.setState({ list: obj },
-        //    () => {
-        //    }
-        //);
     }
     renderGames() {
         let list = this.state.games;
-        //console.log("list: ", list);
         let items = [];
         for (let i = 0; i < list.length; i++) {
             var game = this.state.list.games.filter(p => p.key == list[i].key)[0];
@@ -452,8 +383,6 @@ export default class ListScreen extends React.Component {
             if (game != undefined) {
                 userconsoles = game.userConsoles;
             }
-            console.log("game: ", game);
-            //console.log("userconsoles: ", userconsoles);
             items.push(<AddGameItem key={i} game={list[i]} userConsoles={userconsoles} callback={this.addGame.bind(this)} id={this.state.list.key} />);
         }
         return items;
@@ -488,7 +417,6 @@ export default class ListScreen extends React.Component {
         }
     }
     _modalAdd() {
-        console.log("RENDER GAMES");
         return (
             <View style={styles.menuList}>
                 <View style={styles.scrollBox}>
@@ -711,7 +639,7 @@ export default class ListScreen extends React.Component {
         );
     }
 }
-const styles = {
+const styles = StyleSheet.create({
     containersort: {
         flex: 1,
         justifyContent: 'center',
@@ -756,7 +684,6 @@ const styles = {
         alignSelf: 'center',
         textAlign: 'center',
         width: Dimensions.get('window').width / 2,
-        //height: Dimensions.get('window').height / 3,
         padding: 15,
         marginTop: 20
     },
@@ -830,8 +757,6 @@ const styles = {
         padding: 15,
         marginBottom: 15,
         backgroundColor: "#006CD8",
-        //borderTopColor: "#006CD8",
-        //borderTopWidth: 4
     },
     labelTitle: {
         fontSize: 34,
@@ -884,7 +809,6 @@ const styles = {
         textAlign: 'center',
         alignItems: 'center',
         justifyContent: 'center'
-        //paddingBottom: 100
     },
     listBox: {
         paddingTop: 50,
@@ -894,7 +818,6 @@ const styles = {
         textAlign: 'center',
         alignItems: 'center',
         justifyContent: 'center',
-        //paddingBottom: 100
     },
     menuTitle: {
         color: '#FFF',
@@ -991,7 +914,6 @@ const styles = {
         width: '100%'
     },
     pickerStyle: {
-        //backgroundColor: '#444',
         borderRadius: 10,
         color: '#FFF'
     },
@@ -1005,4 +927,4 @@ const styles = {
         textAlign: 'center',
         padding: 40,
     },
-}
+});

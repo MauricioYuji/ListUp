@@ -1,82 +1,68 @@
 import * as firebase from 'firebase';
 import { getData, setData, deleteData, insertData } from './baseService';
 
-export const getGames = async (page) => {
-    let games = null;
-    var objgames = [];
+const getGame = async (keys) => {
+
     let list = require('../../files/consoles.json');
 
-    await firebase.database().ref('/Games').once('value').then(function (snapshot) {
-        games = snapshot.val();
+    return new Promise((resolve, reject) => {
+        var promises = keys.map(function (key) {
+            return firebase.database().ref("/Games/").child(key).once("value");
+        });
+        Promise.all(promises).then(function (snapshots) {
+            var obj = {};
+            snapshots.forEach(function (snapshot) {
+                var genres = [];
+                var consoles = [];
+                var companies = [];
+                var item = snapshot.val();
+                var file = { key: item.img, url: "", file: null };
+                for (var j = 0; j < item.keyconsole.length; j++) {
+                    var c = list.Companies[list.Consoles[item.keyconsole[j]].keycompany];
+                    consoles.push(list.Consoles[item.keyconsole[j]]);
+                    c.key = list.Consoles[item.keyconsole[j]].keycompany;
+                    if (!companies.includes(c))
+                        companies.push(c);
+                }
+
+                for (var j = 0; j < item.keygenre.length; j++) {
+                    genres.push(list.Genres[item.keygenre[j]]);
+
+                }
+                var game = {
+                    key: snapshot.key,
+                    name: item.name,
+                    image: file,
+                    genres: genres,
+                    consoles: consoles,
+                    companies: companies
+                };
+
+                obj[snapshot.key] = game;
+
+            });
+
+
+
+            resolve(obj);
+        });
     });
 
-    for (var key in games) {
-        var genres = [];
-        var consoles = [];
-        var companies = [];
-        var item = games[key];
-        var file = { key: games[key].img, url: "", file: null };
-        for (var j = 0; j < item.keyconsole.length; j++) {
-            var c = list.Companies[list.Consoles[item.keyconsole[j]].keycompany];
-            consoles.push(list.Consoles[item.keyconsole[j]]);
-            c.key = list.Consoles[item.keyconsole[j]].keycompany;
-            if (!companies.includes(c))
-                companies.push(c);
-        }
-
-        for (var j = 0; j < item.keygenre.length; j++) {
-            genres.push(list.Genres[item.keygenre[j]]);
-
-        }
-        var obj = {
-            key: key,
-            name: item.name,
-            file: file,
-            genres: genres,
-            consoles: consoles,
-            companies: companies,
-        };
-        objgames.push(obj);
-    };
-    return objgames;
 };
+const getImages = async (keys) => {
+    return new Promise((resolve, reject) => {
+        var promises = keys.map(function (key) {
+            return firebase.database().ref("/thumbs/").child(key).once("value");
+        });
+        Promise.all(promises).then(function (snapshots) {
+            var obj = {};
+            snapshots.forEach(function (snapshot) {
+                obj[snapshot.key] = snapshot.val();
 
-export const getGameDetail = async (key) => {
-    let game = null;
-    let list = require('../../files/consoles.json');
-    await firebase.database().ref('/Games/' + key).once('value').then(function (snapshot) {
-        game = snapshot.val();
+            });
+            resolve(obj);
+        });
     });
-    var genres = [];
-    var consoles = [];
-    var companies = [];
-    var file = await firebase.database().ref('thumbs/' + game.img).once('value').then(function (snapshot) {
-        return snapshot.val();
-    });
-    for (var j = 0; j < game.keyconsole.length; j++) {
-        var c = list.Companies[list.Consoles[game.keyconsole[j]].keycompany];
-        consoles.push(list.Consoles[game.keyconsole[j]]);
-        c.key = list.Consoles[game.keyconsole[j]].keycompany;
-        if (!companies.includes(c))
-            companies.push(c);
-
-    }
-
-    for (var j = 0; j < game.keygenre.length; j++) {
-        genres.push(list.Genres[game.keygenre[j]]);
-
-    }
-    var obj = {
-        key: key,
-        name: game.name,
-        file: file,
-        description: game.description,
-        genres: genres,
-        consoles: consoles,
-        companies: companies,
-    };
-
-    return obj;
 };
 
 export const structureGames = async (games) => {
@@ -134,7 +120,6 @@ export const structureGames = async (games) => {
 
     });
 };
-
 export const structureList = async (obj) => {
     let objlist = require('../../files/consoles.json');
     return new Promise((resolve, reject) => {
@@ -178,135 +163,6 @@ export const structureList = async (obj) => {
 
     });
 };
-
-getGame = async (keys) => {
-
-    let list = require('../../files/consoles.json');
-
-    return new Promise((resolve, reject) => {
-        var promises = keys.map(function (key) {
-            return firebase.database().ref("/Games/").child(key).once("value");
-        });
-        Promise.all(promises).then(function (snapshots) {
-            var obj = {};
-            snapshots.forEach(function (snapshot) {
-                var genres = [];
-                var consoles = [];
-                var companies = [];
-                var item = snapshot.val();
-                var file = { key: item.img, url: "", file: null };
-                for (var j = 0; j < item.keyconsole.length; j++) {
-                    var c = list.Companies[list.Consoles[item.keyconsole[j]].keycompany];
-                    consoles.push(list.Consoles[item.keyconsole[j]]);
-                    c.key = list.Consoles[item.keyconsole[j]].keycompany;
-                    if (!companies.includes(c))
-                        companies.push(c);
-                }
-
-                for (var j = 0; j < item.keygenre.length; j++) {
-                    genres.push(list.Genres[item.keygenre[j]]);
-
-                }
-                var game = {
-                    key: snapshot.key,
-                    name: item.name,
-                    image: file,
-                    genres: genres,
-                    consoles: consoles,
-                    companies: companies
-                };
-
-                obj[snapshot.key] = game;
-
-            });
-
-
-
-            resolve(obj);
-        });
-    });
-
-};
-getImages = async (keys) => {
-    return new Promise((resolve, reject) => {
-        var promises = keys.map(function (key) {
-            return firebase.database().ref("/thumbs/").child(key).once("value");
-        });
-        Promise.all(promises).then(function (snapshots) {
-            var obj = {};
-            snapshots.forEach(function (snapshot) {
-                obj[snapshot.key] = snapshot.val();
-
-            });
-            resolve(obj);
-        });
-    });
-};
-
-export const getuserList = async (page) => {
-    var user = firebase.auth().currentUser;
-    let lists = null;
-    var objgames = [];
-    await firebase.database().ref('/userLists/' + user.uid).once('value').then(function (snapshot) {
-        lists = snapshot.val();
-    });
-
-
-    for (var key in lists) {
-
-
-
-        var item = lists[key];
-
-
-        let consoles = [];
-        for (var games in item.games) {
-            var objgame = {
-                key: games,
-                consoles: item.games[games]
-            };
-            consoles.push(objgame);
-        }
-        var obj = {
-            key: key,
-            title: item.title,
-            limit: item.limit,
-            type: item.type,
-            games: consoles,
-            description: item.description
-        };
-        objgames.push(obj);
-    }
-    return objgames;
-};
-
-export const getListByKey = async (key) => {
-    var user = firebase.auth().currentUser;
-    let list = null;
-    await firebase.database().ref('/userLists/' + user.uid + '/' + key).once('value').then(function (snapshot) {
-        list = snapshot.val();
-    });
-
-    let consoles = [];
-    for (var games in list.games) {
-        var objgame = {
-            key: games,
-            consoles: list.games[games]
-        };
-        consoles.push(objgame);
-    }
-    var obj = {
-        key: key,
-        title: list.title,
-        limit: list.limit,
-        type: list.type,
-        games: consoles,
-        description: list.description
-    };
-    return obj;
-};
-
-
 export const deleteItemsFromList = async (keys) => {
 
     var user = firebase.auth().currentUser;
@@ -325,7 +181,6 @@ export const deleteItemsFromList = async (keys) => {
     });
 
 };
-
 export const deleteGamesFromList = async (keys, keylist) => {
 
     var user = firebase.auth().currentUser;
@@ -350,7 +205,6 @@ export const deleteGamesFromList = async (keys, keylist) => {
     });
 
 };
-
 export const addGamestoList = async (keylist, keygame, obj) => {
     var user = firebase.auth().currentUser;
     let list = null;

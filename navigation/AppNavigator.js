@@ -2,7 +2,6 @@ import React from 'react';
 import { createAppContainer, createSwitchNavigator, createStackNavigator, Easing, Animated } from 'react-navigation';
 
 import MainTabNavigator from './MainTabNavigator';
-import UserNavigator from './UserNavigator';
 import AuthNavigator from './AuthNavigator';
 import TutorialScreen from '../screens/Tutorial/TutorialTemplate';
 import GroupsScreen from '../screens/Pages/GroupsScreen';
@@ -31,21 +30,8 @@ const transitionConfig = () => {
     };
 };
 export default createAppContainer(createSwitchNavigator({
-    // You could add another route here for authentication.
-    // Read more at https://reactnavigation.org/docs/en/auth-flow.html
     App: MainTabNavigator,
-    User: UserNavigator,
     Auth: AuthNavigator,
     Tutorial: TutorialScreen,
     Group: GroupsScreen
 }));
-
-
-const TutorialStack = createStackNavigator({
-    Tutorial: TutorialScreen
-},
-    {
-        headerMode: 'none',
-        cardStyle: { backgroundColor: '#00000000' },
-        transitionConfig: transitionConfig,
-    });

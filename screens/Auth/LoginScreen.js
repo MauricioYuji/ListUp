@@ -1,10 +1,6 @@
 ﻿import React from 'react';
-import { ScrollView, StyleSheet, Text, View, TextInput, CheckBox, DeviceEventEmitter, Image, TouchableOpacity, Switch, Icon, ActivityIndicator, ImageBackground } from 'react-native';
-import { ExpoLinksView } from '@expo/samples';
-import Layout from '../../constants/Layout';
+import { StyleSheet, Text, View, TextInput, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { signInWithFacebook } from '../../components/services/facebookAuth';
-import { setData } from '../../components/services/baseService';
-import { Constants } from 'expo';
 import * as firebase from 'firebase';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 
@@ -19,50 +15,23 @@ export default class LoginScreen extends React.Component {
     state = {
         secureTextEntry: true, email: '', password: '', errorMessage: null, loading: null, emailSend: false, feedback: null
     };
-    facebookloggin() {
+    facebooklogin() {
         const _self = this;
         this.setState({ loading: 'facebook' });
         signInWithFacebook().then(() => {
 
             _self.setState({ errorMessage: null, loading: null });
-            //var user = firebase.auth().currentUser;
-
-            //console.log("user: ", user);
-            //var obj = {
-            //    uid: user.uid,
-            //    photoURL: user.photoURL,
-            //    displayName: user.displayName,
-            //    email: user.email,
-            //    flagtutorial: false
-            //};
-            //console.log("obj: ", obj);
-            //setData('UserInfo/' + user.uid, obj).then((p) => {
-            //    console.log("p: ", p);
-            //    _self.setState({ errorMessage: null, loading: null });
-            //});
-            //if (user.emailVerified) {
-            //    _self.setState({ errorMessage: null, loading: null });
-            //} else {
-
-            //    firebase.auth().signOut().then(function () {
-            //        // Sign-out successful.
-            //        _self.setState({ errorMessage: 'Verifique seu email e confirma sua conta para poder entrar.', loading: null });
-            //    }, function (error) {
-            //        // An error happened.
-            //    });
-            //}
         })
             .catch(() => {
                 this.setState({ errorMessage: null, loading: null });
             });
     }
-    loggin() {
+    login() {
 
         const { email, password } = this.state;
         const _self = this;
         _self.setState({ loading: 'login', errorMessage: null, emailSend: false, feedback: null });
         firebase.auth().signOut().then(function () {
-            // Sign-out successful.
             firebase.auth().signInWithEmailAndPassword(email, password)
                 .then((data) => {
                     var user = firebase.auth().currentUser;
@@ -73,19 +42,12 @@ export default class LoginScreen extends React.Component {
 
 
                         _self.setState({ errorMessage: 'Verifique seu email e confirme sua conta para poder entrar.', loading: null, emailSend: true, feedback: null });
-                        //firebase.auth().signOut().then(function () {
-                        //    // Sign-out successful.
-                        //}, function (error) {
-                        //    // An error happened.
-                        //});
                     }
-                    //DeviceEventEmitter.emit('login', { logged: true });
                 })
                 .catch(() => {
                     _self.setState({ errorMessage: 'Usuário ou senha inválidos!', loading: null, feedback: null });
                 });
         }, function (error) {
-            // An error happened.
         });
 
 
@@ -95,11 +57,8 @@ export default class LoginScreen extends React.Component {
         _self.setState({ errorMessage: null, loading: null, emailSend: false });
         var user = firebase.auth().currentUser;
         user.sendEmailVerification().then(function () {
-            console.log("EMAIL ENVIADO");
-            // Email sent.
             _self.setState({ feedback: 'Email enviado com sucesso.' });
         }).catch(function (error) {
-            // An error happened.
         });
     }
     render() {
@@ -117,9 +76,7 @@ export default class LoginScreen extends React.Component {
         return (
             <View style={styles.container}
                 keyboardShouldPersistTaps='handled'>
-                {/* Go ahead and delete ExpoLinksView and replace it with your
-           * content, we just wanted to provide you with some helpful links */}
-                    <View style={styles.loginBox}>
+                <View style={styles.loginBox}>
 
                     <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
                     <View style={styles.inputGroup}>
@@ -179,7 +136,7 @@ export default class LoginScreen extends React.Component {
                                 <ActivityIndicator size="small" color="#FFFFFF" />
                             ) : (
                                     <TouchableOpacity onPress={() => {
-                                        this.loggin();
+                                        this.login();
                                     }}>
 
 
@@ -197,7 +154,7 @@ export default class LoginScreen extends React.Component {
                         {loadingButton === "facebook" ? (
                             <ActivityIndicator size="small" color="#FFFFFF" />
                         ) : (
-                                <TouchableOpacity onPress={() => { this.facebookloggin(); }} style={styles.buttonGroup}>
+                                <TouchableOpacity onPress={() => { this.facebooklogin(); }} style={styles.buttonGroup}>
                                     <TabBarIcon
                                         size={26}
                                         name={'facebook'}
@@ -212,22 +169,12 @@ export default class LoginScreen extends React.Component {
                     </View>
 
                 </View>
-                </View >
+            </View >
         );
     }
 }
 
 const styles = StyleSheet.create({
-    backgroundBanner: {
-        width: '100%',
-        height: Layout.window.height,
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 0,
-    },
     container: {
         flex: 1,
         alignItems: 'center',

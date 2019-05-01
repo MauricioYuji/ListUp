@@ -1,10 +1,6 @@
 ﻿import React from 'react';
-import { ScrollView, StyleSheet, Text, View, TextInput, CheckBox, DeviceEventEmitter, Image, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
-import { ExpoLinksView } from '@expo/samples';
-import Layout from '../../constants/Layout';
-import { Constants } from 'expo';
+import { StyleSheet, Text, View, TextInput, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import * as firebase from 'firebase';
-//import { getUserInfo, saveUserInfo } from '../components/baseService';
 import { signInWithFacebook } from '../../components/services/facebookAuth';
 import { setData } from '../../components/services/baseService';
 import TabBarIcon from '../../components/UI/TabBarIcon';
@@ -22,14 +18,11 @@ export default class RegisterScreen extends React.Component {
     };
 
     validate = (text) => {
-        //console.log(text);
         let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
         if (reg.test(text) === false) {
-            //console.log("Email is Not Correct");
             return false;
         }
         else {
-            //console.log("Email is Correct");
             return true;
         }
     }
@@ -39,7 +32,6 @@ export default class RegisterScreen extends React.Component {
         signInWithFacebook().then(() => {
 
             var user = firebase.auth().currentUser;
-            console.log("user: ", user);
             var obj = {
                 uid: user.uid,
                 photoURL: user.photoURL,
@@ -47,9 +39,7 @@ export default class RegisterScreen extends React.Component {
                 email: user.email,
                 flagtutorial: false
             };
-            console.log("obj: ", obj);
             setData('UserInfo/' + user.uid, obj).then((p) => {
-                console.log("p: ", p);
                 _self.setState({ errorMessage: null, loading: null });
             });
 
@@ -116,7 +106,6 @@ export default class RegisterScreen extends React.Component {
             });
             firebase.auth().createUserWithEmailAndPassword(email.value, password.value)
                 .then(() => {
-                    console.log("usuario criado");
 
                     var user = firebase.auth().currentUser;
 
@@ -124,12 +113,8 @@ export default class RegisterScreen extends React.Component {
                         displayName: name.value,
                         photoURL: ""
                     }).then(function () {
-                        // Update successful.
 
                         user.sendEmailVerification().then(function () {
-                            console.log("EMAIL ENVIADO");
-                            // Email sent.
-                            console.log("user: ", user);
                             var obj = {
                                 uid: user.uid,
                                 photoURL: user.photoURL,
@@ -137,32 +122,17 @@ export default class RegisterScreen extends React.Component {
                                 email: user.email,
                                 flagtutorial: false
                             };
-                            console.log("obj: ", obj);
                             setData('UserInfo/' + user.uid, obj).then((p) => {
-                                console.log("p: ", p);
                                 _self.setState({ errorMessage: null, loading: null, feedback: 'Usuário criado, acesse seu email para confirmar a conta.' });
                             });
                         }).catch(function (error) {
-                            // An error happened.
                         });
                     }).catch(function (error) {
-                        // An error happened.
                     });
 
 
-                    //getUserInfo(user.uid).then((res) => {
-                    //    console.log("firebase.auth().currentUser.uid: ", firebase.auth().currentUser.uid);
-                    //    console.log("name: ", name.value);
-                    //    if (res === null) {
-                    //        saveUserInfo(firebase.auth().currentUser.uid, name.value, '').then((res) => {
-                    //            console.log("res: ", res);
-                    //        });
-                    //    }
-                    //});
-
                 })
                 .catch((e) => {
-                    console.log("erro: ", e);
                     this.setState({
                         email: { value: this.state.email.value, errorMessage: "Email já cadastrado!" }, loading: null
                     });
@@ -173,16 +143,7 @@ export default class RegisterScreen extends React.Component {
             });
         }
     }
-    sendEmail() {
-        var user = firebase.auth().currentUser;
-        user.sendEmailVerification().then(function () {
-            console.log("EMAIL ENVIADO");
-            // Email sent.
-            _self.setState({ error: '', loading: null, feedback: 'Email de verificação enviado com sucesso, acesse-ô para confirmar sua conta.' });
-        }).catch(function (error) {
-            // An error happened.
-        });
-    }
+    
 
     renderButton() {
         if (this.state.loading === "register") {
@@ -227,8 +188,6 @@ export default class RegisterScreen extends React.Component {
         return (
             <View style={styles.container}
                 keyboardShouldPersistTaps='handled'>
-                {/* Go ahead and delete ExpoLinksView and replace it with your
-           * content, we just wanted to provide you with some helpful links */}
                 <View style={styles.loginBox}>
 
                     <Image source={require('../../assets/images/logo.png')} style={styles.logo} />

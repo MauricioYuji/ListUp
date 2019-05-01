@@ -1,40 +1,23 @@
 ﻿import React from 'react';
 import * as firebase from 'firebase';
 import {
-    Image,
-    Platform,
     ScrollView,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View,
-    Button,
     TouchableHighlight,
     Dimensions,
-    RefreshControl,
-    ActivityIndicator,
     DeviceEventEmitter,
     Modal,
-    TouchableWithoutFeedback,
     TextInput,
     Picker
 } from 'react-native';
-import { WebBrowser, Icon, Constants, LinearGradient } from 'expo';
 
-import NavigationService from '../../components/services/NavigationService';
-import Layout from '../../constants/Layout';
-import { getData, setData, insertData, deleteData } from '../../components/services/baseService';
-import { getuserList, deleteItemsFromList, structureList } from '../../components/services/Service';
+import { insertData } from '../../components/services/baseService';
+import { deleteItemsFromList, structureList } from '../../components/services/Service';
 import ListItem from '../../components/UI/ListItem';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 import Header from '../../screens/Shared/Header';
-import LoadingScreen from '../Loading/LoadingScreen';
-import { parse } from 'qs';
-import MasonryList from '@appandflow/masonry-list';
-
-const { width } = Dimensions.get("window");
-const columnWidth = (width - 10) / 2 - 10;
-var process = false;
 
 
 
@@ -74,12 +57,6 @@ export default class ListScreen extends React.Component {
         DeviceEventEmitter.addListener('selectMode', (data) => {
             this.setState({ selectMode: data });
         });
-        //DeviceEventEmitter.addListener('refresh', (data) => {
-        //    if (data) {
-        //        _self.loadData();
-        //    }
-        //});
-
         DeviceEventEmitter.emit('reloading', true);
         this.loadData();
     }
@@ -101,7 +78,6 @@ export default class ListScreen extends React.Component {
                 );
             }
         );
-        //this.setState({ modal: visible });
     }
 
 
@@ -142,18 +118,14 @@ export default class ListScreen extends React.Component {
         });
     }
     selectItem = (id) => {
-        //console.log("id: ", id);
         var arrayobj = this.state.selectedItens;
         if (!arrayobj.includes(id)) {
             arrayobj.push(id);
         } else {
             arrayobj = this.arrayRemove(arrayobj, [id]);
         }
-        //console.log("arrayobj: ", arrayobj);
-        //console.log("================");
         this.setState({ selectedItens: arrayobj },
             () => {
-                //DeviceEventEmitter.emit('selectMode', true);
             }
         );
     }
@@ -166,18 +138,10 @@ export default class ListScreen extends React.Component {
             this.closeModal();
             _self.setState({ selectedItens: [], selectMode: false },
                 () => {
-                    //DeviceEventEmitter.emit('confirmDelete', true);
                     DeviceEventEmitter.emit('selectMode', false);
                 }
             );
 
-            //_self.setState({ selectedItens: [], confirmDelete: false },
-            //    () => {
-            //        DeviceEventEmitter.emit('confirmDelete', true);
-            //        DeviceEventEmitter.emit('selectMode', false);
-            //        //this.loadData();
-            //    }
-            //);
         });
     }
     deleteItens = () => {
@@ -202,7 +166,6 @@ export default class ListScreen extends React.Component {
                 .then((resp) => {
                     _self.setModalVisible(false);
                     _self.closeModal();
-                    //_self.loadData();
                 });
         }
     }
@@ -409,7 +372,7 @@ export default class ListScreen extends React.Component {
         );
     }
 }
-const styles = {
+const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingBottom: 50,
@@ -511,8 +474,7 @@ const styles = {
         flex: 1,
         textAlign: 'center',
         alignItems: 'center',
-        justifyContent: 'center',
-        //paddingBottom: 100
+        justifyContent: 'center'
     },
     menuTitle: {
         color: '#FFF',
@@ -604,8 +566,7 @@ const styles = {
     },
 
     pickerStyle: {
-        //backgroundColor: '#FFF',
         borderRadius: 10,
         color: '#FFF'
     },
-}
+});
