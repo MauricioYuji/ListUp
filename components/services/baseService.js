@@ -4,6 +4,13 @@ import * as firebase from 'firebase';
 
 
 export const setData = (table, obj) => {
+    return firebase.database().ref('/' + table).set(obj).then((data) => {
+        return data;
+    }).catch((error) => {
+        console.log('error ', error);
+    });
+};
+export const updateData = (table, obj) => {
     return firebase.database().ref('/' + table).update(obj).then((data) => {
         return data;
     }).catch((error) => {

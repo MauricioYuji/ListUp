@@ -6,7 +6,6 @@ import {
     Text,
     View,
     TouchableHighlight,
-    Dimensions,
     DeviceEventEmitter,
     Modal,
     TextInput,
@@ -17,6 +16,7 @@ import { insertData } from '../../components/services/baseService';
 import { deleteItemsFromList, structureList } from '../../components/services/Service';
 import ListItem from '../../components/UI/ListItem';
 import TabBarIcon from '../../components/UI/TabBarIcon';
+import ConfirmDelete from '../../components/UI/ConfirmDelete';
 import Header from '../../screens/Shared/Header';
 
 
@@ -251,87 +251,73 @@ export default class ListScreen extends React.Component {
             pickerStateStatus = styles.unselected;
         }
         return (
-                <View style={styles.listBox}>
-                    <Text style={styles.menuTitle}>-CRIAR LISTA-</Text>
-                    {this.state.modelInvalid &&
-                        <Text style={styles.erroText}>Preencha todos os campos.</Text>
-                    }
-                    <TextInput
-                        placeholder={"Nome"}
-                        style={[styles.inputsearch, styles.inputText]}
-                        onChangeText={(text) => this._setTitle(text)}
-                        ref={input => { this.titleInput = input }}
-                    />
-                    <View style={styles.rowInput}>
-                        <View style={[styles.inputSelect, styles.SelectLeft]}>
-                            <Picker
-                                selectedValue={this.state.list.type}
-                                style={[styles.pickerStyle, pickerState]}
-                                itemStyle={[styles.itempickerStyle]}
-                                onValueChange={(itemValue, itemIndex) =>
-                                    this._setSelect(itemValue)
-                                }>
-                                <Picker.Item label="Selecione um tipo" value="" />
-                                <Picker.Item label="Lista Padrão" value="padrao" />
-                                <Picker.Item label="Ranking" value="ranking" />
-                            </Picker>
-                        </View>
-                        <View style={[styles.inputSelect, styles.SelectRight]}>
-                            <Picker
-                                selectedValue={this.state.list.status}
-                                style={[styles.pickerStyle, pickerStateStatus]}
-                                itemStyle={[styles.itempickerStyle]}
-                                onValueChange={(itemValue, itemIndex) =>
-                                    this._setStatus(itemValue)
-                                }>
-                                <Picker.Item label="Selecione um status" value="" />
-                                <Picker.Item label="Público" value="publico" />
-                                <Picker.Item label="Privado" value="privado" />
-                            </Picker>
-                        </View>
+            <View style={styles.listBox}>
+                <Text style={styles.menuTitle}>-CRIAR LISTA-</Text>
+                {this.state.modelInvalid &&
+                    <Text style={styles.erroText}>Preencha todos os campos.</Text>
+                }
+                <TextInput
+                    placeholder={"Nome"}
+                    style={[styles.inputsearch, styles.inputText]}
+                    onChangeText={(text) => this._setTitle(text)}
+                    ref={input => { this.titleInput = input }}
+                />
+                <View style={styles.rowInput}>
+                    <View style={[styles.inputSelect, styles.SelectLeft]}>
+                        <Picker
+                            selectedValue={this.state.list.type}
+                            style={[styles.pickerStyle, pickerState]}
+                            itemStyle={[styles.itempickerStyle]}
+                            onValueChange={(itemValue, itemIndex) =>
+                                this._setSelect(itemValue)
+                            }>
+                            <Picker.Item label="Selecione um tipo" value="" />
+                            <Picker.Item label="Lista Padrão" value="padrao" />
+                            <Picker.Item label="Ranking" value="ranking" />
+                        </Picker>
                     </View>
-                    <TextInput
-                        placeholder={"Limite de jogos"}
-                        keyboardType='numeric'
-                        maxLength={10}
-                        style={[styles.inputsearch, styles.inputText]}
-                        onChangeText={(text) => this._setLimit(text)}
-                        ref={input => { this.limitInput = input }}
-                    />
-                    <TextInput
-                        placeholder={"Descrição"}
-                        multiline={true}
-                        numberOfLines={4}
-                        style={[styles.inputsearch, styles.inputMulti, styles.inputText]}
-                        onChangeText={(text) => this._setText(text)}
-                        ref={input => { this.textInput = input }} />
-                    <TouchableHighlight underlayColor="transparent" style={styles.saveButton} onPress={() => this.addList()}>
-                        <TabBarIcon
-                            name={'save'}
-                            type={'MaterialIcons'}
-                            style={styles.saveBoxIcon}
-                        />
-                    </TouchableHighlight>
+                    <View style={[styles.inputSelect, styles.SelectRight]}>
+                        <Picker
+                            selectedValue={this.state.list.status}
+                            style={[styles.pickerStyle, pickerStateStatus]}
+                            itemStyle={[styles.itempickerStyle]}
+                            onValueChange={(itemValue, itemIndex) =>
+                                this._setStatus(itemValue)
+                            }>
+                            <Picker.Item label="Selecione um status" value="" />
+                            <Picker.Item label="Público" value="publico" />
+                            <Picker.Item label="Privado" value="privado" />
+                        </Picker>
+                    </View>
                 </View>
+                <TextInput
+                    placeholder={"Limite de jogos"}
+                    keyboardType='numeric'
+                    maxLength={10}
+                    style={[styles.inputsearch, styles.inputText]}
+                    onChangeText={(text) => this._setLimit(text)}
+                    ref={input => { this.limitInput = input }}
+                />
+                <TextInput
+                    placeholder={"Descrição"}
+                    multiline={true}
+                    numberOfLines={4}
+                    style={[styles.inputsearch, styles.inputMulti, styles.inputText]}
+                    onChangeText={(text) => this._setText(text)}
+                    ref={input => { this.textInput = input }} />
+                <TouchableHighlight underlayColor="transparent" style={styles.saveButton} onPress={() => this.addList()}>
+                    <TabBarIcon
+                        name={'save'}
+                        type={'MaterialIcons'}
+                        style={styles.saveBoxIcon}
+                    />
+                </TouchableHighlight>
+            </View>
         );
     }
     _modalDeleteList() {
         return (
-            <View>
-                <Text style={styles.addItemText}>DESEJA EXCLUIR?</Text>
-                <View style={styles.buttonBox}>
-                    <TouchableHighlight underlayColor="transparent" onPress={() => this.confirmdeleteItens()}>
-                        <View style={[styles.addItem, styles.dangerButton]}>
-                            <Text style={[styles.addItemText]}>Deletar</Text>
-                        </View>
-                    </TouchableHighlight>
-                    <TouchableHighlight underlayColor="transparent" onPress={() => this.closeModal()}>
-                        <View style={styles.addItem}>
-                            <Text style={styles.addItemText}>Cancelar</Text>
-                        </View>
-                    </TouchableHighlight>
-                </View>
-            </View>
+            <ConfirmDelete confirmdeleteItens={this.confirmdeleteItens.bind(this)} closeModal={this.closeModal.bind(this)} />
         );
     }
     render() {
@@ -345,7 +331,7 @@ export default class ListScreen extends React.Component {
 
                 <Header style={styles.header} type={"info-lists"} back={true} label={"Minhas Listas"} detail={this.state.lists.length + " listas"} itens={this._headerItens()} />
 
-            
+
 
 
 
@@ -378,9 +364,6 @@ const styles = StyleSheet.create({
         paddingBottom: 50,
         paddingTop: 60
     },
-    menuList: {
-        flex: 1,
-    },
     sideIcon: {
         padding: 5
     },
@@ -391,12 +374,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: "center",
         alignItems: "center",
-    },
-    contentModal: {
-        flex: 1,
-        textAlign: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
     },
     unselected: {
         color: '#CCC'
@@ -416,56 +393,6 @@ const styles = StyleSheet.create({
         color: "#F00",
         fontSize: 24,
         fontFamily: 'SourceSansPro-SemiBold'
-    },
-    loadingBackground: {
-        position: "absolute",
-        justifyContent: "center",
-        alignItems: "center",
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: "rgba(0,0,0,0.3)"
-    },
-    listItem: {
-        marginTop: 10,
-        flexDirection: 'row',
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#222222"
-    },
-    itemInfo: {
-        flex: 1,
-        paddingHorizontal: 20,
-    },
-    labelTitle: {
-        fontSize: 24,
-        color: '#FFF',
-        fontFamily: 'SourceSansPro-SemiBold'
-    },
-    labelDetail: {
-        fontSize: 14,
-        color: '#FFF',
-        fontFamily: 'SourceSansPro-SemiBold'
-    },
-    thumbArea: {
-        flexDirection: 'row-reverse',
-        alignItems: 'flex-start',
-        flex: 1
-    },
-    thumb: {
-        width: 60,
-        height: 90,
-        marginLeft: 2
-    },
-    backgroundOverlayModal: {
-        height: Dimensions.get('window').height / 3,
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 0
     },
     listBox: {
         paddingTop: 50,
@@ -502,32 +429,7 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontSize: 50
     },
-    buttonBox: {
-        flexDirection: 'row'
-    },
-    addItem: {
-        flex: 1,
-        backgroundColor: '#006CD8',
-        marginTop: 30,
-        marginLeft: 10,
-        marginRight: 10,
-        paddingTop: 15,
-        paddingBottom: 15,
-        paddingLeft: 30,
-        paddingRight: 30,
-        minHeight: 50,
-        borderRadius: 5,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    addItemText: {
-        fontSize: 16,
-        color: '#FFF',
-        fontFamily: 'SourceSansPro-SemiBold'
-    },
-    dangerButton: {
-        backgroundColor: '#F00'
-    },
+    
     SelectLeft: {
         marginRight: 10
     },

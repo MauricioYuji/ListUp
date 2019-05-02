@@ -1,5 +1,4 @@
 import React from 'react';
-import { Icon } from 'expo';
 import {
     Text,
     View,
@@ -8,6 +7,7 @@ import {
     Image,
     Keyboard
 } from 'react-native';
+import TabBarIcon from '../UI/TabBarIcon';
 import { addGamestoList } from '../services/Service';
 
 

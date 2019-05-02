@@ -2,7 +2,7 @@
 import { StyleSheet, Text, View, TextInput, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import * as firebase from 'firebase';
 import { signInWithFacebook } from '../../components/services/facebookAuth';
-import { setData } from '../../components/services/baseService';
+import { updateData } from '../../components/services/baseService';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 
 export default class RegisterScreen extends React.Component {
@@ -39,7 +39,7 @@ export default class RegisterScreen extends React.Component {
                 email: user.email,
                 flagtutorial: false
             };
-            setData('UserInfo/' + user.uid, obj).then((p) => {
+            updateData('UserInfo/' + user.uid, obj).then((p) => {
                 _self.setState({ errorMessage: null, loading: null });
             });
 
@@ -122,7 +122,7 @@ export default class RegisterScreen extends React.Component {
                                 email: user.email,
                                 flagtutorial: false
                             };
-                            setData('UserInfo/' + user.uid, obj).then((p) => {
+                            updateData('UserInfo/' + user.uid, obj).then((p) => {
                                 _self.setState({ errorMessage: null, loading: null, feedback: 'Usuário criado, acesse seu email para confirmar a conta.' });
                             });
                         }).catch(function (error) {

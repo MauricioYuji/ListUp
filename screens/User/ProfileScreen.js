@@ -1,6 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View, TextInput, Image, TouchableWithoutFeedback, TouchableHighlight } from 'react-native';
-import { ExpoConfigView } from '@expo/samples';
+import { ScrollView, StyleSheet, Text, View, TouchableHighlight } from 'react-native';
 import { Fade } from '../../components/animations/Fade';
 
 export default class ProfileScreen extends React.Component {
@@ -16,6 +15,11 @@ export default class ProfileScreen extends React.Component {
         const { navigation } = this.props;
         const Id = navigation.getParam('Id', 0);
         this.setState({ Id: Id });
+
+        DeviceEventEmitter.emit('reloading', true);
+    }
+    componentDidMount() {
+        DeviceEventEmitter.emit('reloading', false);
     }
     test() {
 

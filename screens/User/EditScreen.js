@@ -1,6 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View, TextInput, Image, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import { ExpoConfigView } from '@expo/samples';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 
 export default class EditScreen extends React.Component {
     static navigationOptions = {
@@ -15,6 +14,11 @@ export default class EditScreen extends React.Component {
         const { navigation } = this.props;
         const Id = navigation.getParam('Id', 'NO-ID');
         this.setState({ Id: Id });
+
+        DeviceEventEmitter.emit('reloading', true);
+    }
+    componentDidMount() {
+        DeviceEventEmitter.emit('reloading', false);
     }
     render() {
         return (
@@ -33,6 +37,6 @@ const styles = StyleSheet.create({
     },
     text: {
         color: '#FFF',
-        margin:40
+        margin: 40
     },
 });

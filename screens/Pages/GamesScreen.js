@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 
 import NavigationService from '../../components/services/NavigationService';
-import { getData } from '../../components/services/baseService';
 import { structureGames } from '../../components/services/Service';
 import Header from '../../screens/Shared/Header';
 import MasonryList from '@appandflow/masonry-list';

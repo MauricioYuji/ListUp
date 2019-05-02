@@ -16,7 +16,7 @@ import { AppLoading, Asset, Font, Icon, Constants } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
 import Auth from './navigation/AuthNavigator';
 import Layout from './constants/Layout';
-import { setData, getData } from './components/services/baseService';
+import { updateData, getData } from './components/services/baseService';
 import * as firebase from 'firebase';
 import NavigationService from './components/services/NavigationService';
 
@@ -63,7 +63,7 @@ export default class App extends React.Component {
     }
     _updateUser = (user) => {
         var _self = this;
-        setData('UserInfo/' + user.uid, user).then((p) => {
+        updateData('UserInfo/' + user.uid, user).then((p) => {
             _self._storeUser(user);
         });
     };

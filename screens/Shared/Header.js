@@ -12,6 +12,7 @@ import {
     Dimensions
 } from 'react-native';
 import TabBarIcon from '../../components/UI/TabBarIcon';
+import NavigationService from '../../components/services/NavigationService';
 
 export default class Header extends React.Component {
 

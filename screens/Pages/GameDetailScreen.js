@@ -15,7 +15,7 @@ import { LinearGradient } from 'expo';
 
 import NavigationService from '../../components/services/NavigationService';
 import Layout from '../../constants/Layout';
-import { setData } from '../../components/services/baseService';
+import { updateData } from '../../components/services/baseService';
 import { structureGames } from '../../components/services/Service';
 import LoadingScreen from '../Loading/LoadingScreen';
 import TabBarIcon from '../../components/UI/TabBarIcon';
@@ -176,7 +176,7 @@ export default class GameDetailScreen extends React.Component {
         var _self = this;
 
         var user = firebase.auth().currentUser;
-        setData('userGames/' + user.uid + '/' + this.state.game.key, this.state.consolesActive)
+        updateData('userGames/' + user.uid + '/' + this.state.game.key, this.state.consolesActive)
             .then((resp) => {
             });
 

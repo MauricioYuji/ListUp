@@ -1,5 +1,5 @@
 import * as firebase from 'firebase';
-import { getData, setData, deleteData, insertData } from './baseService';
+import { getData, updateData, setData } from './baseService';
 
 const getGame = async (keys) => {
 
@@ -175,7 +175,7 @@ export const deleteItemsFromList = async (keys) => {
         for (var i = 0; i < keys.length; i++) {
             lists[keys[i]] = null;
         }
-        setData('/userLists/' + user.uid + '/', lists)
+        updateData('/userLists/' + user.uid + '/', lists)
             .then((img) => {
             });
     });
@@ -185,17 +185,15 @@ export const deleteGamesFromList = async (keys, keylist) => {
 
     var user = firebase.auth().currentUser;
 
-
     let lists = null;
-    var objgames = [];
     await firebase.database().ref('/userLists/' + user.uid + '/' + keylist + '/games/').once('value').then(function (snapshot) {
         lists = snapshot.val();
+        var index = [];
         for (var i = 0; i < keys.length; i++) {
 
-            var r = lists.filter(p => Object.keys(p) == keys[i]);
-            var index = lists.indexOf(r[0]);
-
-            lists[index] = null;
+            var r = lists.filter(p => Object.keys(p) == keys[i] && p != null);
+            index = lists.indexOf(r[0]);
+            lists.splice(index, 1);
 
 
         }
@@ -207,7 +205,6 @@ export const deleteGamesFromList = async (keys, keylist) => {
 };
 export const addGamestoList = async (keylist, keygame, obj) => {
     var user = firebase.auth().currentUser;
-    let list = null;
 
     var itemobj = {};
     itemobj[keygame] = obj.length <= 0 ? "" : obj;

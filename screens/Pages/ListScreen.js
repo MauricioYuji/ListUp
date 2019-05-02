@@ -16,7 +16,7 @@ import {
 import SortableList from 'react-native-sortable-list';
 
 import NavigationService from '../../components/services/NavigationService';
-import { setData } from '../../components/services/baseService';
+import { updateData } from '../../components/services/baseService';
 import { deleteGamesFromList, structureList, structureGames, deleteItemsFromList } from '../../components/services/Service';
 import GameItem from '../../components/UI/GameItem';
 import AddGameItem from '../../components/UI/AddGameItem';
@@ -134,10 +134,17 @@ export default class ListScreen extends React.Component {
     itemAction = () => {
 
     }
+    arrayRemove(arr, value) {
+        return arr.filter(function (el) {
+            return !value.includes(el);
+        });
+    }
     selectItem = (id) => {
         var arrayobj = this.state.selectedItens;
         if (!arrayobj.includes(id)) {
             arrayobj.push(id);
+        } else {
+            arrayobj = this.arrayRemove(arrayobj, [id]);
         }
         this.setState({ selectedItens: arrayobj, selectMode: true },
             () => {
@@ -150,6 +157,7 @@ export default class ListScreen extends React.Component {
         var list = this.state.list;
         DeviceEventEmitter.emit('reloading', true);
         deleteGamesFromList(this.state.selectedItens, list.key).then(() => {
+            DeviceEventEmitter.emit('reloading', false);
             this.closeModal();
             _self.setState({ selectedItens: [], selectMode: false },
                 () => {
@@ -222,7 +230,7 @@ export default class ListScreen extends React.Component {
                 limit: list.limit
             };
             var user = firebase.auth().currentUser;
-            setData('userLists/' + user.uid + '/' + list.key, obj)
+            updateData('userLists/' + user.uid + '/' + list.key, obj)
                 .then((resp) => {
                     _self.setState({ modalVisible: false });
                     _self.loadData("");
@@ -333,7 +341,7 @@ export default class ListScreen extends React.Component {
                     obj.games.push(item);
                 }
                 var user = firebase.auth().currentUser;
-                setData('userLists/' + user.uid + '/' + list.key, obj)
+                updateData('userLists/' + user.uid + '/' + list.key, obj)
                     .then((resp) => {
                         _self.setState({ modalVisible: false },
                             () => {
