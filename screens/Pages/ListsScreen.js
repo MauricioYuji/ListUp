@@ -6,7 +6,7 @@ import {
     View,
     TouchableHighlight,
     DeviceEventEmitter,
-    Modal,
+    Text
 } from 'react-native';
 
 import { insertData } from '../../components/services/baseService';
@@ -15,6 +15,7 @@ import ListItem from '../../components/UI/ListItem';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 import AddEditList from '../../components/UI/AddEditList';
 import ConfirmDelete from '../../components/UI/ConfirmDelete';
+import ModalDefault from '../../components/UI/ModalDefault';
 import Header from '../../screens/Shared/Header';
 
 
@@ -36,8 +37,7 @@ export default class ListScreen extends React.Component {
                 games: [],
                 status: "",
                 description: "",
-                type: "",
-                limit: ""
+                type: ""
             },
             multiSelect: false,
             selectedItens: [],
@@ -86,22 +86,24 @@ export default class ListScreen extends React.Component {
         var user = firebase.auth().currentUser;
 
         firebase.database().ref('/userLists/' + user.uid).on('value', function (snapshot) {
+            if (snapshot.val() != null) {
+                structureList(snapshot.val()).then(r => {
 
-
-            structureList(snapshot.val()).then(r => {
-
-                var obj = [];
-                var ol = Object.keys(r);
-                for (var item in r) {
-                    obj.push(r[item]);
-                }
-                _self.setState({ page: 0, lists: obj, listend: false, loading: false, mounted: true },
-                    () => {
-                        DeviceEventEmitter.emit('reloading', false);
+                    var obj = [];
+                    var ol = Object.keys(r);
+                    for (var item in r) {
+                        obj.push(r[item]);
                     }
-                );
-                return true;
-            }).catch(err => console.log('There was an error:' + err));
+                    _self.setState({ page: 0, lists: obj, listend: false, loading: false, mounted: true },
+                        () => {
+                            DeviceEventEmitter.emit('reloading', false);
+                        }
+                    );
+                    return true;
+                }).catch(err => console.log('There was an error:' + err));
+            } else {
+                DeviceEventEmitter.emit('reloading', false);
+            }
         });
 
     }
@@ -146,22 +148,9 @@ export default class ListScreen extends React.Component {
         let _self = this;
         this.setVisible(this._modalAdd());
     }
-    addList = () => {
-        var obj = this.state.list;
-        if (obj.title == "" || obj.type == "" || obj.status == "" || obj.description == "" || obj.limit == "") {
-            this.setState({ modelInvalid: true });
-        } else {
-            DeviceEventEmitter.emit('reloading', true);
-            this.setState({ modelInvalid: false });
-            var _self = this;
-
-            var user = firebase.auth().currentUser;
-            insertData('userLists/' + user.uid + '/', obj)
-                .then((resp) => {
-                    _self.setModalVisible(false);
-                    _self.closeModal();
-                });
-        }
+    callbackAdd = () => {
+        this.setModalVisible(false);
+        this.closeModal();
     }
     closeModal = () => {
         this.setState({
@@ -209,7 +198,7 @@ export default class ListScreen extends React.Component {
 
     _modalAdd() {
         return (
-            <AddEditList list={this.state.list} saveList={this.addList.bind(this)} />
+            <AddEditList list={this.state.list} callback={this.callbackAdd.bind(this)} />
         );
     }
     _modalDeleteList() {
@@ -217,40 +206,35 @@ export default class ListScreen extends React.Component {
             <ConfirmDelete confirmdeleteItens={this.confirmdeleteItens.bind(this)} closeModal={this.closeModal.bind(this)} />
         );
     }
-    render() {
-        return (
-            <View style={styles.container}>
+    _renderList() {
+
+        if (this.state.lists.length > 0) {
+            return (
                 <ScrollView>
                     <View style={styles.scrollArea}>
                         {this.renderLists()}
                     </View>
                 </ScrollView>
+            );
+        } else {
+            return (
+                <View style={styles.emptyFeedbackBox}>
+                    <Text style={styles.emptyFeedback}>Não há nenhuma lista cadastrada!</Text>
+                </View>
+            );
+        }
+    }
+    render() {
+        return (
+            <View style={styles.container}>
+                {this._renderList()}
 
                 <Header style={styles.header} type={"info-lists"} back={true} label={"Minhas Listas"} detail={this.state.lists.length + " listas"} itens={this._headerItens()} />
 
 
 
 
-
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={this.state.mounted && this.state.modalVisible}
-                    onRequestClose={() => {
-                        this.setState({ modalVisible: false });
-                    }}>
-                    <View style={styles.backgroundModal}>
-                        {this.state.modalActive}
-
-                        <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.closeModal()}>
-                            <TabBarIcon
-                                name={'close'}
-                                type={'MaterialIcons'}
-                                style={styles.closeBoxIcon}
-                            />
-                        </TouchableHighlight>
-                    </View>
-                </Modal>
+                <ModalDefault type="slide" visible={this.state.mounted && this.state.modalVisible} modalActive={this.state.modalActive} closeModal={this.closeModal.bind(this)} />
             </View>
         );
     }
@@ -267,33 +251,19 @@ const styles = StyleSheet.create({
     backButton: {
         fontSize: 40
     },
-    unselected: {
-        color: '#CCC'
-    },
-    backgroundModal: {
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
-        flex: 1,
-        textAlign: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000
-    },
     scrollArea: {
         paddingBottom: 40
     },
-    erroText: {
-        color: "#F00",
-        fontSize: 24,
-        fontFamily: 'SourceSansPro-SemiBold'
+    emptyFeedbackBox: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: "center",
+        alignItems: "center",
     },
-    closeBox: {
-        position: 'absolute',
-        top: 10,
-        left: 10,
-    },
-    closeBoxIcon: {
-        color: '#FFF',
-        fontSize: 50
-    },
+    emptyFeedback: {
+        color: "#FFF",
+        fontFamily: 'SourceSansPro-SemiBold',
+        fontSize: 20
 
+    }
 });

@@ -66,7 +66,6 @@ const getImages = async (keys) => {
 };
 
 export const structureGames = async (games) => {
-
     var objgames = [];
     let list = require('../../files/consoles.json');
 
@@ -77,17 +76,20 @@ export const structureGames = async (games) => {
             var companies = [];
             var item = games[key];
             var file = { key: games[key].img, url: "", file: null };
-            for (var j = 0; j < item.keyconsole.length; j++) {
-                var c = list.Companies[list.Consoles[item.keyconsole[j]].keycompany];
-                consoles.push(list.Consoles[item.keyconsole[j]]);
-                c.key = list.Consoles[item.keyconsole[j]].keycompany;
-                if (!companies.includes(c))
-                    companies.push(c);
+
+            if (item.keyconsole != undefined) {
+                for (var j = 0; j < item.keyconsole.length; j++) {
+                    var c = list.Companies[list.Consoles[item.keyconsole[j]].keycompany];
+                    consoles.push(list.Consoles[item.keyconsole[j]]);
+                    c.key = list.Consoles[item.keyconsole[j]].keycompany;
+                    if (!companies.includes(c))
+                        companies.push(c);
+                }
             }
-
-            for (var j = 0; j < item.keygenre.length; j++) {
-                genres.push(list.Genres[item.keygenre[j]]);
-
+            if (item.keygenre != undefined) {
+                for (var j = 0; j < item.keygenre.length; j++) {
+                    genres.push(list.Genres[item.keygenre[j]]);
+                }
             }
             var obj = {
                 key: key,
@@ -99,6 +101,7 @@ export const structureGames = async (games) => {
             };
             objgames.push(obj);
         }
+
 
         var imgkeys = [];
         for (let key in games) {
@@ -154,7 +157,9 @@ export const structureList = async (obj) => {
             getImages(imgkeys).then((imgs) => {
                 for (var list in obj) {
                     for (var key in obj[list].games) {
-                        obj[list].games[key].image = imgs[obj[list].games[key].image.key];
+                        if (imgs[obj[list].games[key].image.key] != undefined) {
+                            obj[list].games[key].image = imgs[obj[list].games[key].image.key];
+                        }
                     }
                 }
                 resolve(obj);

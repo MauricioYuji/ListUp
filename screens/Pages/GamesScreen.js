@@ -57,19 +57,21 @@ export default class GameScreen extends React.Component {
 
 
         firebase.database().ref('/Games/').on('value', function (snapshot) {
-
-
-            structureGames(snapshot.val()).then(games => {
-                _self.setState({ page: 0, games: games },
-                    () => {
-                        _self.filterObj();
-                    }
-                );
-                return true;
-            }).catch(err => console.log('There was an error:' + err));
+            if (snapshot.val() != null) {
+                structureGames(snapshot.val()).then(games => {
+                    _self.setState({ page: 0, games: games },
+                        () => {
+                            _self.filterObj();
+                        }
+                    );
+                    return true;
+                }).catch(err => console.log('There was an error:' + err));
+            } else {
+                DeviceEventEmitter.emit('reloading', false);
+            }
         });
 
-        
+
     }
 
 
@@ -144,41 +146,53 @@ export default class GameScreen extends React.Component {
             return (<Image source={{ uri: item.url }} style={{ height: columnWidth / item.file.width * item.file.height }} />);
         }
     }
+    _renderlist() {
+        if (this.state.games != null) {
+            return (
+                <MasonryList
+                    onMomentumScrollEnd={this.onScrollEnd.bind(this)}
+                    onScrollBeginDrag={this.checkLoading.bind(this)}
+                    onScrollEndDrag={this.checkLoading.bind(this)}
+                    refreshControl={(<RefreshControl
+                        refreshing={this.state.isRefreshing}
+                        onRefresh={this._onRefresh.bind(this)}
+                        tintColor="#FFFFFF"
+                        title="Loading..."
+                        titleColor="#CCCCCC"
+                        colors={['#FFFFFF', '#CCCCCC', '#EEEEEE']}
+                        progressBackgroundColor="#48A2F8"
+                    />)}
+                    data={this.state.gamesfiltered}
+                    renderItem={({ item }) =>
+                        (
+                            <TouchableHighlight underlayColor="transparent" onPress={() => this.showGame(item.key)} key={item.name}>
+                                <View key={item.key} style={styles.card}>
+                                    {this.renderThumb(item.image)}
+                                    <View style={styles.cardHeader}>
+                                        <Text style={styles.cardText}>{item.name}</Text>
+                                    </View>
+                                    <View style={styles.logosBox}>
+                                        {this.renderConsoles(item.consoles, item.key)}
+                                    </View>
+                                </View>
+                            </TouchableHighlight>
+                        )}
+                    getHeightForItem={({ item }) => 300}
+                    numColumns={2}
+                    keyExtractor={item => item.key}
+                />
+            );
+        } else {
+            return (
+                <View style={styles.emptyFeedbackBox}>
+                    <Text style={styles.emptyFeedback}>Não há nenhum game cadastro!</Text>
+                </View>
+            );
+        }
+    }
     render() {
         return <View style={styles.container}>
-            <MasonryList
-                onMomentumScrollEnd={this.onScrollEnd.bind(this)}
-                onScrollBeginDrag={this.checkLoading.bind(this)}
-                onScrollEndDrag={this.checkLoading.bind(this)}
-                refreshControl={(<RefreshControl
-                    refreshing={this.state.isRefreshing}
-                    onRefresh={this._onRefresh.bind(this)}
-                    tintColor="#FFFFFF"
-                    title="Loading..."
-                    titleColor="#CCCCCC"
-                    colors={['#FFFFFF', '#CCCCCC', '#EEEEEE']}
-                    progressBackgroundColor="#48A2F8"
-                />)}
-                data={this.state.gamesfiltered}
-                renderItem={({ item }) =>
-                    (
-                        <TouchableHighlight underlayColor="transparent" onPress={() => this.showGame(item.key)} key={item.name}>
-                            <View key={item.key} style={styles.card}>
-                                {this.renderThumb(item.image)}
-                                <View style={styles.cardHeader}>
-                                    <Text style={styles.cardText}>{item.name}</Text>
-                                </View>
-                                <View style={styles.logosBox}>
-                                    {this.renderConsoles(item.consoles, item.key)}
-                                </View>
-                            </View>
-                        </TouchableHighlight>
-                    )}
-                getHeightForItem={({ item }) => 300}
-                numColumns={2}
-                keyExtractor={item => item.key}
-            />
-
+            {this._renderlist()}
             <Header style={styles.header} type={"search"} />
         </View>
     }
@@ -220,5 +234,17 @@ const styles = StyleSheet.create({
         padding: 5,
         color: "#FFF",
         fontSize: 20
+    },
+    emptyFeedbackBox: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    emptyFeedback: {
+        color: "#FFF",
+        fontFamily: 'SourceSansPro-SemiBold',
+        fontSize: 20
+
     }
 });

@@ -59,23 +59,26 @@ export default class ListItem extends React.Component {
     }
     renderGamesThumbs() {
         let lists = this.props.obj.games;
-        var lista = lists.slice(0, 3);
         let items = [];
-        
-        for (let i = 0; i < lista.length; i++) {
-            items.push(<Image key={i} source={{ uri: lista[i].image.url }} resizeMode={'cover'} style={styles.thumb} />);
+        if (lists.length != 0) {
+            for (let i = 0; i < 3; i++) {
+                if (lists[i].image != undefined) {
+                    items.push(<Image key={i} source={{ uri: lists[i].image.url }} resizeMode={'cover'} style={styles.thumb} />);
+                }
+            }
         }
         return items;
     }
     renderGamesNames() {
         let lists = this.props.obj.games;
-        var lista = lists.slice(0, 3);
         let items = "";
-        for (let i = 0; i < lista.length; i++) {
-            if (lista.length - 1 === i) {
-                items += lista[i].name;
-            } else {
-                items += lista[i].name + ", ";
+        if (lists.length != 0) {
+            for (let i = 0; i < 3; i++) {
+                if (lists.length - 1 === i) {
+                    items += lists[i].name;
+                } else {
+                    items += lists[i].name + ", ";
+                }
             }
         }
         return (<Text style={styles.nameList}>{items}</Text>);

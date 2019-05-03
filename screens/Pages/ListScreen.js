@@ -1,7 +1,6 @@
 ﻿import React from 'react';
 import * as firebase from 'firebase';
 import {
-    Platform,
     ScrollView,
     StyleSheet,
     Text,
@@ -10,23 +9,19 @@ import {
     Dimensions,
     DeviceEventEmitter,
     Modal,
-    TextInput,
-    Picker
 } from 'react-native';
-import SortableList from 'react-native-sortable-list';
 
 import NavigationService from '../../components/services/NavigationService';
 import { updateData } from '../../components/services/baseService';
 import { deleteGamesFromList, structureList, structureGames, deleteItemsFromList } from '../../components/services/Service';
 import GameItem from '../../components/UI/GameItem';
-import AddGameItem from '../../components/UI/AddGameItem';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 import Header from '../../screens/Shared/Header';
-import DragGame from '../../components/UI/DragGame';
 import AddEditList from '../../components/UI/AddEditList';
 import EditGames from '../../components/UI/EditGames';
 import ConfirmDelete from '../../components/UI/ConfirmDelete';
 import AddGame from '../../components/UI/AddGame';
+import ModalDefault from '../../components/UI/ModalDefault';
 
 
 
@@ -214,6 +209,11 @@ export default class ListScreen extends React.Component {
         );
 
     }
+    
+    callbackAdd = () => {
+        this.setState({ modalVisible: false });
+        this.loadData("");
+    }
     editList = () => {
         var list = this.state.listedit;
         if (list.title == "" || list.type == "" || list.status == "" || list.description == "" || list.limit == "") {
@@ -313,7 +313,7 @@ export default class ListScreen extends React.Component {
     }
     _modalEditList() {
         return (
-            <AddEditList list={this.state.listedit} saveList={this.editList.bind(this)} />
+            <AddEditList list={this.state.listedit} callback={this.callbackAdd.bind(this)} />
         );
     }
     _modalDeleteGame() {
@@ -364,25 +364,7 @@ export default class ListScreen extends React.Component {
 
                 <Header style={styles.header} type={"info-list"} back={true} label={"Lista"} detail={this.state.list.games.length + " jogos"} itens={this._headerItens()} />
 
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={this.state.mounted && this.state.modalVisible}
-                    onRequestClose={() => {
-                        this.setState({ modalVisible: false });
-                    }}>
-                    <View style={styles.backgroundModal}>
-                        {this.state.modalActive}
-
-                        <TouchableHighlight underlayColor="transparent" style={styles.closeBox} onPress={() => this.closeModal()}>
-                            <TabBarIcon
-                                name={'close'}
-                                type={'MaterialIcons'}
-                                style={styles.closeBoxIcon}
-                            />
-                        </TouchableHighlight>
-                    </View>
-                </Modal>
+                <ModalDefault type="slide" visible={this.state.mounted && this.state.modalVisible} modalActive={this.state.modalActive} closeModal={this.closeModal.bind(this)}/>
 
 
             </View>

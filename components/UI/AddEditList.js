@@ -1,11 +1,14 @@
 import React from 'react';
+import * as firebase from 'firebase';
+import { insertData, updateData } from '../../components/services/baseService';
 import {
     View,
     StyleSheet,
     TouchableHighlight,
     Text,
     TextInput,
-    Picker
+    Picker,
+    DeviceEventEmitter
 } from 'react-native';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 
@@ -18,18 +21,38 @@ export default class AddEditList extends React.Component {
     }
 
     state = {
+        modelInvalid: false
     };
+
     saveList = () => {
-        this.props.saveList();
+        var obj = this.props.list;
+        if (obj.title == "" || obj.type == "" || obj.status == "" || obj.description == "" || obj.limit == "") {
+            this.setState({ modelInvalid: true });
+        } else {
+            DeviceEventEmitter.emit('reloading', true);
+            this.setState({ modelInvalid: false });
+            var _self = this;
+
+            var user = firebase.auth().currentUser;
+
+            
+            if (obj.key == undefined) {
+                insertData('userLists/' + user.uid + '/', obj)
+                    .then((resp) => {
+                        this.props.callback();
+                    });
+            } else {
+                updateData('userLists/' + user.uid + '/' + obj.key, obj)
+                    .then((resp) => {
+                        this.props.callback();
+                    });
+            }
+        }
+
     }
     _setTitle(value) {
         var obj = this.props.list;
         obj.title = value;
-        this.setState({ list: obj });
-    }
-    _setLimit(value) {
-        var obj = this.props.list;
-        obj.limit = value;
         this.setState({ list: obj });
     }
     _setSelect(value) {
@@ -98,15 +121,6 @@ export default class AddEditList extends React.Component {
                     </View>
                 </View>
                 <TextInput
-                    placeholder={"Limite de jogos"}
-                    keyboardType='numeric'
-                    maxLength={10}
-                    value={this.props.list.limit}
-                    style={[styles.inputsearch, styles.inputText]}
-                    onChangeText={(text) => this._setLimit(text)}
-                    ref={input => { this.limitInput = input }}
-                />
-                <TextInput
                     placeholder={"Descrição"}
                     multiline={true}
                     numberOfLines={4}
@@ -126,7 +140,7 @@ export default class AddEditList extends React.Component {
     }
 }
 const styles = StyleSheet.create({
-    
+
     rowInput: {
         flexDirection: 'row',
         justifyContent: "center",
@@ -141,7 +155,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
-    
+
     menuTitle: {
         color: '#FFF',
         textAlign: 'center',
