@@ -23,6 +23,10 @@ import AddGameItem from '../../components/UI/AddGameItem';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 import Header from '../../screens/Shared/Header';
 import DragGame from '../../components/UI/DragGame';
+import AddEditList from '../../components/UI/AddEditList';
+import EditGames from '../../components/UI/EditGames';
+import ConfirmDelete from '../../components/UI/ConfirmDelete';
+import AddGame from '../../components/UI/AddGame';
 
 
 
@@ -131,9 +135,6 @@ export default class ListScreen extends React.Component {
             }).catch(err => console.log('There was an error:' + err));
         });
     }
-    itemAction = () => {
-
-    }
     arrayRemove(arr, value) {
         return arr.filter(function (el) {
             return !value.includes(el);
@@ -237,90 +238,13 @@ export default class ListScreen extends React.Component {
                 });
         }
     }
-    addGame = () => {
-        _self.setState({ modalActive: _self._modalAdd() },
-            () => {
-            }
-        );
-    }
     closeModal = () => {
         this.setState({ games: [], modalVisible: false });
     }
-    _setTitle(value) {
-        var obj = this.state.listedit;
-        obj.title = value;
-        this.setState({ listedit: obj, modalActive: this._modalEditList() });
-    }
-    _setLimit(value) {
-        var obj = this.state.listedit;
-        obj.limit = value;
-        this.setState({ listedit: obj, modalActive: this._modalEditList() });
-    }
-    _setSelect(value) {
-        var obj = this.state.listedit;
-        obj.type = value;
-        this.setState({ listedit: obj, modalActive: this._modalEditList() });
-    }
-    _setStatus(value) {
-        var obj = this.state.listedit;
-        obj.status = value;
-        this.setState({ listedit: obj, modalActive: this._modalEditList() });
-    }
-    _setText(value) {
-        var obj = this.state.listedit;
-        obj.description = value;
-        this.setState({ listedit: obj, modalActive: this._modalEditList() });
-    }
 
-    _searchGame(search) {
-        var _self = this;
-        if (search == "") {
-            _self.setState({ games: [] },
-                () => {
-                    _self.setState({ modalActive: _self._modalAdd() },
-                        () => {
-                        }
-                    );
-                }
-            );
-        } else {
-            if (this.state.searching)
-                return false;
-            _self.setState({ searching: true },
-                () => {
-                    var re = new RegExp(search.toLowerCase(), 'g');
-
-                    firebase.database().ref('/Games/').on('value', function (snapshot) {
-                        var obj = {};
-                        for (var key in snapshot.val()) {
-                            let item = snapshot.val()[key];
-                            if ((item.name.toLowerCase().match(re) != null && search != "") || search == "") {
-                                obj[key] = item;
-                            }
-                        }
-
-                        structureGames(obj).then(games => {
-                            _self.setState({ games: games, searching: false },
-                                () => {
-                                    _self.setState({ modalActive: _self._modalAdd() },
-                                        () => {
-                                        }
-                                    );
-                                }
-                            );
-                            return true;
-                        }).catch(err => console.log('There was an error:' + err));
-                    });
-
-                }
-            );
-
-
-        }
-    }
-    saveGameEdit() {
+    saveGameEdit(gamelist) {
         var list = this.state.list;
-        list.games = this.state.listgames;
+        list.games = gamelist;
         this.setState({ list: list },
             () => {
                 var _self = this;
@@ -352,49 +276,7 @@ export default class ListScreen extends React.Component {
             }
         );
     }
-    onchangePos(pos) {
-        var list = Object.assign([], this.state.list.games);
-        var newlist = [];
-        for (let i = 0; i < pos.length; i++) {
-            newlist.push(list[pos[i]]);
-        }
-        this.setState({ listgames: newlist },
-            () => {
-            }
-        );
-    }
-    deleteItemFromList = (id) => {
-        var list = Object.assign([], this.state.listgames);
-        var r = list.filter(p => p.key == id);
-        var index = list.indexOf(r[0]);
-
-        list.splice(index, 1);
-
-        this.setState({ modalActive: this._modalEditGames() });
-        var _self = this;
-
-        this.setState({ listgames: list },
-            () => {
-                _self.setState({ modalActive: _self._modalEditGames() },
-                    () => {
-                    }
-                );
-            }
-        );
-    }
-    renderGames() {
-        let list = this.state.games;
-        let items = [];
-        for (let i = 0; i < list.length; i++) {
-            var game = this.state.list.games.filter(p => p.key == list[i].key)[0];
-            var userconsoles = null;
-            if (game != undefined) {
-                userconsoles = game.userConsoles;
-            }
-            items.push(<AddGameItem key={i} game={list[i]} userConsoles={userconsoles} callback={this.addGame.bind(this)} id={this.state.list.key} />);
-        }
-        return items;
-    }
+    
     renderGamesList() {
         let list = this.state.list.games;
         let items = [];
@@ -426,164 +308,27 @@ export default class ListScreen extends React.Component {
     }
     _modalAdd() {
         return (
-            <View style={styles.menuList}>
-                <View style={styles.scrollBox}>
-                    <Text style={styles.menuTitle}>-ADICIONAR JOGO-</Text>
-                    <TextInput
-                        placeholder={"Nome"}
-                        style={[styles.inputsearch, styles.inputText]}
-                        onChangeText={(text) => this._searchGame(text)}
-                        ref={input => { this.titleInput = input }}
-                    />
-                </View>
-
-                <ScrollView keyboardShouldPersistTaps="always" style={styles.gamebox}>
-                    {(this.state.games.length == 0) ? (
-                        <Text style={styles.TextclearList}>Procure pelo nome o jogo que gostaria de adicionar</Text>
-                    ) : (
-                            <View>
-                                {this.renderGames()}
-                            </View>
-                        )
-                    }
-
-                </ScrollView>
-            </View>
+            <AddGame list={this.state.list} />
         );
     }
     _modalEditList() {
-        let pickerState = null;
-        let pickerStateStatus = null;
-        if (this.state.list.type == "") {
-            pickerState = styles.unselected;
-        }
-        if (this.state.list.status == "") {
-            pickerStateStatus = styles.unselected;
-        }
         return (
-            <View style={styles.listBox}>
-                <Text style={styles.menuTitle}>-CRIAR LISTA-</Text>
-                {this.state.modelInvalid &&
-                    <Text style={styles.erroText}>Preencha todos os campos.</Text>
-                }
-                <TextInput
-                    placeholder={"Nome"}
-                    value={this.state.listedit.title}
-                    style={[styles.inputsearch, styles.inputText]}
-                    onChangeText={(text) => this._setTitle(text)}
-                    ref={input => { this.titleInput = input }}
-                />
-                <View style={styles.rowInput}>
-                    <View style={[styles.inputSelect, styles.SelectLeft]}>
-                        <Picker
-                            selectedValue={this.state.listedit.type}
-                            style={[styles.pickerStyle, pickerState]}
-                            itemStyle={[styles.itempickerStyle]}
-                            onValueChange={(itemValue, itemIndex) =>
-                                this._setSelect(itemValue)
-                            }>
-                            <Picker.Item label="Selecione um tipo" value="" />
-                            <Picker.Item label="Lista Padrão" value="padrao" />
-                            <Picker.Item label="Ranking" value="ranking" />
-                        </Picker>
-                    </View>
-                    <View style={[styles.inputSelect, styles.SelectRight]}>
-                        <Picker
-                            selectedValue={this.state.listedit.status}
-                            style={[styles.pickerStyle, pickerStateStatus]}
-                            itemStyle={[styles.itempickerStyle]}
-                            onValueChange={(itemValue, itemIndex) =>
-                                this._setStatus(itemValue)
-                            }>
-                            <Picker.Item label="Selecione um status" value="" />
-                            <Picker.Item label="Público" value="publico" />
-                            <Picker.Item label="Privado" value="privado" />
-                        </Picker>
-                    </View>
-                </View>
-                <TextInput
-                    placeholder={"Limite de jogos"}
-                    keyboardType='numeric'
-                    maxLength={10}
-                    value={this.state.listedit.limit}
-                    style={[styles.inputsearch, styles.inputText]}
-                    onChangeText={(text) => this._setLimit(text)}
-                    ref={input => { this.limitInput = input }}
-                />
-                <TextInput
-                    placeholder={"Descrição"}
-                    multiline={true}
-                    numberOfLines={4}
-                    value={this.state.listedit.description.toString()}
-                    style={[styles.inputsearch, styles.inputMulti, styles.inputText]}
-                    onChangeText={(text) => this._setText(text)}
-                    ref={input => { this.textInput = input }} />
-                <TouchableHighlight underlayColor="transparent" style={styles.saveButton} onPress={() => this.editList()}>
-                    <TabBarIcon
-                        name={'save'}
-                        type={'MaterialIcons'}
-                        style={styles.saveBoxIcon}
-                    />
-                </TouchableHighlight>
-            </View>
+            <AddEditList list={this.state.listedit} saveList={this.editList.bind(this)} />
         );
     }
     _modalDeleteGame() {
         return (
-            <View>
-                <Text style={styles.addItemText}>DESEJA EXCLUIR?</Text>
-                <View style={styles.buttonBox}>
-                    <TouchableHighlight underlayColor="transparent" onPress={() => this.confirmdeleteItens()}>
-                        <View style={[styles.addItem, styles.dangerButton]}>
-                            <Text style={[styles.addItemText]}>Deletar</Text>
-                        </View>
-                    </TouchableHighlight>
-                    <TouchableHighlight underlayColor="transparent" onPress={() => this.closeModal()}>
-                        <View style={styles.addItem}>
-                            <Text style={styles.addItemText}>Cancelar</Text>
-                        </View>
-                    </TouchableHighlight>
-                </View>
-            </View>
+            <ConfirmDelete confirmdeleteItens={this.confirmdeleteItens.bind(this)} closeModal={this.closeModal.bind(this)} />
         );
     }
     _modalDeleteList() {
         return (
-            <View>
-                <Text style={styles.addItemText}>DESEJA EXCLUIR A LISTA?</Text>
-                <View style={styles.buttonBox}>
-                    <TouchableHighlight underlayColor="transparent" onPress={() => this.confirmdeleteList()}>
-                        <View style={[styles.addItem, styles.dangerButton]}>
-                            <Text style={[styles.addItemText]}>Deletar</Text>
-                        </View>
-                    </TouchableHighlight>
-                    <TouchableHighlight underlayColor="transparent" onPress={() => this.closeModal()}>
-                        <View style={styles.addItem}>
-                            <Text style={styles.addItemText}>Cancelar</Text>
-                        </View>
-                    </TouchableHighlight>
-                </View>
-            </View>
+            <ConfirmDelete confirmdeleteItens={this.confirmdeleteList.bind(this)} closeModal={this.closeModal.bind(this)} />
         );
     }
     _modalEditGames() {
         return (
-            <View>
-                <SortableList
-                    style={styles.list}
-                    contentContainerStyle={styles.contentContainer}
-                    onChangeOrder={this.onchangePos.bind(this)}
-                    data={this.state.listgames}
-                    renderRow={this._renderRow} />
-
-                <TouchableHighlight underlayColor="transparent" style={styles.saveButton} onPress={() => this.saveGameEdit()}>
-                    <TabBarIcon
-                        name={'save'}
-                        type={'MaterialIcons'}
-                        style={styles.saveBoxIcon}
-                    />
-                </TouchableHighlight>
-            </View>
+            <EditGames list={this.state.list} saveGameEdit={this.saveGameEdit.bind(this)} />
         );
     }
     _modalMenu() {
@@ -603,9 +348,6 @@ export default class ListScreen extends React.Component {
                 </TouchableHighlight>
             </View>
         );
-    }
-    _renderRow = ({ key, index, data, active }) => {
-        return <DragGame data={data} pos={index} active={active} callback={this.deleteItemFromList.bind(this)} />;
     }
     render() {
         return (
@@ -648,44 +390,6 @@ export default class ListScreen extends React.Component {
     }
 }
 const styles = StyleSheet.create({
-    containersort: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#eee',
-
-        ...Platform.select({
-            ios: {
-                paddingTop: 20,
-            },
-        }),
-    },
-
-    title: {
-        fontSize: 20,
-        paddingVertical: 20,
-        color: '#999999',
-    },
-
-    list: {
-        marginTop: 80,
-        flex: 1,
-    },
-
-    contentContainer: {
-        width: Dimensions.get('window').width,
-
-        ...Platform.select({
-            ios: {
-                paddingHorizontal: 30,
-            },
-
-            android: {
-                paddingHorizontal: 0,
-            }
-        })
-    },
-
     dropdownMenu: {
         backgroundColor: "#FFF",
         borderRadius: 10,
@@ -708,21 +412,11 @@ const styles = StyleSheet.create({
         paddingBottom: 50,
         paddingTop: 60
     },
-    erroText: {
-        color: "#F00",
-        fontSize: 24,
-        fontFamily: 'SourceSansPro-SemiBold'
-    },
     sideIcon: {
         padding: 5
     },
     backButton: {
         fontSize: 40
-    },
-    rowInput: {
-        flexDirection: 'row',
-        justifyContent: "center",
-        alignItems: "center",
     },
     backgroundModal: {
         backgroundColor: 'rgba(0, 0, 0, 0.9)',
@@ -731,34 +425,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 1000
-    },
-    menuList: {
-        width: '100%',
-        flex: 1,
-        textAlign: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    loadingBackground: {
-        position: "absolute",
-        justifyContent: "center",
-        alignItems: "center",
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: "rgba(0,0,0,0.3)"
-    },
-    listItem: {
-        marginTop: 10,
-        flexDirection: 'row',
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#222222"
-    },
-    itemInfo: {
-        flex: 1,
-        paddingHorizontal: 20,
     },
     titleBox: {
         flex: 1,
@@ -774,14 +440,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         fontFamily: 'SourceSansPro-SemiBold'
     },
-    labelDetail: {
-        fontSize: 14,
-        textAlign: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#FFF',
-        fontFamily: 'SourceSansPro-SemiBold'
-    },
     labelDescription: {
         fontSize: 16,
         textAlign: 'center',
@@ -791,59 +449,6 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontFamily: 'SourceSansPro-Regular'
     },
-    thumbArea: {
-        flexDirection: 'row-reverse',
-        alignItems: 'flex-start',
-        flex: 1
-    },
-    thumb: {
-        width: 60,
-        height: 90,
-        marginLeft: 2
-    },
-    backgroundOverlayModal: {
-        height: Dimensions.get('window').height / 3,
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 0
-    },
-    scrollBox: {
-        width: '100%',
-        height: 150,
-        paddingHorizontal: 15,
-        textAlign: 'center',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    listBox: {
-        paddingTop: 50,
-        width: '100%',
-        padding: 15,
-        flex: 1,
-        textAlign: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    menuTitle: {
-        color: '#FFF',
-        textAlign: 'center',
-        fontFamily: 'SourceSansPro-Light',
-        fontSize: 30,
-        paddingHorizontal: 50,
-        marginTop: 50,
-    },
-    saveButton: {
-        position: 'absolute',
-        top: 10,
-        right: 10,
-    },
-    saveBoxIcon: {
-        color: '#FFF',
-        fontSize: 50
-    },
     closeBox: {
         position: 'absolute',
         top: 10,
@@ -852,87 +457,5 @@ const styles = StyleSheet.create({
     closeBoxIcon: {
         color: '#FFF',
         fontSize: 50
-    },
-    buttonBox: {
-        flexDirection: 'row'
-    },
-    addItem: {
-        flex: 1,
-        backgroundColor: '#006CD8',
-        marginTop: 30,
-        marginLeft: 10,
-        marginRight: 10,
-        paddingTop: 15,
-        paddingBottom: 15,
-        paddingLeft: 30,
-        paddingRight: 30,
-        minHeight: 50,
-        borderRadius: 5,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    addItemText: {
-        fontSize: 16,
-        color: '#FFF',
-        fontFamily: 'SourceSansPro-SemiBold'
-    },
-    dangerButton: {
-        backgroundColor: '#F00'
-    },
-    SelectLeft: {
-        marginRight: 10
-    },
-    SelectRight: {
-        marginLeft: 10
-    },
-    inputSelect: {
-        flex: 1,
-        backgroundColor: '#444',
-        marginVertical: 10,
-        paddingLeft: 15,
-        padding: 0,
-        borderRadius: 10,
-        maxHeight: 50,
-    },
-    gamebox: {
-        padding: 0,
-        width: '100%',
-        paddingHorizontal: 15,
-        height: Dimensions.get('window').height / 150
-    },
-    inputsearch: {
-        backgroundColor: '#444',
-        margin: 10,
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderRadius: 10,
-        minHeight: 50,
-        width: '100%'
-    },
-    inputText: {
-        color: '#FFF',
-        fontFamily: 'SourceSansPro-Regular',
-        fontSize: 18,
-    },
-    inputMulti: {
-        textAlignVertical: 'top',
-    },
-    itempickerStyle: {
-        color: '#FFF',
-        width: '100%'
-    },
-    pickerStyle: {
-        borderRadius: 10,
-        color: '#FFF'
-    },
-    unselected: {
-        color: '#CCC'
-    },
-    TextclearList: {
-        color: '#FFF',
-        fontFamily: 'SourceSansPro-Bold',
-        fontSize: 18,
-        textAlign: 'center',
-        padding: 40,
     },
 });

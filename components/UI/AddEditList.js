@@ -3,12 +3,15 @@ import {
     View,
     StyleSheet,
     TouchableHighlight,
-    Text
+    Text,
+    TextInput,
+    Picker
 } from 'react-native';
+import TabBarIcon from '../../components/UI/TabBarIcon';
 
 
 
-export default class AddGameButton extends React.Component {
+export default class AddEditList extends React.Component {
 
     constructor(props) {
         super(props);
@@ -16,41 +19,41 @@ export default class AddGameButton extends React.Component {
 
     state = {
     };
-    addList = () => {
-        this.props.addList();
+    saveList = () => {
+        this.props.saveList();
     }
     _setTitle(value) {
-        var obj = this.state.list;
+        var obj = this.props.list;
         obj.title = value;
-        this.setState({ list: obj, modalActive: this._modalAdd() });
+        this.setState({ list: obj });
     }
     _setLimit(value) {
-        var obj = this.state.list;
+        var obj = this.props.list;
         obj.limit = value;
-        this.setState({ list: obj, modalActive: this._modalAdd() });
+        this.setState({ list: obj });
     }
     _setSelect(value) {
-        var obj = this.state.list;
+        var obj = this.props.list;
         obj.type = value;
-        this.setState({ list: obj, modalActive: this._modalAdd() });
+        this.setState({ list: obj });
     }
     _setStatus(value) {
-        var obj = this.state.list;
+        var obj = this.props.list;
         obj.status = value;
-        this.setState({ list: obj, modalActive: this._modalAdd() });
+        this.setState({ list: obj });
     }
     _setText(value) {
-        var obj = this.state.list;
+        var obj = this.props.list;
         obj.description = value;
-        this.setState({ list: obj, modalActive: this._modalAdd() });
+        this.setState({ list: obj });
     }
     render() {
         let pickerState = null;
         let pickerStateStatus = null;
-        if (this.state.list.type == "") {
+        if (this.props.list.type == "") {
             pickerState = styles.unselected;
         }
-        if (this.state.list.status == "") {
+        if (this.props.list.status == "") {
             pickerStateStatus = styles.unselected;
         }
         return (
@@ -61,6 +64,7 @@ export default class AddGameButton extends React.Component {
                 }
                 <TextInput
                     placeholder={"Nome"}
+                    value={this.props.list.title}
                     style={[styles.inputsearch, styles.inputText]}
                     onChangeText={(text) => this._setTitle(text)}
                     ref={input => { this.titleInput = input }}
@@ -68,7 +72,7 @@ export default class AddGameButton extends React.Component {
                 <View style={styles.rowInput}>
                     <View style={[styles.inputSelect, styles.SelectLeft]}>
                         <Picker
-                            selectedValue={this.state.list.type}
+                            selectedValue={this.props.list.type}
                             style={[styles.pickerStyle, pickerState]}
                             itemStyle={[styles.itempickerStyle]}
                             onValueChange={(itemValue, itemIndex) =>
@@ -81,7 +85,7 @@ export default class AddGameButton extends React.Component {
                     </View>
                     <View style={[styles.inputSelect, styles.SelectRight]}>
                         <Picker
-                            selectedValue={this.state.list.status}
+                            selectedValue={this.props.list.status}
                             style={[styles.pickerStyle, pickerStateStatus]}
                             itemStyle={[styles.itempickerStyle]}
                             onValueChange={(itemValue, itemIndex) =>
@@ -97,6 +101,7 @@ export default class AddGameButton extends React.Component {
                     placeholder={"Limite de jogos"}
                     keyboardType='numeric'
                     maxLength={10}
+                    value={this.props.list.limit}
                     style={[styles.inputsearch, styles.inputText]}
                     onChangeText={(text) => this._setLimit(text)}
                     ref={input => { this.limitInput = input }}
@@ -105,10 +110,11 @@ export default class AddGameButton extends React.Component {
                     placeholder={"Descrição"}
                     multiline={true}
                     numberOfLines={4}
+                    value={this.props.list.description.toString()}
                     style={[styles.inputsearch, styles.inputMulti, styles.inputText]}
                     onChangeText={(text) => this._setText(text)}
                     ref={input => { this.textInput = input }} />
-                <TouchableHighlight underlayColor="transparent" style={styles.saveButton} onPress={() => this.addList()}>
+                <TouchableHighlight underlayColor="transparent" style={styles.saveButton} onPress={() => this.saveList()}>
                     <TabBarIcon
                         name={'save'}
                         type={'MaterialIcons'}
@@ -121,6 +127,38 @@ export default class AddGameButton extends React.Component {
 }
 const styles = StyleSheet.create({
     
+    rowInput: {
+        flexDirection: 'row',
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    listBox: {
+        paddingTop: 50,
+        width: '100%',
+        padding: 15,
+        flex: 1,
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    
+    menuTitle: {
+        color: '#FFF',
+        textAlign: 'center',
+        fontFamily: 'SourceSansPro-Light',
+        fontSize: 30,
+        paddingHorizontal: 50,
+        marginTop: 50,
+    },
+    saveButton: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+    },
+    saveBoxIcon: {
+        color: '#FFF',
+        fontSize: 50
+    },
     SelectLeft: {
         marginRight: 10
     },

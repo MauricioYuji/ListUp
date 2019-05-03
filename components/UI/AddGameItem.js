@@ -35,7 +35,20 @@ export default class AddGameItem extends React.Component {
         }
 
     }
+    setConsoles = () => {
+        var item = this.props.userConsoles;
+        var array = [];
+        if (item != null) {
+            for (var i = 0; i < item.length; i++) {
+                array.push(item[i].key);
+            }
+            this.setState({ consolesActive: array });
+        }
+    }
     showButtons = () => {
+        if(this.props.userConsoles != this.state.consolesActive && this.state.consolesActive.length == 0){
+            this.setConsoles();
+        }
         var _self = this;
         Keyboard.dismiss();
         _self.setState({ showButtons: !this.state.showButtons },

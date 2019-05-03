@@ -8,7 +8,7 @@ import {
 
 
 
-export default class AddGameButton extends React.Component {
+export default class ConfirmDelete extends React.Component {
 
     constructor(props) {
         super(props);
