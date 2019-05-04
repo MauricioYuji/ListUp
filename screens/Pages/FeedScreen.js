@@ -5,6 +5,11 @@ import {
     View,
     DeviceEventEmitter
 } from 'react-native';
+import * as firebase from 'firebase';
+// const firebase = require("firebase");
+// Required for side-effects
+require("firebase/firestore");
+
 
 
 export default class FeedScreen extends React.Component {
@@ -22,7 +27,27 @@ export default class FeedScreen extends React.Component {
         DeviceEventEmitter.emit('reloading', true);
     }
     componentDidMount() {
-        DeviceEventEmitter.emit('reloading', false);
+
+
+        // firebase.database().ref('/Games/').endAt(100).on('value', function (snapshot) {
+        //     console.log("results: ", snapshot.val());
+        //     // console.log("results: ", Object.assign([], snapshot.val()));
+        //     console.log("PROCESSADO");
+        //     DeviceEventEmitter.emit('reloading', false);
+        // });
+
+        firebase.firestore().collection("Games").get().then(function (f) {
+            f.forEach(function (doc) {
+                // doc.data() is never undefined for query doc snapshots
+                const game = doc.data()
+                game.img.get().then(snap => {
+                    game.image = snap.data()
+                });
+                console.log(doc.id, " => ", game);
+                DeviceEventEmitter.emit('reloading', false);
+            });
+        });
+
     }
     componentWillUnmount() {
     }
