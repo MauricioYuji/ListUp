@@ -6,8 +6,6 @@ import {
     DeviceEventEmitter
 } from 'react-native';
 import * as firebase from 'firebase';
-// const firebase = require("firebase");
-// Required for side-effects
 require("firebase/firestore");
 
 
@@ -23,9 +21,9 @@ export default class FeedScreen extends React.Component {
 
     state = {
     };
-    componentWillMount() {
-        DeviceEventEmitter.emit('reloading', true);
-    }
+    //componentWillMount() {
+    //    DeviceEventEmitter.emit('reloading', true);
+    //}
     componentDidMount() {
 
 

@@ -1,6 +1,9 @@
 import * as firebase from 'firebase';
 import { getData, updateData, setData } from './baseService';
 
+
+
+
 const getGame = async (keys) => {
 
     let list = require('../../files/consoles.json');

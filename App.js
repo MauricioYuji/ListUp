@@ -36,6 +36,7 @@ export default class App extends React.Component {
     componentWillMount() {
 
         DeviceEventEmitter.addListener('reloading', (data) => {
+            console.log("SET DATA: ", data);
             this.setState({ loading: data });
         });
         DeviceEventEmitter.addListener('updateUser', (data) => {
@@ -46,6 +47,7 @@ export default class App extends React.Component {
     }
     componentDidMount() {
         LayoutAnimation.easeInEaseOut();
+
     }
     _storeUser = async (user) => {
         try {
