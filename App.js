@@ -17,6 +17,7 @@ import AppNavigator from './navigation/AppNavigator';
 import Auth from './navigation/AuthNavigator';
 import Layout from './constants/Layout';
 import { updateData, getData } from './components/services/baseService';
+import { getUser, deleteUser, storeUser } from './components/services/AuthService';
 import * as firebase from 'firebase';
 import NavigationService from './components/services/NavigationService';
 
@@ -39,9 +40,20 @@ export default class App extends React.Component {
             console.log("SET DATA: ", data);
             this.setState({ loading: data });
         });
-        DeviceEventEmitter.addListener('updateUser', (data) => {
-            this._updateUser(data.user);
-            NavigationService.navigate('App');
+        DeviceEventEmitter.addListener('setUser', (data) => {
+
+            storeUser(data).then(p => {
+                this._checkLogin(p);
+            });
+            ////console.log("data: ", data);
+            //if (data != null) {
+            //    storeUser(data).then(p => {
+            //        console.log("p: ", p);
+            //        NavigationService.navigate('App');
+            //    });
+            //} else {
+            //    NavigationService.navigate('Auth');
+            //}
         });
 
     }
@@ -49,26 +61,6 @@ export default class App extends React.Component {
         LayoutAnimation.easeInEaseOut();
 
     }
-    _storeUser = async (user) => {
-        try {
-            await AsyncStorage.setItem('user', user);
-        } catch (error) {
-            // Error saving data
-        }
-    }
-    _deleteUser = async () => {
-        try {
-            await AsyncStorage.removeItem('user');
-        } catch (error) {
-            // Error saving data
-        }
-    }
-    _updateUser = (user) => {
-        var _self = this;
-        updateData('UserInfo/' + user.uid, user).then((p) => {
-            _self._storeUser(user);
-        });
-    };
     _loadResourcesAsync = async () => {
         return Promise.all([
             Asset.loadAsync([
@@ -104,27 +96,59 @@ export default class App extends React.Component {
     _handleLoadingError = error => {
         console.warn(error);
     };
-
+    _checkLogin = (data) => {
+        this.setState({ isLoadingComplete: true });
+        if (data != null) {
+            var obj = JSON.parse(data);
+            console.log("obj: ", obj);
+            if (obj.flagtutorial) {
+                NavigationService.navigate('App');
+            } else {
+                NavigationService.navigate('Tutorial');
+            }
+        } else {
+            console.log("SEM USER");
+            NavigationService.navigate('Auth');
+        }
+    }
     _handleFinishLoading = () => {
 
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user != null && (user.emailVerified || user.providerData[0].providerId === "facebook.com")) {
-                getData('UserInfo/' + user.uid).then((p) => {
-                    this._storeUser(JSON.stringify(p));
-                    this.setState({ isLoadingComplete: true });
-                    if (p.flagtutorial) {
-                        NavigationService.navigate('App');
-                    } else {
-                        NavigationService.navigate('Tutorial');
-                    }
-                });
-            } else {
-                this.setState({ isLoadingComplete: true });
-                this._deleteUser();
+        getUser().then(p => {
+            this._checkLogin(p);
 
-                NavigationService.navigate('Auth');
-            }
+            //console.log("user: ", p);
+            //this.setState({ isLoadingComplete: true });
+            //if (p === null || p === undefined) {
+            //    NavigationService.navigate('Auth');
+            //} else {
+            //    //if (p.flagtutorial) {
+            //    //    NavigationService.navigate('App');
+            //    //} else {
+            //    //    NavigationService.navigate('Tutorial');
+            //    //}
+            //}
         });
+
+        //firebase.auth().onAuthStateChanged((user) => {
+        //    if (user != null && (user.emailVerified || user.providerData[0].providerId === "facebook.com")) {
+        //        getData('UserInfo/' + user.uid).then((p) => {
+        //            this._storeUser(JSON.stringify(p));
+        //            this.setState({ isLoadingComplete: true });
+        //            if (p.flagtutorial) {
+        //                NavigationService.navigate('App');
+        //            } else {
+        //                NavigationService.navigate('Tutorial');
+        //            }
+        //        });
+        //    } else {
+        //        this.setState({ isLoadingComplete: true });
+        //        this._deleteUser();
+
+        //        NavigationService.navigate('Auth');
+        //    }
+        //});
+
+
     };
     render() {
         if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {

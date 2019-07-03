@@ -1,5 +1,5 @@
 import * as firebase from 'firebase';
-const base = "http://192.168.1.30:3000";
+const base = "http://192.168.1.31:3000";
 //const base = "http://179.99.252.181:3000";
 
 export const put = (path, obj) => {

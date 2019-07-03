@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { StyleSheet, Text, View, TextInput, Image, TouchableOpacity, ActivityIndicator, DeviceEventEmitter } from 'react-native';
 import { signInWithFacebook } from '../../components/services/facebookAuth';
-import { signIn } from '../../components/services/AuthService';
+import { signIn, storeUser } from '../../components/services/AuthService';
 import * as firebase from 'firebase';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 
@@ -16,7 +16,6 @@ export default class LoginScreen extends React.Component {
     state = {
         secureTextEntry: true, email: '', password: '', errorMessage: null, loading: null, emailSend: false, feedback: null
     };
-
     facebooklogin() {
         const _self = this;
         this.setState({ loading: 'facebook' });
@@ -35,8 +34,12 @@ export default class LoginScreen extends React.Component {
         _self.setState({ loading: 'login', errorMessage: null, emailSend: false, feedback: null });
 
         signIn(email, password).then(p => {
-            console.log("p: ", p);
-            _self.setState({ errorMessage: null, loading: null });
+            if (p.success) {
+                DeviceEventEmitter.emit('setUser', p.data);
+                _self.setState({ errorMessage: null, loading: null });
+            } else {
+                _self.setState({ errorMessage: "Usuário inválido.", loading: null });
+            }
         });
 
 

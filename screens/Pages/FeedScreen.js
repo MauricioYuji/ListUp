@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import * as firebase from 'firebase';
 require("firebase/firestore");
+import { getUser } from '../../components/services/AuthService';
 
 
 
@@ -44,6 +45,9 @@ export default class FeedScreen extends React.Component {
                 console.log(doc.id, " => ", game);
                 DeviceEventEmitter.emit('reloading', false);
             });
+        });
+        getUser().then(p => {
+            console.log("p: ", JSON.parse(p));
         });
 
     }

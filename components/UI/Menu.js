@@ -4,6 +4,7 @@ import Icon from '@expo/vector-icons/FontAwesome';
 import Layout from '../../constants/Layout';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 import NavigationService from '../../components/services/NavigationService';
+import { logOut } from '../../components/services/AuthService';
 import * as firebase from 'firebase';
 
 const SIZE = 60;
@@ -45,12 +46,16 @@ class Menu extends Component {
 
     }
     logoff() {
-        firebase.auth().signOut().then(function () {
-            // Sign-out successful.
-
-        }, function (error) {
-            // An error happened.
+        logOut().then(p => {
+            console.log("logout: ", p);
+            DeviceEventEmitter.emit('setUser', null);
         });
+        //firebase.auth().signOut().then(function () {
+        //    // Sign-out successful.
+
+        //}, function (error) {
+        //    // An error happened.
+        //});
     }
     render() {
         const radius = this.mode.interpolate({
