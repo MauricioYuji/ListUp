@@ -1,11 +1,13 @@
 ﻿import React, { Component } from 'react';
 import { Animated, TouchableHighlight, View, Image, StyleSheet, ScrollView, Text, DeviceEventEmitter } from "react-native";
-import Icon from '@expo/vector-icons/FontAwesome';
+//import Icon from '@expo/vector-icons';
+
+import { Entypo } from '@expo/vector-icons';
 import Layout from '../../constants/Layout';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 import NavigationService from '../../components/services/NavigationService';
 import { logOut } from '../../components/services/AuthService';
-import * as firebase from 'firebase';
+//import * as firebase from 'firebase';
 
 const SIZE = 60;
 class Menu extends Component {
@@ -124,7 +126,7 @@ class Menu extends Component {
                                 { rotate: rotation }
                             ]
                         }}>
-                            <Icon name="plus" size={30} color="#F8F8F8" />
+                            <Entypo name="plus" size={30} color="#F8F8F8" />
                         </Animated.View>
                     </View>
                 </TouchableHighlight>

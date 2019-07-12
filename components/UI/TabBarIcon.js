@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from 'expo';
+import { Ionicons, MaterialCommunityIcons, MaterialIcons, FontAwesome, Octicons } from '@expo/vector-icons';
 
 import Colors from '../../constants/Colors';
 
@@ -7,7 +7,7 @@ export default class TabBarIcon extends React.Component {
     render() {
         if (this.props.type == "Ionicons") {
             return (
-                <Icon.Ionicons
+                <Ionicons
                     name={this.props.name}
                     size={26}
                     style={[{ marginBottom: -3 }, this.props.style]}
@@ -16,7 +16,7 @@ export default class TabBarIcon extends React.Component {
             );
         } else if (this.props.type === "MaterialIcons") {
             return (
-                <Icon.MaterialIcons
+                <MaterialIcons
                     name={this.props.name}
                     size={26}
                     style={[{ marginBottom: -3 }, this.props.style]}
@@ -25,7 +25,7 @@ export default class TabBarIcon extends React.Component {
             );
         } else if (this.props.type === "MaterialCommunityIcons") {
             return (
-                <Icon.MaterialCommunityIcons
+                <MaterialCommunityIcons
                     name={this.props.name}
                     size={26}
                     style={[{ marginBottom: -3 }, this.props.style]}
@@ -34,7 +34,7 @@ export default class TabBarIcon extends React.Component {
             );
         } else if (this.props.type === "FontAwesome") {
             return (
-                <Icon.FontAwesome
+                <FontAwesome
                     name={this.props.name}
                     size={26}
                     style={[{ marginBottom: -3 }, this.props.style]}
@@ -43,7 +43,7 @@ export default class TabBarIcon extends React.Component {
             );
         } else if (this.props.type === "Octicons") {
             return (
-                <Icon.FontAwesome
+                <FontAwesome
                     name={this.props.name}
                     size={26}
                     style={[{ marginBottom: -3 }, this.props.style]}

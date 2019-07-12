@@ -1,21 +1,23 @@
-import * as firebase from 'firebase';
-const base = "http://192.168.1.31:3000";
-//const base = "http://179.99.252.181:3000";
+//import * as firebase from 'firebase';
+const base = "http://192.168.15.12:3000";
+//const base = "http://191.8.8.200:3000";
 
-export const put = (path, obj) => {
+
+export const put = (path, obj, token) => {
     let data = {
         method: 'PUT',
         body: JSON.stringify(obj),
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
         }
     };
     return fetch(base + path, data)
         .then(response => response.json())  // promise
         .then(json => dispatch(receiveAppos(json)));
 };
-export const post = (path, obj) => {
+export const post = (path, obj, token) => {
 
     //return fetch(base + path, {
     //    method: 'POST',
@@ -31,7 +33,8 @@ export const post = (path, obj) => {
         body: JSON.stringify(obj),
         headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
         }
     };
     return fetch(base + path, data)
@@ -39,25 +42,24 @@ export const post = (path, obj) => {
 
 };
 
-export const get = (path) => {
+export const get = (path, token) => {
     let data = {
         method: 'GET',
         headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Authorization': 'Bearer ' + token
         }
     };
-    return fetch(base + path)
-        .then(response => response.json())  // promise
-        .then(json => dispatch(receiveAppos(json)));
+    return fetch(base + path, data)
+        .then(response => response.json());
 };
 
-export const del = (path, key) => {
+export const del = (path, key, token) => {
     let data = {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token,
             'X-CSRFToken': cookie.load('csrftoken')
         }
     };

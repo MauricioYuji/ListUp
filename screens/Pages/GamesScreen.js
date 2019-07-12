@@ -1,5 +1,5 @@
 import React from 'react';
-import * as firebase from 'firebase';
+//import * as firebase from 'firebase';
 import {
     Image,
     StyleSheet,
@@ -56,21 +56,21 @@ export default class GameScreen extends React.Component {
 
 
 
-        firebase.database().ref('/Games/').on('value', function (snapshot) {
-            if (snapshot.val() != null) {
-                structureGames(snapshot.val()).then(games => {
-                    console.log("PROCESSADO");
-                    _self.setState({ page: 0, games: games },
-                        () => {
-                            _self.filterObj();
-                        }
-                    );
-                    return true;
-                }).catch(err => console.log('There was an error:' + err));
-            } else {
-                DeviceEventEmitter.emit('reloading', false);
-            }
-        });
+        //firebase.database().ref('/Games/').on('value', function (snapshot) {
+        //    if (snapshot.val() != null) {
+        //        structureGames(snapshot.val()).then(games => {
+        //            console.log("PROCESSADO");
+        //            _self.setState({ page: 0, games: games },
+        //                () => {
+        //                    _self.filterObj();
+        //                }
+        //            );
+        //            return true;
+        //        }).catch(err => console.log('There was an error:' + err));
+        //    } else {
+        //        DeviceEventEmitter.emit('reloading', false);
+        //    }
+        //});
 
 
     }

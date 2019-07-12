@@ -1,72 +1,72 @@
-import * as firebase from 'firebase';
+//import * as firebase from 'firebase';
 import { getData, updateData, setData } from './baseService';
 
 
 
 
-const getGame = async (keys) => {
+//const getGame = async (keys) => {
 
-    let list = require('../../files/consoles.json');
+//    let list = require('../../files/consoles.json');
 
-    return new Promise((resolve, reject) => {
-        var promises = keys.map(function (key) {
-            return firebase.database().ref("/Games/").child(key).once("value");
-        });
-        Promise.all(promises).then(function (snapshots) {
-            var obj = {};
-            snapshots.forEach(function (snapshot) {
-                var genres = [];
-                var consoles = [];
-                var companies = [];
-                var item = snapshot.val();
-                var file = { key: item.img, url: "", file: null };
-                for (var j = 0; j < item.keyconsole.length; j++) {
-                    var c = list.Companies[list.Consoles[item.keyconsole[j]].keycompany];
-                    consoles.push(list.Consoles[item.keyconsole[j]]);
-                    c.key = list.Consoles[item.keyconsole[j]].keycompany;
-                    if (!companies.includes(c))
-                        companies.push(c);
-                }
+//    return new Promise((resolve, reject) => {
+//        var promises = keys.map(function (key) {
+//            return firebase.database().ref("/Games/").child(key).once("value");
+//        });
+//        Promise.all(promises).then(function (snapshots) {
+//            var obj = {};
+//            snapshots.forEach(function (snapshot) {
+//                var genres = [];
+//                var consoles = [];
+//                var companies = [];
+//                var item = snapshot.val();
+//                var file = { key: item.img, url: "", file: null };
+//                for (var j = 0; j < item.keyconsole.length; j++) {
+//                    var c = list.Companies[list.Consoles[item.keyconsole[j]].keycompany];
+//                    consoles.push(list.Consoles[item.keyconsole[j]]);
+//                    c.key = list.Consoles[item.keyconsole[j]].keycompany;
+//                    if (!companies.includes(c))
+//                        companies.push(c);
+//                }
 
-                for (var j = 0; j < item.keygenre.length; j++) {
-                    genres.push(list.Genres[item.keygenre[j]]);
+//                for (var j = 0; j < item.keygenre.length; j++) {
+//                    genres.push(list.Genres[item.keygenre[j]]);
 
-                }
-                var game = {
-                    key: snapshot.key,
-                    name: item.name,
-                    image: file,
-                    genres: genres,
-                    consoles: consoles,
-                    companies: companies
-                };
+//                }
+//                var game = {
+//                    key: snapshot.key,
+//                    name: item.name,
+//                    image: file,
+//                    genres: genres,
+//                    consoles: consoles,
+//                    companies: companies
+//                };
 
-                obj[snapshot.key] = game;
+//                obj[snapshot.key] = game;
 
-            });
+//            });
 
 
 
-            resolve(obj);
-        });
-    });
+//            resolve(obj);
+//        });
+//    });
 
-};
-const getImages = async (keys) => {
-    return new Promise((resolve, reject) => {
-        var promises = keys.map(function (key) {
-            return firebase.database().ref("/thumbs/").child(key).once("value");
-        });
-        Promise.all(promises).then(function (snapshots) {
-            var obj = {};
-            snapshots.forEach(function (snapshot) {
-                obj[snapshot.key] = snapshot.val();
+//};
+//const getImages = async (keys) => {
+//    return new Promise((resolve, reject) => {
+//        var promises = keys.map(function (key) {
+//            return firebase.database().ref("/thumbs/").child(key).once("value");
+//        });
+//        Promise.all(promises).then(function (snapshots) {
+//            var obj = {};
+//            snapshots.forEach(function (snapshot) {
+//                obj[snapshot.key] = snapshot.val();
 
-            });
-            resolve(obj);
-        });
-    });
-};
+//            });
+//            resolve(obj);
+//        });
+//    });
+//};
 
 export const structureGames = async (games) => {
     var objgames = [];

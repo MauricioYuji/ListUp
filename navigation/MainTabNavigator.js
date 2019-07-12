@@ -1,11 +1,11 @@
 import React from 'react';
-import { Easing, Animated } from 'react-native';
+import { Platform, Easing, Animated } from 'react-native';
 import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
 
 import { MultiBar } from './MultiBar';
-
 import MenuIcon from '../components/UI/MenuIcon';
 import { Menu } from '../components/UI/Menu';
+
 import FeedScreen from '../screens/Pages/FeedScreen';
 import GamesScreen from '../screens/Pages/GamesScreen';
 import GroupsScreen from '../screens/Pages/GroupsScreen';
@@ -14,37 +14,46 @@ import ListScreen from '../screens/Pages/ListScreen';
 import ListsScreen from '../screens/Pages/ListsScreen';
 import ProfileScreen from '../screens/Pages/ProfileScreen';
 import TestScreen from '../screens/Pages/TestScreen';
+
 const transitionConfig = () => {
     return {
         transitionSpec: {
             duration: 750,
             easing: Easing.out(Easing.poly(4)),
             timing: Animated.timing,
-            useNativeDriver: true,
+            useNativeDriver: true
         },
         screenInterpolator: sceneProps => {
-            const { layout, position, scene } = sceneProps
+            const { layout, position, scene } = sceneProps;
 
-            const thisSceneIndex = scene.index
-            const width = layout.initWidth
+            const thisSceneIndex = scene.index;
+            const width = layout.initWidth;
 
             const translateX = position.interpolate({
                 inputRange: [thisSceneIndex - 1, thisSceneIndex],
-                outputRange: [width, 0],
-            })
+                outputRange: [width, 0]
+            });
 
-            return { transform: [{ translateX }] }
-        },
-    }
-}
-const FeedStack = createStackNavigator({
-    Feed: FeedScreen,
-},
+            return { transform: [{ translateX }] };
+        }
+    };
+};
+const config = {
+    //Platform.select({
+    //    web: { headerMode: 'screen' },
+    //    default: {},
+    //}),
+    headerMode: 'none',
+    cardStyle: { backgroundColor: '#00000000' },
+    transitionConfig: transitionConfig,
+};
+
+const FeedStack = createStackNavigator(
     {
-        headerMode: 'none',
-        cardStyle: { backgroundColor: '#00000000' },
-        transitionConfig: transitionConfig,
-    });
+        Feed: FeedScreen
+    },
+    config
+);
 
 FeedStack.navigationOptions = {
     tabBarLabel: 'Feed',
@@ -57,18 +66,18 @@ FeedStack.navigationOptions = {
     ),
 };
 
-const GamesStack = createStackNavigator({
-    Games: GamesScreen,
-    GameDetail: GameDetailScreen,
-    Lists: ListsScreen,
-    List: ListScreen,
-    Test: TestScreen
-},
+FeedStack.path = '';
+
+const GamesStack = createStackNavigator(
     {
-        headerMode: 'none',
-        cardStyle: { backgroundColor: '#00000000' },
-        transitionConfig: transitionConfig,
-    });
+        Games: GamesScreen,
+        GameDetail: GameDetailScreen,
+        Lists: ListsScreen,
+        List: ListScreen,
+        Test: TestScreen
+    },
+    config
+);
 
 GamesStack.navigationOptions = {
     tabBarLabel: 'Games',
@@ -78,17 +87,16 @@ GamesStack.navigationOptions = {
             name={'gamepad'}
             type={'FontAwesome'}
         />
-    )
+    ),
 };
 
-const ProfileStack = createStackNavigator({
-    Profile: ProfileScreen,
-},
+GamesStack.path = '';
+const ProfileStack = createStackNavigator(
     {
-        headerMode: 'none',
-        cardStyle: { backgroundColor: '#00000000' },
-        transitionConfig: transitionConfig,
-    });
+        Profile: ProfileScreen
+    },
+    config
+);
 
 ProfileStack.navigationOptions = {
     tabBarLabel: 'Profile',
@@ -100,17 +108,16 @@ ProfileStack.navigationOptions = {
         />
     ),
 };
-const GroupsStack = createStackNavigator({
-    Groups: GroupsScreen,
-},
+
+ProfileStack.path = '';
+const GroupsStack = createStackNavigator(
     {
-        headerMode: 'none',
-        cardStyle: { backgroundColor: '#00000000' },
-        transitionConfig: transitionConfig,
-    });
+        Grupos: GroupsScreen
+    },
+    config
+);
 
 GroupsStack.navigationOptions = {
-    initialRouteName: 'Groups',
     tabBarLabel: 'Grupos',
     tabBarIcon: ({ focused }) => (
         <MenuIcon
@@ -119,9 +126,9 @@ GroupsStack.navigationOptions = {
             type={'FontAwesome'}
         />
     ),
-
 };
 
+GroupsStack.path = '';
 
 const MenuStack = {
     screen: () => null, // Empty screen
@@ -132,8 +139,7 @@ const MenuStack = {
         navigationDisabled: true
     }
 };
-
-export default createBottomTabNavigator({
+const tabNavigator = createBottomTabNavigator({
     FeedStack,
     GamesStack,
     MenuStack,
@@ -157,3 +163,7 @@ export default createBottomTabNavigator({
         cardStyle: { backgroundColor: '#00000000' },
         transitionConfig: transitionConfig,
     });
+
+tabNavigator.path = '';
+
+export default tabNavigator;

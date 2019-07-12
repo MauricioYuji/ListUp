@@ -1,5 +1,5 @@
 import React from 'react';
-import * as firebase from 'firebase';
+//import * as firebase from 'firebase';
 import { insertData, updateData } from '../../components/services/baseService';
 import {
     View,
@@ -33,20 +33,20 @@ export default class AddEditList extends React.Component {
             this.setState({ modelInvalid: false });
             var _self = this;
 
-            var user = firebase.auth().currentUser;
+            //var user = firebase.auth().currentUser;
 
             
-            if (obj.key == undefined) {
-                insertData('userLists/' + user.uid + '/', obj)
-                    .then((resp) => {
-                        this.props.callback();
-                    });
-            } else {
-                updateData('userLists/' + user.uid + '/' + obj.key, obj)
-                    .then((resp) => {
-                        this.props.callback();
-                    });
-            }
+            //if (obj.key == undefined) {
+            //    insertData('userLists/' + user.uid + '/', obj)
+            //        .then((resp) => {
+            //            this.props.callback();
+            //        });
+            //} else {
+            //    updateData('userLists/' + user.uid + '/' + obj.key, obj)
+            //        .then((resp) => {
+            //            this.props.callback();
+            //        });
+            //}
         }
 
     }

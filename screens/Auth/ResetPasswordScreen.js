@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import { StyleSheet, Text, View, TextInput, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
-import * as firebase from 'firebase';
+//import * as firebase from 'firebase';
 
 export default class ResetPasswordScreen extends React.Component {
 
@@ -18,13 +18,13 @@ export default class ResetPasswordScreen extends React.Component {
         const { email } = this.state;
 
         this.setState({ loading: 'enviar' });
-        firebase.auth().sendPasswordResetEmail(email)
-            .then(() => {
-                this.setState({ errorMessage: null, loading: null, feedback: 'Confirme seu email para trocar a senha!' });
-            })
-            .catch(() => {
-                this.setState({ errorMessage: 'Usuário ou senha inválidos!', loading: null, feedback: null });
-            });
+        //firebase.auth().sendPasswordResetEmail(email)
+        //    .then(() => {
+        //        this.setState({ errorMessage: null, loading: null, feedback: 'Confirme seu email para trocar a senha!' });
+        //    })
+        //    .catch(() => {
+        //        this.setState({ errorMessage: 'Usuário ou senha inválidos!', loading: null, feedback: null });
+        //    });
     }
     render() {
         const loadingButton = this.state.loading;

@@ -8,6 +8,6 @@ export default {
     width,
     height,
   },
-  isSmallDevice: width < 375,
-  hasHeader: false,
+    isSmallDevice: width < 375,
+    hasHeader: false,
 };

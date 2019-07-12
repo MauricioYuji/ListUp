@@ -5,8 +5,8 @@ import {
     View,
     DeviceEventEmitter
 } from 'react-native';
-import * as firebase from 'firebase';
-require("firebase/firestore");
+//import * as firebase from 'firebase';
+//require("firebase/firestore");
 import { getUser } from '../../components/services/AuthService';
 
 
@@ -35,20 +35,20 @@ export default class FeedScreen extends React.Component {
         //     DeviceEventEmitter.emit('reloading', false);
         // });
 
-        firebase.firestore().collection("Games").get().then(function (f) {
-            f.forEach(function (doc) {
-                // doc.data() is never undefined for query doc snapshots
-                const game = doc.data()
-                game.img.get().then(snap => {
-                    game.image = snap.data()
-                });
-                console.log(doc.id, " => ", game);
-                DeviceEventEmitter.emit('reloading', false);
-            });
-        });
-        getUser().then(p => {
-            console.log("p: ", JSON.parse(p));
-        });
+        //firebase.firestore().collection("Games").get().then(function (f) {
+        //    f.forEach(function (doc) {
+        //        // doc.data() is never undefined for query doc snapshots
+        //        const game = doc.data()
+        //        game.img.get().then(snap => {
+        //            game.image = snap.data()
+        //        });
+        //        console.log(doc.id, " => ", game);
+        //        DeviceEventEmitter.emit('reloading', false);
+        //    });
+        //});
+        //getUser().then(p => {
+        //    console.log("p: ", JSON.parse(p));
+        //});
 
     }
     componentWillUnmount() {

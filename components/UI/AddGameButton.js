@@ -7,7 +7,7 @@ import {
     Dimensions,
     Image
 } from 'react-native';
-import * as firebase from 'firebase';
+//import * as firebase from 'firebase';
 import TabBarIcon from '../UI/TabBarIcon';
 import { updateData } from '../services/baseService';
 

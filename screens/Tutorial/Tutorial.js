@@ -7,8 +7,7 @@ import {
     View,
     DeviceEventEmitter
 } from 'react-native';
-import * as firebase from 'firebase';
-import { Icon } from 'expo';
+import { FontAwesome } from '@expo/vector-icons';
 import Swiper from 'react-native-swiper';
 
 export default class Tutorial extends React.Component {
@@ -21,17 +20,17 @@ export default class Tutorial extends React.Component {
 
     _doneTutorial = () => {
 
-        var user = firebase.auth().currentUser;
+        //var user = firebase.auth().currentUser;
 
-        var newuser = {
-            uid: user.uid,
-            photoURL: user.photoURL,
-            displayName: user.displayName,
-            email: user.email,
-            flagtutorial: true
-        };
+        //var newuser = {
+        //    uid: user.uid,
+        //    photoURL: user.photoURL,
+        //    displayName: user.displayName,
+        //    email: user.email,
+        //    flagtutorial: true
+        //};
 
-        DeviceEventEmitter.emit('updateUser', { user: newuser });
+        //DeviceEventEmitter.emit('updateUser', { user: newuser });
     };
     render() {
         return (
@@ -41,12 +40,12 @@ export default class Tutorial extends React.Component {
                 showsButtons={true}
                 dot={<View style={styles.dotStyle} />}
                 activeDot={<View style={styles.dotActiveStyle} />}
-                nextButton={<Icon.FontAwesome
+                nextButton={<FontAwesome
                     name='chevron-right'
                     size={40}
                     color='#FFF'
                 />}
-                prevButton={<Icon.FontAwesome
+                prevButton={<FontAwesome
                     name='chevron-left'
                     size={40}
                     color='#FFF'

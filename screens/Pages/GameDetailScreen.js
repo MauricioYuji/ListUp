@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import * as firebase from 'firebase';
+//import * as firebase from 'firebase';
 import {
     Image,
     ScrollView,
@@ -53,19 +53,19 @@ export default class GameDetailScreen extends React.Component {
         var _self = this;
 
 
-        firebase.database().ref('/Games/' + this.state.key).on('value', function (snapshot) {
-            var obj = {};
-            obj[snapshot.key] = snapshot.val();
-            structureGames(obj).then(r => {
+        //firebase.database().ref('/Games/' + this.state.key).on('value', function (snapshot) {
+        //    var obj = {};
+        //    obj[snapshot.key] = snapshot.val();
+        //    structureGames(obj).then(r => {
 
-                var game = null;
-                for (var item in r) {
-                    var game = r[item];
-                }
-                _self.setState({ loaded: true, game: game, mounted: true });
-                return true;
-            }).catch(err => console.log('There was an error:' + err));
-        });
+        //        var game = null;
+        //        for (var item in r) {
+        //            var game = r[item];
+        //        }
+        //        _self.setState({ loaded: true, game: game, mounted: true });
+        //        return true;
+        //    }).catch(err => console.log('There was an error:' + err));
+        //});
     }
     componentWillUnmount() {
         this.setState({ mounted: false });

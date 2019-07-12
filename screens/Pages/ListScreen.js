@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import * as firebase from 'firebase';
+//import * as firebase from 'firebase';
 import {
     ScrollView,
     StyleSheet,
@@ -108,27 +108,27 @@ export default class ListScreen extends React.Component {
 
     loadData = (key) => {
         var _self = this;
-        var user = firebase.auth().currentUser;
+        //var user = firebase.auth().currentUser;
 
-        if (key == "") {
-            key = this.state.key;
-        }
-        firebase.database().ref('/userLists/' + user.uid + '/' + key).on('value', function (snapshot) {
-            var obj = {};
-            var list = null;
-            obj[snapshot.key] = snapshot.val();
-            structureList(obj).then(r => {
-                for (var item in r) {
-                    list = r[item];
-                }
-                _self.setState({ page: 0, list: list, listend: false, loading: false, mounted: true, key: key },
-                    () => {
-                        DeviceEventEmitter.emit('reloading', false);
-                    }
-                );
-                return true;
-            }).catch(err => console.log('There was an error:' + err));
-        });
+        //if (key == "") {
+        //    key = this.state.key;
+        //}
+        //firebase.database().ref('/userLists/' + user.uid + '/' + key).on('value', function (snapshot) {
+        //    var obj = {};
+        //    var list = null;
+        //    obj[snapshot.key] = snapshot.val();
+        //    structureList(obj).then(r => {
+        //        for (var item in r) {
+        //            list = r[item];
+        //        }
+        //        _self.setState({ page: 0, list: list, listend: false, loading: false, mounted: true, key: key },
+        //            () => {
+        //                DeviceEventEmitter.emit('reloading', false);
+        //            }
+        //        );
+        //        return true;
+        //    }).catch(err => console.log('There was an error:' + err));
+        //});
     }
     arrayRemove(arr, value) {
         return arr.filter(function (el) {
@@ -230,12 +230,12 @@ export default class ListScreen extends React.Component {
                 status: list.status,
                 limit: list.limit
             };
-            var user = firebase.auth().currentUser;
-            updateData('userLists/' + user.uid + '/' + list.key, obj)
-                .then((resp) => {
-                    _self.setState({ modalVisible: false });
-                    _self.loadData("");
-                });
+            //var user = firebase.auth().currentUser;
+            //updateData('userLists/' + user.uid + '/' + list.key, obj)
+            //    .then((resp) => {
+            //        _self.setState({ modalVisible: false });
+            //        _self.loadData("");
+            //    });
         }
     }
     closeModal = () => {

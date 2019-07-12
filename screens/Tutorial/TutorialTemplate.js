@@ -6,8 +6,8 @@ import {
     TouchableOpacity,
     DeviceEventEmitter
 } from 'react-native';
-import * as firebase from 'firebase';
-import Tutorial from '../../screens/Tutorial/Tutorial';
+//import * as firebase from 'firebase';
+import Tutorial from '../Tutorial/Tutorial';
 
 export default class TutorialTemplate extends React.Component {
     static navigationOptions = {
@@ -19,17 +19,17 @@ export default class TutorialTemplate extends React.Component {
 
     _doneTutorial = () => {
 
-        var user = firebase.auth().currentUser;
+        //var user = firebase.auth().currentUser;
 
-        var newuser = {
-            uid: user.uid,
-            photoURL: user.photoURL,
-            displayName: user.displayName,
-            email: user.email,
-            flagtutorial: true
-        };
+        //var newuser = {
+        //    uid: user.uid,
+        //    photoURL: user.photoURL,
+        //    displayName: user.displayName,
+        //    email: user.email,
+        //    flagtutorial: true
+        //};
 
-        DeviceEventEmitter.emit('updateUser', { user: newuser });
+        //DeviceEventEmitter.emit('updateUser', { user: newuser });
     };
     render() {
         return (

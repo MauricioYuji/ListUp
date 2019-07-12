@@ -5,11 +5,24 @@ npm-debug.*
 *.p12
 *.key
 *.mobileprovision
+*.orig.*
+web-build/
+web-report/
 
-\.vs/ListUP/v15/\.suo
+\.vs/ExpoApp/v16/
 
-\.vs/slnx\.sqlite
+\.vs/
 
-\.vs/VSWorkspaceState\.json
+\.vscode/
 
-dist/
+__tests__/__snapshots__/App-test\.js\.snap
+
+__tests__/App-test\.js
+
+\.expo-shared/assets\.json
+
+\.watchmanconfig
+
+android/\.expo/packager-info\.json
+
+android/\.expo/settings\.json

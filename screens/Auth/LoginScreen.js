@@ -2,7 +2,7 @@
 import { StyleSheet, Text, View, TextInput, Image, TouchableOpacity, ActivityIndicator, DeviceEventEmitter } from 'react-native';
 import { signInWithFacebook } from '../../components/services/facebookAuth';
 import { signIn, storeUser } from '../../components/services/AuthService';
-import * as firebase from 'firebase';
+//import * as firebase from 'firebase';
 import TabBarIcon from '../../components/UI/TabBarIcon';
 
 export default class LoginScreen extends React.Component {
@@ -32,8 +32,10 @@ export default class LoginScreen extends React.Component {
         const { email, password } = this.state;
         const _self = this;
         _self.setState({ loading: 'login', errorMessage: null, emailSend: false, feedback: null });
-
+        //console.log("LOGIN");
         signIn(email, password).then(p => {
+            console.log("RETORNO LOGIN: ", p);
+            console.log("OBJ: ", JSON.parse(p.data));
             if (p.success) {
                 DeviceEventEmitter.emit('setUser', p.data);
                 _self.setState({ errorMessage: null, loading: null });
@@ -43,35 +45,11 @@ export default class LoginScreen extends React.Component {
         });
 
 
-        //firebase.auth().signOut().then(function () {
-        //    firebase.auth().signInWithEmailAndPassword(email, password)
-        //        .then((data) => {
-        //            var user = firebase.auth().currentUser;
-        //            console.log("user: ", user);
-        //            if (user.emailVerified) {
-        //                _self.setState({ errorMessage: null, loading: null });
-        //            } else {
-
-
-        //                _self.setState({ errorMessage: 'Verifique seu email e confirme sua conta para poder entrar.', loading: null, emailSend: true, feedback: null });
-        //            }
-        //        })
-        //        .catch(() => {
-        //            _self.setState({ errorMessage: 'Usuário ou senha inválidos!', loading: null, feedback: null });
-        //        });
-        //}, function (error) {
-        //});
-
 
     }
     sendEmail() {
         var _self = this;
         _self.setState({ errorMessage: null, loading: null, emailSend: false });
-        var user = firebase.auth().currentUser;
-        user.sendEmailVerification().then(function () {
-            _self.setState({ feedback: 'Email enviado com sucesso.' });
-        }).catch(function (error) {
-        });
     }
     render() {
         const loadingButton = this.state.loading;
